@@ -1,7 +1,22 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_1 = require("vscode-languageserver/node");
 const vscode_languageserver_textdocument_1 = require("vscode-languageserver-textdocument");
+const source_json_1 = __importDefault(require("../docs/source.json"));
+const autocomplete_labels = source_json_1.default.map(x => {
+    let i = 0;
+    return x.map(y => {
+        return {
+            label: y.label,
+            labelDetails: { detail: ` (${y.meta})` },
+            kind: node_1.CompletionItemKind.Text,
+            data: i++
+        };
+    });
+});
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = (0, node_1.createConnection)(node_1.ProposedFeatures.all);
@@ -10,6 +25,9 @@ let documents = new node_1.TextDocuments(vscode_languageserver_textdocument_1.Te
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
 let hasDiagnosticRelatedInformationCapability = false;
+let source_version = 1;
+// Use an enum for this in the future to support the variants
+const valid_source_versions = [1, 2, 3, 4];
 connection.onInitialize((params) => {
     let capabilities = params.capabilities;
     // Does the client support the `workspace/configuration` request?
@@ -80,6 +98,17 @@ function getDocumentSettings(resource) {
     }
     return result;
 }
+// A simple utility to extract the version from the first lines of the document
+function extractVersion(content) {
+    const match = content.match(/\/\/\s*source\s*(\d+)/);
+    return match && valid_source_versions.includes(Number(match[1])) ? Number(match[1]) : 1; // Default to source 1 if no version is found or not a valid version
+}
+// Handler for when the document is opened
+documents.onDidOpen((change) => {
+    const content = change.document.getText();
+    const version = extractVersion(content);
+    source_version = version;
+});
 // Only keep settings for open documents
 documents.onDidClose(e => {
     documentSettings.delete(e.document.uri);
@@ -87,6 +116,9 @@ documents.onDidClose(e => {
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
+    const content = change.document.getText();
+    const version = extractVersion(content);
+    source_version = version;
     validateTextDocument(change.document);
 });
 async function validateTextDocument(textDocument) {
@@ -116,14 +148,7 @@ async function validateTextDocument(textDocument) {
                         uri: textDocument.uri,
                         range: Object.assign({}, diagnostic.range)
                     },
-                    message: 'Spelling matters'
-                },
-                {
-                    location: {
-                        uri: textDocument.uri,
-                        range: Object.assign({}, diagnostic.range)
-                    },
-                    message: 'Particularly for names'
+                    message: source_version + ''
                 }
             ];
         }
@@ -141,30 +166,17 @@ connection.onCompletion((_textDocumentPosition) => {
     // The pass parameter contains the position of the text document in
     // which code complete got requested. For the example we ignore this
     // info and always provide the same completion items.
-    return [
-        {
-            label: 'TypeScript',
-            kind: node_1.CompletionItemKind.Text,
-            data: 1
-        },
-        {
-            label: 'JavaScript',
-            kind: node_1.CompletionItemKind.Text,
-            data: 2
-        }
-    ];
+    return autocomplete_labels[source_version - 1];
 });
 // This handler resolves additional information for the item selected in
 // the completion list.
 connection.onCompletionResolve((item) => {
-    if (item.data === 1) {
-        item.detail = 'TypeScript details';
-        item.documentation = 'TypeScript documentation';
-    }
-    else if (item.data === 2) {
-        item.detail = 'JavaScript details';
-        item.documentation = 'JavaScript documentation';
-    }
+    const doc = source_json_1.default[source_version - 1][item.data];
+    item.detail = doc.title;
+    item.documentation = {
+        kind: node_1.MarkupKind.Markdown,
+        value: doc.description
+    };
     return item;
 });
 // Make the text document manager listen on the connection
