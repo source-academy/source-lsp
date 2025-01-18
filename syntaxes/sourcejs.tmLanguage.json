@@ -74,14 +74,6 @@
           "match": "(\\+|\\-|\\*|\\/|%|===|!==|>|<|>=|<=|&&|\\|\\||!|=|=>)"
         }
       ]
-    },
-    "function-names": {
-      "patterns": [
-        {
-          "name": "entity.name.function.sourcejs",
-          "match": "\\bfunction\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\b"
-        }
-      ]
     }
   },
 	"scopeName": "source.sourcejs"
