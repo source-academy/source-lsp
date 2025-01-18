@@ -53,7 +53,13 @@
 					"description": "Traces the communication between VS Code and the language server."
 				}
 			}
-		}
+		},
+    "commands": [
+      {
+        "command": "sourcejs.setLanguageVersion",
+        "title": "Sourcejs: Set Source Version Used"
+      }
+    ]
   },
   "dependencies": {
     "vscode-languageserver": "^9.0.1"

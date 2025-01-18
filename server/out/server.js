@@ -98,16 +98,12 @@ function getDocumentSettings(resource) {
     }
     return result;
 }
-// A simple utility to extract the version from the first lines of the document
-function extractVersion(content) {
-    const match = content.match(/\/\/\s*source\s*(\d+)/);
-    return match && valid_source_versions.includes(Number(match[1])) ? Number(match[1]) : 1; // Default to source 1 if no version is found or not a valid version
-}
-// Handler for when the document is opened
-documents.onDidOpen((change) => {
-    const content = change.document.getText();
-    const version = extractVersion(content);
-    source_version = version;
+const uri_to_version_map = new Map();
+// Custom request to set the language version
+connection.onRequest("setLanguageVersion", (params) => {
+    source_version = params.version;
+    connection.console.log(`Set language version to ${params.version}`);
+    return { success: true };
 });
 // Only keep settings for open documents
 documents.onDidClose(e => {
@@ -117,8 +113,6 @@ documents.onDidClose(e => {
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
     const content = change.document.getText();
-    const version = extractVersion(content);
-    source_version = version;
     validateTextDocument(change.document);
 });
 async function validateTextDocument(textDocument) {

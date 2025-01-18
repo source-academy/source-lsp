@@ -136,19 +136,15 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 	return result;
 }
 
-// A simple utility to extract the version from the first lines of the document
-function extractVersion(content: string): number {
-	const match = content.match(/\/\/\s*source\s*(\d+)/);
-	return match && valid_source_versions.includes(Number(match[1])) ? Number(match[1]) : 1;  // Default to source 1 if no version is found or not a valid version
-}
 
-// Handler for when the document is opened
-documents.onDidOpen((change) => {
-	const content = change.document.getText();
-	const version = extractVersion(content);
+const uri_to_version_map = new Map<string, number>();
+// Custom request to set the language version
+connection.onRequest("setLanguageVersion", (params: {version: number }) => {
+	source_version = params.version;
+	connection.console.log(`Set language version to ${params.version}`);
+	return { success: true };
+  });
 
-	source_version = version;
-});
 
 // Only keep settings for open documents
 documents.onDidClose(e => {
@@ -159,9 +155,6 @@ documents.onDidClose(e => {
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
 	const content = change.document.getText();
-	const version = extractVersion(content);
-
-	source_version = version;
 	validateTextDocument(change.document);
 });
 

@@ -13,6 +13,11 @@ import {
 	TransportKind
 } from 'vscode-languageclient/node';
 
+import {
+	commands,
+	window
+} from 'vscode'
+
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
@@ -51,7 +56,35 @@ export function activate(context: ExtensionContext) {
 
 	// Start the client. This will also launch the server
 	client.start();
+
+	context.subscriptions.push(
+		commands.registerCommand("sourcejs.setLanguageVersion", async () => {
+			const versions = ["Source 1", "Source 2", "Source 3", "Source 4"]
+			const selectedVersion = await window.showQuickPick(versions, {
+				placeHolder: "Select the language version",
+			});
+		
+			if (selectedVersion) {
+				await setLanguageVersion(versions.indexOf(selectedVersion)+1);
+			}
+
+		})
+	)
 }
+
+// Function to send the version to the server
+async function setLanguageVersion(version: number) {
+	if (!client) {
+	  window.showErrorMessage("Language server is not running.");
+	  return;
+	}
+	try {
+	  const response = await client.sendRequest("setLanguageVersion", { version });
+	  window.showInformationMessage(`Language version set to ${version}`);
+	} catch (error) {
+	  window.showErrorMessage(`Failed to set language version: ${error}`);
+	}
+  }
 
 export function deactivate(): Thenable<void> | undefined {
 	if (!client) {
