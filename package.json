@@ -1,0 +1,25 @@
+{
+  "name": "source-lsp",
+  "displayName": "Source-LSP",
+  "description": "lsp server for source",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "sourcejs",
+      "aliases": ["Source", "sourcejs"],
+      "extensions": [".sourcejs"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "sourcejs",
+      "scopeName": "source.sourcejs",
+      "path": "./syntaxes/sourcejs.tmLanguage.json"
+    }]
+  }
+}
