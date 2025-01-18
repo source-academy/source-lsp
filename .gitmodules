@@ -1,0 +1,3 @@
+[submodule "js-slang"]
+	path = js-slang
+	url = https://github.com/source-academy/js-slang
