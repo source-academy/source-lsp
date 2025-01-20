@@ -11,7 +11,8 @@ import {
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
 	InitializeResult,
-	MarkupKind
+	MarkupKind,
+	InsertTextFormat
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -224,6 +225,12 @@ connection.onCompletionResolve(
 			kind: MarkupKind.Markdown,
 			value: doc.description
 		};
+		if (doc.meta === "func") {
+			item.insertText = `${item.label}(${doc.parameters?.map((x, i) => '${' + (i+1) + ':' + x + '}')})`;
+			item.insertTextFormat = InsertTextFormat.Snippet;
+		}
+
+		//item.insertText = item.label + '(${1:test1}, ${2:test2})';
 		return item;
 	}
 );

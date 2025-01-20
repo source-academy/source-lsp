@@ -171,6 +171,11 @@ connection.onCompletionResolve((item) => {
         kind: node_1.MarkupKind.Markdown,
         value: doc.description
     };
+    if (doc.meta === "func") {
+        item.insertText = `${item.label}(${doc.parameters?.map((x, i) => '${' + (i + 1) + ':' + x + '}')})`;
+        item.insertTextFormat = node_1.InsertTextFormat.Snippet;
+    }
+    //item.insertText = item.label + '(${1:test1}, ${2:test2})';
     return item;
 });
 // Make the text document manager listen on the connection

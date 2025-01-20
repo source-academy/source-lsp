@@ -1,6 +1,7 @@
 import sys
 import json
 from markdownify import markdownify as md
+import re
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
@@ -8,15 +9,32 @@ if __name__ == "__main__":
         exit()
 
     with open("source.json", "w") as f:
+        # one liner :)
         json.dump(
             [
                 [
-                    {
-                        "label": key,
-                        "title": val["title"],
-                        "description": md(val["description"])[1:-1],
-                        "meta": val["meta"],
-                    }
+                    [
+                        item := {
+                            "label": key,
+                            "title": val["title"],
+                            "description": md(val["description"])[1:-1],
+                            "meta": val["meta"],
+                        },
+                        item.update(
+                            {
+                                "parameters": params.split(",")
+                                if len(
+                                    params := re.findall(
+                                        r"\w+\(([^)]*)\)", val["title"]
+                                    )[0]
+                                )
+                                != 0
+                                else []
+                            }
+                        )
+                        if item["meta"] == "func"
+                        else 0,
+                    ][0]
                     for key, val in json.loads(open(i).read()).items()
                 ]
                 for i in sys.argv[1:]
