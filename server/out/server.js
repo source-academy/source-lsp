@@ -6,17 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const node_1 = require("vscode-languageserver/node");
 const vscode_languageserver_textdocument_1 = require("vscode-languageserver-textdocument");
 const source_json_1 = __importDefault(require("../docs/source.json"));
-const autocomplete_labels = source_json_1.default.map(x => {
-    let i = 0;
-    return x.map(y => {
-        return {
-            label: y.label,
-            labelDetails: { detail: ` (${y.meta})` },
-            kind: node_1.CompletionItemKind.Text,
-            data: i++
-        };
-    });
-});
+const autocomplete_labels = source_json_1.default.map(x => x.map((y, i) => {
+    return {
+        label: y.label,
+        labelDetails: { detail: ` (${y.meta})` },
+        kind: node_1.CompletionItemKind.Text,
+        data: i
+    };
+}));
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = (0, node_1.createConnection)(node_1.ProposedFeatures.all);
@@ -172,7 +169,7 @@ connection.onCompletionResolve((item) => {
         value: doc.description
     };
     if (doc.meta === "func") {
-        item.insertText = `${item.label}(${doc.parameters?.map((x, i) => '${' + (i + 1) + ':' + x + '}')})`;
+        item.insertText = `${item.label}(${doc.parameters})`;
         item.insertTextFormat = node_1.InsertTextFormat.Snippet;
     }
     //item.insertText = item.label + '(${1:test1}, ${2:test2})';

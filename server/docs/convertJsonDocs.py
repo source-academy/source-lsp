@@ -8,6 +8,8 @@ if __name__ == "__main__":
         print("usage: python3 convertJsonDocs.py file1.json file2.json ...")
         exit()
 
+    patches = json.loads(open("param_patches.json").read())
+
     with open("source.json", "w") as f:
         # one liner :)
         json.dump(
@@ -22,7 +24,14 @@ if __name__ == "__main__":
                         },
                         item.update(
                             {
-                                "parameters": params.split(",")
+                                "parameters": (
+                                    patches[key]
+                                    if key in patches
+                                    else [
+                                        f"${{{i+1}:{v.strip()}}}"
+                                        for i, v in enumerate(params.split(","))
+                                    ]
+                                )
                                 if len(
                                     params := re.findall(
                                         r"\w+\(([^)]*)\)", val["title"]

@@ -19,17 +19,15 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 
 import source from '../docs/source.json'
 
-const autocomplete_labels = source.map(x => {
-	let i = 0;
-	return x.map(y => {
+const autocomplete_labels = source.map(x => x.map((y, i) => {
 		return {
 			label: y.label,
 			labelDetails: {detail: ` (${y.meta})`},
 			kind: CompletionItemKind.Text, 
-			data: i++
+			data: i
 		}
-	});
-});
+	})
+);
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = createConnection(ProposedFeatures.all);
@@ -226,7 +224,7 @@ connection.onCompletionResolve(
 			value: doc.description
 		};
 		if (doc.meta === "func") {
-			item.insertText = `${item.label}(${doc.parameters?.map((x, i) => '${' + (i+1) + ':' + x + '}')})`;
+			item.insertText = `${item.label}(${doc.parameters})`;
 			item.insertTextFormat = InsertTextFormat.Snippet;
 		}
 
