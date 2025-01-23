@@ -43,7 +43,8 @@ export function activate(context: ExtensionContext) {
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
-		}
+		},
+		traceOutputChannel: window.createOutputChannel("Your Language Server Trace")
 	};
 
 	// Create the language client and start the client.
@@ -65,7 +66,7 @@ export function activate(context: ExtensionContext) {
 			});
 		
 			if (selectedVersion) {
-				await setLanguageVersion(versions.indexOf(selectedVersion)+1);
+				await setLanguageVersion(selectedVersion);
 			}
 
 		})
@@ -73,7 +74,7 @@ export function activate(context: ExtensionContext) {
 }
 
 // Function to send the version to the server
-async function setLanguageVersion(version: number) {
+async function setLanguageVersion(version: string) {
 	if (!client) {
 	  window.showErrorMessage("Language server is not running.");
 	  return;

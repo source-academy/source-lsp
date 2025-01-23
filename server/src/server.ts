@@ -12,12 +12,18 @@ import {
 	TextDocumentSyncKind,
 	InitializeResult,
 	MarkupKind,
-	InsertTextFormat
+	InsertTextFormat,
+	Range
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
 import source from '../docs/source.json'
+
+import { findDeclaration, createContext } from 'js-slang'
+import { Chapter, Variant } from 'js-slang/dist/types'
+import { looseParse } from "js-slang/dist/parser/utils"
+import { findDeclarationNode, findIdentifierNode } from "js-slang/dist/finder"
 
 const autocomplete_labels = source.map(x => x.map((y, i) => {
 		return {
@@ -28,6 +34,14 @@ const autocomplete_labels = source.map(x => x.map((y, i) => {
 		}
 	})
 );
+
+const chapter_names = {
+	"Source 1": Chapter.SOURCE_1,
+	"Source 2": Chapter.SOURCE_2,
+	"Source 3": Chapter.SOURCE_3,
+	"Source 4": Chapter.SOURCE_4
+}
+
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = createConnection(ProposedFeatures.all);
@@ -39,8 +53,6 @@ let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
 let hasDiagnosticRelatedInformationCapability: boolean = false;
 let source_version = 1;
-// Use an enum for this in the future to support the variants
-const valid_source_versions = [1,2,3,4];
 
 connection.onInitialize((params: InitializeParams) => {
 	let capabilities = params.capabilities;
@@ -65,7 +77,8 @@ connection.onInitialize((params: InitializeParams) => {
 			// Tell the client that this server supports code completion.
 			completionProvider: {
 				resolveProvider: true
-			}
+			},
+			declarationProvider: true
 		}
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -136,10 +149,9 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 }
 
 
-const uri_to_version_map = new Map<string, number>();
 // Custom request to set the language version
-connection.onRequest("setLanguageVersion", (params: {version: number }) => {
-	source_version = params.version;
+connection.onRequest("setLanguageVersion", (params: {version: string }) => {
+	source_version = chapter_names[params.version as keyof typeof chapter_names];
 	connection.console.log(`Set language version to ${params.version}`);
 	return { success: true };
   });
@@ -153,7 +165,6 @@ documents.onDidClose(e => {
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
-	const content = change.document.getText();
 	validateTextDocument(change.document);
 });
 
@@ -228,10 +239,42 @@ connection.onCompletionResolve(
 			item.insertTextFormat = InsertTextFormat.Snippet;
 		}
 
-		//item.insertText = item.label + '(${1:test1}, ${2:test2})';
 		return item;
 	}
 );
+
+// This handler provides the declaration location of the name at the location provided
+connection.onDeclaration(async (params) => {
+	const document = documents.get(params.textDocument.uri);
+	if (!document) {
+	  return null;
+	}
+  
+	const text = document.getText();
+	const position = params.position;
+	const loc = {
+		line: position.line+1,
+		column: position.character
+	}
+	const context = createContext(source_version, Variant.DEFAULT);
+
+	const result = findDeclaration(text, context, loc);
+
+	if (result) {
+		const range: Range = {
+			start: { line: result.start.line-1, character: result.start.column},
+			end: { line: result.end.line-1, character: result.end.column }
+		} 
+
+		return {
+			uri: params.textDocument.uri,
+			range
+		};
+	}
+	else {
+		return null;
+	}
+});
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events

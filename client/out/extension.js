@@ -30,7 +30,8 @@ function activate(context) {
         synchronize: {
             // Notify the server about file changes to '.clientrc files contained in the workspace
             fileEvents: vscode_1.workspace.createFileSystemWatcher('**/.clientrc')
-        }
+        },
+        traceOutputChannel: vscode_2.window.createOutputChannel("Your Language Server Trace")
     };
     // Create the language client and start the client.
     client = new node_1.LanguageClient('languageServerExample', 'Language Server Example', serverOptions, clientOptions);
@@ -42,7 +43,7 @@ function activate(context) {
             placeHolder: "Select the language version",
         });
         if (selectedVersion) {
-            await setLanguageVersion(versions.indexOf(selectedVersion) + 1);
+            await setLanguageVersion(selectedVersion);
         }
     }));
 }

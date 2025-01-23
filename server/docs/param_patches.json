@@ -1,5 +1,9 @@
 {
-    "accumulate": ["${1:(x, y) => }", "${2:initial}", "${3:xs}"],
+    "accumulate": [
+        "${1:(x, y) => }",
+        "${2:initial}",
+        "${3:xs}"
+    ],
     "build_list": [
         "${1:x => }",
         "${2:n}"
