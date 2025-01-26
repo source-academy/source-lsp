@@ -28,6 +28,8 @@ function find_trailhead(x, y) {
         num_trailheads = num_trailheads + find_trailhead(x, y + 1);
     }
 
+    
+
     return num_trailheads;
 }
 

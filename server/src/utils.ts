@@ -2,6 +2,7 @@ import { Node } from "js-slang/dist/types"
 import * as es from "estree";
 import { Range, SymbolKind } from "vscode-languageserver";
 import { DeclarationKind } from "js-slang/dist/name-extractor";
+import { ProgramSymbols } from "./types";
 
 function isNotNull<T>(x: T): x is Exclude<T, null> {
   // This function exists to appease the mighty typescript type checker
@@ -109,4 +110,49 @@ export function mapDeclarationKindToSymbolKind(kind: DeclarationKind): SymbolKin
     default:
       return SymbolKind.Namespace;
   }
+}
+
+// The getNames function in js-slang has some issues, firstly it only get the names within a given scope, and it doesnt return the location of the name
+// This implementation doesn't care where the cursor is, and grabs the name of all variables and functions
+// @param prog Root node of the program, generated using looseParse
+// @returns ProgramSymbols[]
+export async function getAllNames(prog: Node): Promise<ProgramSymbols[]> {
+	const queue: Node[] = [prog];
+	const symbols: ProgramSymbols[] = [];
+
+	while (queue.length > 0) {
+		const node = queue.shift()!;
+
+		if (node.type == "VariableDeclaration") {
+			node.declarations.map(declaration => symbols.push({
+				// We know that x is a variable declarator
+				// @ts-ignore
+				name: declaration.id.name,
+				kind: node.kind === 'var' || node.kind === 'let' ? DeclarationKind.KIND_LET : DeclarationKind.KIND_CONST,
+				range: sourceLocToRange(declaration.loc!),
+				selectionRange: sourceLocToRange(declaration.id.loc!)
+			}));
+		}
+
+		if (node.type == "FunctionDeclaration") {
+			symbols.push({
+				name: node.id!.name,
+				kind: DeclarationKind.KIND_FUNCTION,
+				range: sourceLocToRange(node.loc!),
+				selectionRange: sourceLocToRange(node.id!.loc!)
+			});
+
+			node.params.map(param => symbols.push({
+				// @ts-ignore
+				name: param.name,
+				kind: DeclarationKind.KIND_PARAM,
+				range: sourceLocToRange(param.loc!),
+				selectionRange: sourceLocToRange(param.loc!)
+			}))
+		}
+
+		queue.push(...getNodeChildren(node))
+	}
+
+	return symbols;
 }

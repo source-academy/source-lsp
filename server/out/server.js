@@ -52,7 +52,8 @@ connection.onInitialize((params) => {
             },
             declarationProvider: true,
             documentHighlightProvider: true,
-            documentSymbolProvider: true
+            documentSymbolProvider: true,
+            renameProvider: true
         }
     };
     if (hasWorkspaceFolderCapability) {
@@ -163,19 +164,26 @@ connection.onDidChangeWatchedFiles(_change => {
     connection.console.log('We received a file change event');
 });
 // This handler provides the initial list of the completion items.
-connection.onCompletion((textDocumentPosition) => {
+connection.onCompletion(async (textDocumentPosition) => {
     const document = documents.get(textDocumentPosition.textDocument.uri);
-    if (!document) {
+    if (!document)
         return [];
-    }
     const text = document.getText();
     const pos = textDocumentPosition.position;
-    return autocomplete_labels[source_version - 1];
+    const [program, comments] = (0, utils_1.parseWithComments)(text);
+    const [names, _success] = await (0, name_extractor_1.getProgramNames)(program, comments, { line: pos.line + 1, column: pos.character });
+    const new_labels = names.map((name, idx) => ({
+        label: name.name,
+        labelDetails: { detail: ` (${name.meta})` },
+        kind: node_1.CompletionItemKind.Text,
+        data: autocomplete_labels[source_version - 1].length + idx
+    }));
+    return autocomplete_labels[source_version - 1].concat(new_labels);
 });
 // This handler resolves additional information for the item selected in
 // the completion list.
 connection.onCompletionResolve((item) => {
-    if (item.data < source_json_1.default[source_version].length) {
+    if (item.data < source_json_1.default[source_version - 1].length) {
         const doc = source_json_1.default[source_version - 1][item.data];
         item.detail = doc.title;
         item.documentation = {
@@ -192,9 +200,8 @@ connection.onCompletionResolve((item) => {
 // This handler provides the declaration location of the name at the location provided
 connection.onDeclaration(async (params) => {
     const document = documents.get(params.textDocument.uri);
-    if (!document) {
+    if (!document)
         return null;
-    }
     const text = document.getText();
     const position = params.position;
     const loc = {
@@ -216,9 +223,8 @@ connection.onDeclaration(async (params) => {
 });
 connection.onDocumentHighlight((params) => {
     const document = documents.get(params.textDocument.uri);
-    if (!document) {
+    if (!document)
         return null;
-    }
     const text = document.getText();
     const position = params.position;
     const occurences = (0, js_slang_1.getAllOccurrencesInScope)(text, (0, js_slang_1.createContext)(source_version, types_1.Variant.DEFAULT), { line: position.line + 1, column: position.character });
@@ -226,56 +232,32 @@ connection.onDocumentHighlight((params) => {
         range: (0, utils_2.sourceLocToRange)(loc)
     }));
 });
-// The getNames function in js-slang has some issues, firstly it only get the names within a given scope, and it doesnt return the location of the name
-// This implementation doesn't care where the cursor is, and grabs the name of all variables and functions
-// @param prog Root node of the program, generated using looseParse
-// @returns ProgramSymbols[]
-async function getAllNames(prog) {
-    const queue = [prog];
-    const symbols = [];
-    while (queue.length > 0) {
-        const node = queue.shift();
-        if (node.type == "VariableDeclaration") {
-            node.declarations.map(declaration => symbols.push({
-                // We know that x is a variable declarator
-                // @ts-ignore
-                name: declaration.id.name,
-                kind: node.kind === 'var' || node.kind === 'let' ? name_extractor_1.DeclarationKind.KIND_LET : name_extractor_1.DeclarationKind.KIND_CONST,
-                range: (0, utils_2.sourceLocToRange)(declaration.loc),
-                selectionRange: (0, utils_2.sourceLocToRange)(declaration.id.loc)
-            }));
-        }
-        if (node.type == "FunctionDeclaration") {
-            console.debug(node);
-            symbols.push({
-                name: node.id.name,
-                kind: name_extractor_1.DeclarationKind.KIND_FUNCTION,
-                range: (0, utils_2.sourceLocToRange)(node.loc),
-                selectionRange: (0, utils_2.sourceLocToRange)(node.id.loc)
-            });
-            node.params.map(param => symbols.push({
-                // @ts-ignore
-                name: param.name,
-                kind: name_extractor_1.DeclarationKind.KIND_PARAM,
-                range: (0, utils_2.sourceLocToRange)(param.loc),
-                selectionRange: (0, utils_2.sourceLocToRange)(param.loc)
-            }));
-        }
-        queue.push(...(0, utils_2.getNodeChildren)(node));
-    }
-    return symbols;
-}
 connection.onDocumentSymbol(async (params) => {
     const document = documents.get(params.textDocument.uri);
-    if (!document) {
+    if (!document)
         return null;
-    }
     const text = document.getText();
-    const names = await getAllNames((0, utils_1.looseParse)(text, (0, js_slang_1.createContext)(source_version, types_1.Variant.DEFAULT)));
+    const names = await (0, utils_2.getAllNames)((0, utils_1.looseParse)(text, (0, js_slang_1.createContext)(source_version, types_1.Variant.DEFAULT)));
     return names.map(name => ({
         ...name,
         kind: (0, utils_2.mapDeclarationKindToSymbolKind)(name.kind)
     }));
+});
+connection.onRenameRequest((params) => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document)
+        return null;
+    const text = document.getText();
+    const position = params.position;
+    const occurences = (0, js_slang_1.getAllOccurrencesInScope)(text, (0, js_slang_1.createContext)(source_version, types_1.Variant.DEFAULT), { line: position.line + 1, column: position.character });
+    if (occurences.length === 0) {
+        return null;
+    }
+    return {
+        changes: {
+            [params.textDocument.uri]: occurences.map(loc => node_1.TextEdit.replace((0, utils_2.sourceLocToRange)(loc), params.newName))
+        }
+    };
 });
 // Make the text document manager listen on the connection
 documents.listen(connection);

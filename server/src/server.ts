@@ -16,8 +16,9 @@ import {
 	Range,
 	DocumentHighlightParams,
 	DocumentSymbolParams,
-	DocumentSymbol,
-	SymbolKind
+	RenameParams,
+	WorkspaceEdit,
+	TextEdit
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -25,15 +26,13 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import source from '../docs/source.json'
 
 import { findDeclaration, createContext, getAllOccurrencesInScope } from 'js-slang'
-import { Chapter, Node, Variant } from 'js-slang/dist/types'
-import { looseParse } from 'js-slang/dist/parser/utils'
-import { ProgramSymbols } from './types';
-import { getNodeChildren, mapDeclarationKindToSymbolKind, sourceLocToRange } from './utils';
-import { DeclarationKind } from 'js-slang/dist/name-extractor';
-import { Identifier } from 'js-slang/dist/typeChecker/tsESTree'
+import { Chapter, Variant } from 'js-slang/dist/types'
+import { looseParse, parseWithComments } from 'js-slang/dist/parser/utils'
+import { getAllNames, mapDeclarationKindToSymbolKind, sourceLocToRange } from './utils';
+import { getProgramNames } from 'js-slang/dist/name-extractor';
 
 
-const autocomplete_labels = source.map(version => version.map((doc, idx) => {
+const autocomplete_labels = source.map(version => version.map((doc, idx): CompletionItem => {
 		return {
 			label: doc.label,
 			labelDetails: {detail: ` (${doc.meta})`},
@@ -88,7 +87,8 @@ connection.onInitialize((params: InitializeParams) => {
 			},
 			declarationProvider: true,
 			documentHighlightProvider: true,
-			documentSymbolProvider: true
+			documentSymbolProvider: true,
+			renameProvider: true
 		}
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -225,16 +225,24 @@ connection.onDidChangeWatchedFiles(_change => {
 
 // This handler provides the initial list of the completion items.
 connection.onCompletion(
-	(textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+	async (textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> => {
 		const document = documents.get(textDocumentPosition.textDocument.uri);
-		if (!document) {
-			return [];
-		}
+		if (!document) return [];
 
 		const text = document.getText();
 		const pos = textDocumentPosition.position;
+		const [program, comments] = parseWithComments(text)
 
-		return autocomplete_labels[source_version-1];
+		const [names, _success] = await getProgramNames(program, comments, {line: pos.line+1, column: pos.character});
+
+		const new_labels: CompletionItem[] = names.map((name, idx) => ({
+			label: name.name,
+			labelDetails: {detail: ` (${name.meta})`},
+			kind: CompletionItemKind.Text,
+			data: autocomplete_labels[source_version-1].length + idx
+		}))
+
+		return autocomplete_labels[source_version-1].concat(new_labels);
 	}
 );
 
@@ -242,7 +250,7 @@ connection.onCompletion(
 // the completion list.
 connection.onCompletionResolve(
 	(item: CompletionItem): CompletionItem => {
-		if (item.data < source[source_version].length) {
+		if (item.data < source[source_version-1].length) {
 			const doc = source[source_version-1][item.data];
 			item.detail = doc.title;
 			item.documentation = {
@@ -262,9 +270,7 @@ connection.onCompletionResolve(
 // This handler provides the declaration location of the name at the location provided
 connection.onDeclaration(async (params) => {
 	const document = documents.get(params.textDocument.uri);
-	if (!document) {
-	  return null;
-	}
+	if (!document) return null;
   
 	const text = document.getText();
 	const position = params.position;
@@ -291,9 +297,7 @@ connection.onDeclaration(async (params) => {
 
 connection.onDocumentHighlight((params: DocumentHighlightParams) => {
 	const document = documents.get(params.textDocument.uri);
-	if (!document) {
-		return null;
-	}
+	if (!document) return null;
 
 	const text = document.getText();
 	const position = params.position;
@@ -305,58 +309,9 @@ connection.onDocumentHighlight((params: DocumentHighlightParams) => {
 	}));
 })
 
-
-// The getNames function in js-slang has some issues, firstly it only get the names within a given scope, and it doesnt return the location of the name
-// This implementation doesn't care where the cursor is, and grabs the name of all variables and functions
-// @param prog Root node of the program, generated using looseParse
-// @returns ProgramSymbols[]
-async function getAllNames(prog: Node): Promise<ProgramSymbols[]> {
-	const queue: Node[] = [prog];
-	const symbols: ProgramSymbols[] = [];
-
-	while (queue.length > 0) {
-		const node = queue.shift()!;
-
-		if (node.type == "VariableDeclaration") {
-			node.declarations.map(declaration => symbols.push({
-				// We know that x is a variable declarator
-				// @ts-ignore
-				name: declaration.id.name,
-				kind: node.kind === 'var' || node.kind === 'let' ? DeclarationKind.KIND_LET : DeclarationKind.KIND_CONST,
-				range: sourceLocToRange(declaration.loc!),
-				selectionRange: sourceLocToRange(declaration.id.loc!)
-			}));
-		}
-
-		if (node.type == "FunctionDeclaration") {
-			console.debug(node);
-			symbols.push({
-				name: node.id!.name,
-				kind: DeclarationKind.KIND_FUNCTION,
-				range: sourceLocToRange(node.loc!),
-				selectionRange: sourceLocToRange(node.id!.loc!)
-			});
-
-			node.params.map(param => symbols.push({
-				// @ts-ignore
-				name: param.name,
-				kind: DeclarationKind.KIND_PARAM,
-				range: sourceLocToRange(param.loc!),
-				selectionRange: sourceLocToRange(param.loc!)
-			}))
-		}
-
-		queue.push(...getNodeChildren(node))
-	}
-
-	return symbols;
-}
-
 connection.onDocumentSymbol(async (params: DocumentSymbolParams) => {
 	const document = documents.get(params.textDocument.uri);
-	if (!document) {
-		return null;
-	}
+	if (!document) return null;
 
 	const text = document.getText();
 	const names = await getAllNames(looseParse(text, createContext(source_version, Variant.DEFAULT)));
@@ -365,6 +320,26 @@ connection.onDocumentSymbol(async (params: DocumentSymbolParams) => {
 		...name,
 		kind: mapDeclarationKindToSymbolKind(name.kind)
 	}));
+})
+
+connection.onRenameRequest((params: RenameParams): WorkspaceEdit | null => {
+	const document = documents.get(params.textDocument.uri);
+	if (!document) return null;
+
+	const text = document.getText();
+	const position = params.position;
+
+	const occurences = getAllOccurrencesInScope(text, createContext(source_version, Variant.DEFAULT), { line: position.line+1, column: position.character });
+
+	if (occurences.length === 0) {
+		return null;
+	}
+
+	return {
+		changes: {
+			[params.textDocument.uri]: occurences.map(loc => TextEdit.replace(sourceLocToRange(loc), params.newName))
+		}
+	};
 })
 
 

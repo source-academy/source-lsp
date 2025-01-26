@@ -4,6 +4,7 @@ exports.getNodeChildren = getNodeChildren;
 exports.getSubstrFromSouceLoc = getSubstrFromSouceLoc;
 exports.sourceLocToRange = sourceLocToRange;
 exports.mapDeclarationKindToSymbolKind = mapDeclarationKindToSymbolKind;
+exports.getAllNames = getAllNames;
 const vscode_languageserver_1 = require("vscode-languageserver");
 const name_extractor_1 = require("js-slang/dist/name-extractor");
 function isNotNull(x) {
@@ -106,5 +107,43 @@ function mapDeclarationKindToSymbolKind(kind) {
         default:
             return vscode_languageserver_1.SymbolKind.Namespace;
     }
+}
+// The getNames function in js-slang has some issues, firstly it only get the names within a given scope, and it doesnt return the location of the name
+// This implementation doesn't care where the cursor is, and grabs the name of all variables and functions
+// @param prog Root node of the program, generated using looseParse
+// @returns ProgramSymbols[]
+async function getAllNames(prog) {
+    const queue = [prog];
+    const symbols = [];
+    while (queue.length > 0) {
+        const node = queue.shift();
+        if (node.type == "VariableDeclaration") {
+            node.declarations.map(declaration => symbols.push({
+                // We know that x is a variable declarator
+                // @ts-ignore
+                name: declaration.id.name,
+                kind: node.kind === 'var' || node.kind === 'let' ? name_extractor_1.DeclarationKind.KIND_LET : name_extractor_1.DeclarationKind.KIND_CONST,
+                range: sourceLocToRange(declaration.loc),
+                selectionRange: sourceLocToRange(declaration.id.loc)
+            }));
+        }
+        if (node.type == "FunctionDeclaration") {
+            symbols.push({
+                name: node.id.name,
+                kind: name_extractor_1.DeclarationKind.KIND_FUNCTION,
+                range: sourceLocToRange(node.loc),
+                selectionRange: sourceLocToRange(node.id.loc)
+            });
+            node.params.map(param => symbols.push({
+                // @ts-ignore
+                name: param.name,
+                kind: name_extractor_1.DeclarationKind.KIND_PARAM,
+                range: sourceLocToRange(param.loc),
+                selectionRange: sourceLocToRange(param.loc)
+            }));
+        }
+        queue.push(...getNodeChildren(node));
+    }
+    return symbols;
 }
 //# sourceMappingURL=utils.js.map
