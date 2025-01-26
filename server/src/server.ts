@@ -13,17 +13,19 @@ import {
 	InitializeResult,
 	MarkupKind,
 	InsertTextFormat,
-	Range
+	Range,
+	DocumentHighlightParams,
+	DocumentHighlight
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
 import source from '../docs/source.json'
 
-import { findDeclaration, createContext } from 'js-slang'
+import { findDeclaration, createContext, getNames, getScope, getAllOccurrencesInScope } from 'js-slang'
 import { Chapter, Variant } from 'js-slang/dist/types'
-import { looseParse } from "js-slang/dist/parser/utils"
-import { findDeclarationNode, findIdentifierNode } from "js-slang/dist/finder"
+import { NameDeclaration } from 'js-slang/dist/name-extractor';
+
 
 const autocomplete_labels = source.map(x => x.map((y, i) => {
 		return {
@@ -41,6 +43,9 @@ const chapter_names = {
 	"Source 3": Chapter.SOURCE_3,
 	"Source 4": Chapter.SOURCE_4
 }
+
+// store symbols in code
+let symbols: NameDeclaration[];
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -78,7 +83,8 @@ connection.onInitialize((params: InitializeParams) => {
 			completionProvider: {
 				resolveProvider: true
 			},
-			declarationProvider: true
+			declarationProvider: true,
+			documentHighlightProvider: true
 		}
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -228,15 +234,17 @@ connection.onCompletion(
 // the completion list.
 connection.onCompletionResolve(
 	(item: CompletionItem): CompletionItem => {
-		const doc = source[source_version-1][item.data];
-		item.detail = doc.title;
-		item.documentation = {
-			kind: MarkupKind.Markdown,
-			value: doc.description
-		};
-		if (doc.meta === "func") {
-			item.insertText = `${item.label}(${doc.parameters})`;
-			item.insertTextFormat = InsertTextFormat.Snippet;
+		if (item.data < source[source_version].length) {
+			const doc = source[source_version-1][item.data];
+			item.detail = doc.title;
+			item.documentation = {
+				kind: MarkupKind.Markdown,
+				value: doc.description
+			};
+			if (doc.meta === "func") {
+				item.insertText = `${item.label}(${doc.parameters})`;
+				item.insertTextFormat = InsertTextFormat.Snippet;
+			}
 		}
 
 		return item;
@@ -275,6 +283,31 @@ connection.onDeclaration(async (params) => {
 		return null;
 	}
 });
+
+connection.onDocumentHighlight(async (params: DocumentHighlightParams) => {
+	const document = documents.get(params.textDocument.uri);
+	if (!document) {
+		return null;
+	}
+
+	const text = document.getText();
+	const position = params.position;
+
+	const occurences = getAllOccurrencesInScope(text, createContext(source_version, Variant.DEFAULT), { line: position.line+1, column: position.character });
+
+	return occurences.map(x => ({
+		range: {
+			start: {
+				line: x.start.line-1,
+				character: x.start.column
+			},
+			end: {
+				line: x.end.line-1,
+				character: x.end.column
+			}
+		}
+	}));
+})
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events
