@@ -15,24 +15,30 @@ import {
 	InsertTextFormat,
 	Range,
 	DocumentHighlightParams,
-	DocumentHighlight
+	DocumentSymbolParams,
+	DocumentSymbol,
+	SymbolKind
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
 import source from '../docs/source.json'
 
-import { findDeclaration, createContext, getNames, getScope, getAllOccurrencesInScope } from 'js-slang'
-import { Chapter, Variant } from 'js-slang/dist/types'
-import { NameDeclaration } from 'js-slang/dist/name-extractor';
+import { findDeclaration, createContext, getAllOccurrencesInScope } from 'js-slang'
+import { Chapter, Node, Variant } from 'js-slang/dist/types'
+import { looseParse } from 'js-slang/dist/parser/utils'
+import { ProgramSymbols } from './types';
+import { getNodeChildren, mapDeclarationKindToSymbolKind, sourceLocToRange } from './utils';
+import { DeclarationKind } from 'js-slang/dist/name-extractor';
+import { Identifier } from 'js-slang/dist/typeChecker/tsESTree'
 
 
-const autocomplete_labels = source.map(x => x.map((y, i) => {
+const autocomplete_labels = source.map(version => version.map((doc, idx) => {
 		return {
-			label: y.label,
-			labelDetails: {detail: ` (${y.meta})`},
+			label: doc.label,
+			labelDetails: {detail: ` (${doc.meta})`},
 			kind: CompletionItemKind.Text, 
-			data: i
+			data: idx
 		}
 	})
 );
@@ -43,9 +49,6 @@ const chapter_names = {
 	"Source 3": Chapter.SOURCE_3,
 	"Source 4": Chapter.SOURCE_4
 }
-
-// store symbols in code
-let symbols: NameDeclaration[];
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -84,7 +87,8 @@ connection.onInitialize((params: InitializeParams) => {
 				resolveProvider: true
 			},
 			declarationProvider: true,
-			documentHighlightProvider: true
+			documentHighlightProvider: true,
+			documentSymbolProvider: true
 		}
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -221,10 +225,14 @@ connection.onDidChangeWatchedFiles(_change => {
 
 // This handler provides the initial list of the completion items.
 connection.onCompletion(
-	(_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-		// The pass parameter contains the position of the text document in
-		// which code complete got requested. For the example we ignore this
-		// info and always provide the same completion items.
+	(textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+		const document = documents.get(textDocumentPosition.textDocument.uri);
+		if (!document) {
+			return [];
+		}
+
+		const text = document.getText();
+		const pos = textDocumentPosition.position;
 
 		return autocomplete_labels[source_version-1];
 	}
@@ -269,10 +277,7 @@ connection.onDeclaration(async (params) => {
 	const result = findDeclaration(text, context, loc);
 
 	if (result) {
-		const range: Range = {
-			start: { line: result.start.line-1, character: result.start.column},
-			end: { line: result.end.line-1, character: result.end.column }
-		} 
+		const range: Range = sourceLocToRange(result);
 
 		return {
 			uri: params.textDocument.uri,
@@ -284,7 +289,7 @@ connection.onDeclaration(async (params) => {
 	}
 });
 
-connection.onDocumentHighlight(async (params: DocumentHighlightParams) => {
+connection.onDocumentHighlight((params: DocumentHighlightParams) => {
 	const document = documents.get(params.textDocument.uri);
 	if (!document) {
 		return null;
@@ -295,22 +300,75 @@ connection.onDocumentHighlight(async (params: DocumentHighlightParams) => {
 
 	const occurences = getAllOccurrencesInScope(text, createContext(source_version, Variant.DEFAULT), { line: position.line+1, column: position.character });
 
-	return occurences.map(x => ({
-		range: {
-			start: {
-				line: x.start.line-1,
-				character: x.start.column
-			},
-			end: {
-				line: x.end.line-1,
-				character: x.end.column
-			}
-		}
+	return occurences.map(loc => ({
+		range: sourceLocToRange(loc)
 	}));
 })
 
+
+// The getNames function in js-slang has some issues, firstly it only get the names within a given scope, and it doesnt return the location of the name
+// This implementation doesn't care where the cursor is, and grabs the name of all variables and functions
+// @param prog Root node of the program, generated using looseParse
+// @returns ProgramSymbols[]
+async function getAllNames(prog: Node): Promise<ProgramSymbols[]> {
+	const queue: Node[] = [prog];
+	const symbols: ProgramSymbols[] = [];
+
+	while (queue.length > 0) {
+		const node = queue.shift()!;
+
+		if (node.type == "VariableDeclaration") {
+			node.declarations.map(declaration => symbols.push({
+				// We know that x is a variable declarator
+				// @ts-ignore
+				name: declaration.id.name,
+				kind: node.kind === 'var' || node.kind === 'let' ? DeclarationKind.KIND_LET : DeclarationKind.KIND_CONST,
+				range: sourceLocToRange(declaration.loc!),
+				selectionRange: sourceLocToRange(declaration.id.loc!)
+			}));
+		}
+
+		if (node.type == "FunctionDeclaration") {
+			console.debug(node);
+			symbols.push({
+				name: node.id!.name,
+				kind: DeclarationKind.KIND_FUNCTION,
+				range: sourceLocToRange(node.loc!),
+				selectionRange: sourceLocToRange(node.id!.loc!)
+			});
+
+			node.params.map(param => symbols.push({
+				// @ts-ignore
+				name: param.name,
+				kind: DeclarationKind.KIND_PARAM,
+				range: sourceLocToRange(param.loc!),
+				selectionRange: sourceLocToRange(param.loc!)
+			}))
+		}
+
+		queue.push(...getNodeChildren(node))
+	}
+
+	return symbols;
+}
+
+connection.onDocumentSymbol(async (params: DocumentSymbolParams) => {
+	const document = documents.get(params.textDocument.uri);
+	if (!document) {
+		return null;
+	}
+
+	const text = document.getText();
+	const names = await getAllNames(looseParse(text, createContext(source_version, Variant.DEFAULT)));
+	
+	return names.map(name => ({
+		...name,
+		kind: mapDeclarationKindToSymbolKind(name.kind)
+	}));
+})
+
+
 // Make the text document manager listen on the connection
-// for open, change and close text document events
 documents.listen(connection);
 
 // Listen on the connection

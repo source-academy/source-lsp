@@ -8,12 +8,15 @@ const vscode_languageserver_textdocument_1 = require("vscode-languageserver-text
 const source_json_1 = __importDefault(require("../docs/source.json"));
 const js_slang_1 = require("js-slang");
 const types_1 = require("js-slang/dist/types");
-const autocomplete_labels = source_json_1.default.map(x => x.map((y, i) => {
+const utils_1 = require("js-slang/dist/parser/utils");
+const utils_2 = require("./utils");
+const name_extractor_1 = require("js-slang/dist/name-extractor");
+const autocomplete_labels = source_json_1.default.map(version => version.map((doc, idx) => {
     return {
-        label: y.label,
-        labelDetails: { detail: ` (${y.meta})` },
+        label: doc.label,
+        labelDetails: { detail: ` (${doc.meta})` },
         kind: node_1.CompletionItemKind.Text,
-        data: i
+        data: idx
     };
 }));
 const chapter_names = {
@@ -22,8 +25,6 @@ const chapter_names = {
     "Source 3": types_1.Chapter.SOURCE_3,
     "Source 4": types_1.Chapter.SOURCE_4
 };
-// store symbols in code
-let symbols;
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = (0, node_1.createConnection)(node_1.ProposedFeatures.all);
@@ -50,7 +51,8 @@ connection.onInitialize((params) => {
                 resolveProvider: true
             },
             declarationProvider: true,
-            documentHighlightProvider: true
+            documentHighlightProvider: true,
+            documentSymbolProvider: true
         }
     };
     if (hasWorkspaceFolderCapability) {
@@ -161,10 +163,13 @@ connection.onDidChangeWatchedFiles(_change => {
     connection.console.log('We received a file change event');
 });
 // This handler provides the initial list of the completion items.
-connection.onCompletion((_textDocumentPosition) => {
-    // The pass parameter contains the position of the text document in
-    // which code complete got requested. For the example we ignore this
-    // info and always provide the same completion items.
+connection.onCompletion((textDocumentPosition) => {
+    const document = documents.get(textDocumentPosition.textDocument.uri);
+    if (!document) {
+        return [];
+    }
+    const text = document.getText();
+    const pos = textDocumentPosition.position;
     return autocomplete_labels[source_version - 1];
 });
 // This handler resolves additional information for the item selected in
@@ -199,10 +204,7 @@ connection.onDeclaration(async (params) => {
     const context = (0, js_slang_1.createContext)(source_version, types_1.Variant.DEFAULT);
     const result = (0, js_slang_1.findDeclaration)(text, context, loc);
     if (result) {
-        const range = {
-            start: { line: result.start.line - 1, character: result.start.column },
-            end: { line: result.end.line - 1, character: result.end.column }
-        };
+        const range = (0, utils_2.sourceLocToRange)(result);
         return {
             uri: params.textDocument.uri,
             range
@@ -212,7 +214,7 @@ connection.onDeclaration(async (params) => {
         return null;
     }
 });
-connection.onDocumentHighlight(async (params) => {
+connection.onDocumentHighlight((params) => {
     const document = documents.get(params.textDocument.uri);
     if (!document) {
         return null;
@@ -220,21 +222,62 @@ connection.onDocumentHighlight(async (params) => {
     const text = document.getText();
     const position = params.position;
     const occurences = (0, js_slang_1.getAllOccurrencesInScope)(text, (0, js_slang_1.createContext)(source_version, types_1.Variant.DEFAULT), { line: position.line + 1, column: position.character });
-    return occurences.map(x => ({
-        range: {
-            start: {
-                line: x.start.line - 1,
-                character: x.start.column
-            },
-            end: {
-                line: x.end.line - 1,
-                character: x.end.column
-            }
+    return occurences.map(loc => ({
+        range: (0, utils_2.sourceLocToRange)(loc)
+    }));
+});
+// The getNames function in js-slang has some issues, firstly it only get the names within a given scope, and it doesnt return the location of the name
+// This implementation doesn't care where the cursor is, and grabs the name of all variables and functions
+// @param prog Root node of the program, generated using looseParse
+// @returns ProgramSymbols[]
+async function getAllNames(prog) {
+    const queue = [prog];
+    const symbols = [];
+    while (queue.length > 0) {
+        const node = queue.shift();
+        if (node.type == "VariableDeclaration") {
+            node.declarations.map(declaration => symbols.push({
+                // We know that x is a variable declarator
+                // @ts-ignore
+                name: declaration.id.name,
+                kind: node.kind === 'var' || node.kind === 'let' ? name_extractor_1.DeclarationKind.KIND_LET : name_extractor_1.DeclarationKind.KIND_CONST,
+                range: (0, utils_2.sourceLocToRange)(declaration.loc),
+                selectionRange: (0, utils_2.sourceLocToRange)(declaration.id.loc)
+            }));
         }
+        if (node.type == "FunctionDeclaration") {
+            console.debug(node);
+            symbols.push({
+                name: node.id.name,
+                kind: name_extractor_1.DeclarationKind.KIND_FUNCTION,
+                range: (0, utils_2.sourceLocToRange)(node.loc),
+                selectionRange: (0, utils_2.sourceLocToRange)(node.id.loc)
+            });
+            node.params.map(param => symbols.push({
+                // @ts-ignore
+                name: param.name,
+                kind: name_extractor_1.DeclarationKind.KIND_PARAM,
+                range: (0, utils_2.sourceLocToRange)(param.loc),
+                selectionRange: (0, utils_2.sourceLocToRange)(param.loc)
+            }));
+        }
+        queue.push(...(0, utils_2.getNodeChildren)(node));
+    }
+    return symbols;
+}
+connection.onDocumentSymbol(async (params) => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document) {
+        return null;
+    }
+    const text = document.getText();
+    const names = await getAllNames((0, utils_1.looseParse)(text, (0, js_slang_1.createContext)(source_version, types_1.Variant.DEFAULT)));
+    return names.map(name => ({
+        ...name,
+        kind: (0, utils_2.mapDeclarationKindToSymbolKind)(name.kind)
     }));
 });
 // Make the text document manager listen on the connection
-// for open, change and close text document events
 documents.listen(connection);
 // Listen on the connection
 connection.listen();
