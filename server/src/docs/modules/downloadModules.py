@@ -17,7 +17,7 @@ for module_name in module_list:
             item := {
                 "label": k,
                 "meta": kind_to_meta_map[module[k]["kind"]],
-                "title": f"Imported from {module_name}",
+                "title": f"Auto-import from {module_name}",
                 "description": (
                     "#### "
                     + (

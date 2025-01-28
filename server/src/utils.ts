@@ -1,8 +1,8 @@
-import { Node } from "js-slang/dist/types"
+import { Chapter, Context, Node } from "js-slang/dist/types"
 import * as es from "estree";
-import { Range, SymbolKind } from "vscode-languageserver";
+import { CompletionItemKind, Range, SymbolKind } from "vscode-languageserver";
 import { DeclarationKind } from "js-slang/dist/name-extractor";
-import { ProgramSymbols } from "./types";
+import { DECLARATIONS, NodeToSymbol, ProgramSymbols } from "./types";
 
 function isNotNull<T>(x: T): x is Exclude<T, null> {
   // This function exists to appease the mighty typescript type checker
@@ -96,15 +96,16 @@ export function sourceLocToRange(loc: es.SourceLocation): Range {
   }
 }
 
-export function mapDeclarationKindToSymbolKind(kind: DeclarationKind): SymbolKind {
+export function mapDeclarationKindToSymbolKind(kind: DeclarationKind, context: Context): SymbolKind {
   switch (kind) {
     case DeclarationKind.KIND_IMPORT:
       return SymbolKind.Namespace;
     case DeclarationKind.KIND_FUNCTION:
       return SymbolKind.Function;
     case DeclarationKind.KIND_LET:
-    case DeclarationKind.KIND_PARAM:
       return SymbolKind.Variable;
+    case DeclarationKind.KIND_PARAM:
+      return context.chapter === Chapter.SOURCE_1 || context.chapter === Chapter.SOURCE_2 ? SymbolKind.Constant : SymbolKind.Variable;
     case DeclarationKind.KIND_CONST:
       return SymbolKind.Constant
     default:
@@ -112,47 +113,107 @@ export function mapDeclarationKindToSymbolKind(kind: DeclarationKind): SymbolKin
   }
 }
 
+export function mapMetaToCompletionItemKind(meta: string) {
+  switch (meta) {
+    case "const":
+      return CompletionItemKind.Constant;
+    case "let":
+      return CompletionItemKind.Variable;
+    case "import":
+      return CompletionItemKind.Module;
+    default:
+      return CompletionItemKind.Text;
+  }
+}
+
 // The getNames function in js-slang has some issues, firstly it only get the names within a given scope, and it doesnt return the location of the name
 // This implementation doesn't care where the cursor is, and grabs the name of all variables and functions
 // @param prog Root node of the program, generated using looseParse
 // @returns ProgramSymbols[]
-export async function getAllNames(prog: Node): Promise<ProgramSymbols[]> {
+export async function getAllNames<T>(prog: Node, ...nodeToSymbols: {type: string, callback: (node: Node) => T[]}[]): Promise<T[]> {
 	const queue: Node[] = [prog];
-	const symbols: ProgramSymbols[] = [];
+	let symbols: T[] = [];
 
 	while (queue.length > 0) {
 		const node = queue.shift()!;
 
-		if (node.type == "VariableDeclaration") {
-			node.declarations.map(declaration => symbols.push({
-				// We know that x is a variable declarator
-				// @ts-ignore
-				name: declaration.id.name,
-				kind: node.kind === 'var' || node.kind === 'let' ? DeclarationKind.KIND_LET : DeclarationKind.KIND_CONST,
-				range: sourceLocToRange(declaration.loc!),
-				selectionRange: sourceLocToRange(declaration.id.loc!)
-			}));
-		}
+    nodeToSymbols.forEach(x => {
+      if (node.type === x.type) {
+        symbols = symbols.concat(x.callback(node));
+      }
+    });
 
-		if (node.type == "FunctionDeclaration") {
-			symbols.push({
-				name: node.id!.name,
-				kind: DeclarationKind.KIND_FUNCTION,
-				range: sourceLocToRange(node.loc!),
-				selectionRange: sourceLocToRange(node.id!.loc!)
-			});
-
-			node.params.map(param => symbols.push({
-				// @ts-ignore
-				name: param.name,
-				kind: DeclarationKind.KIND_PARAM,
-				range: sourceLocToRange(param.loc!),
-				selectionRange: sourceLocToRange(param.loc!)
-			}))
-		}
-
-		queue.push(...getNodeChildren(node))
+		queue.push(...getNodeChildren(node));
 	}
 
 	return symbols;
+}
+
+function variableDeclarationToSymbol(node: Node): ProgramSymbols[] {
+  node = node as es.VariableDeclaration;
+  return node.declarations.map((declaration): ProgramSymbols => ({
+    name: (declaration.id as es.Identifier).name,
+    kind: node.kind === 'var' || node.kind === 'let' ? DeclarationKind.KIND_LET : DeclarationKind.KIND_CONST,
+    range: sourceLocToRange(declaration.loc!),
+    selectionRange: sourceLocToRange(declaration.id.loc!)
+  }));
+}
+
+function functionDeclarationToSymbol(node: Node): ProgramSymbols[] {
+  node = node as es.FunctionDeclaration;
+  const ret = node.params.map((param): ProgramSymbols => ({
+        name: (param as es.Identifier).name,
+				kind: DeclarationKind.KIND_PARAM,
+				range: sourceLocToRange(param.loc!),
+				selectionRange: sourceLocToRange(param.loc!)
+  }));
+  
+  ret.push({
+        name: node.id!.name,
+				kind: DeclarationKind.KIND_FUNCTION,
+				range: sourceLocToRange(node.loc!),
+				selectionRange: sourceLocToRange(node.id!.loc!)
+  });
+
+  return ret;
+}
+
+function importDeclarationToSymbol(node: Node): ProgramSymbols[] {
+  node = node as es.ImportDeclaration;
+
+  return node.specifiers.map((specifier): ProgramSymbols => ({
+    name: ((specifier as es.ImportSpecifier).imported as es.Identifier).name,
+    kind: DeclarationKind.KIND_IMPORT,
+    range: sourceLocToRange(node.loc!),
+    selectionRange: sourceLocToRange(specifier.loc!)
+  }))
+}
+
+export const VariableNodeToSymbol: NodeToSymbol = {
+  type: DECLARATIONS.VARIABLE,
+  callback: variableDeclarationToSymbol
+}
+
+export const FunctionNodeToSymbol: NodeToSymbol = {
+  type: DECLARATIONS.FUNCTION,
+  callback: functionDeclarationToSymbol
+}
+
+export const ImportNodeToSymbol: NodeToSymbol = {
+  type: DECLARATIONS.IMPORT,
+  callback: importDeclarationToSymbol
+}
+
+export function findExistingImportLine(code: string, moduleName: string): { line: number } | null {
+  const importRegex = `import\\s*{\\s*([^}]*)\\s*}\\s*from\\s*["']${moduleName}["'];`;
+  const lines = code.split("\n");
+
+  for (let i = 0; i < lines.length; i++) {
+      const match = lines[i].match(importRegex);
+      if (match) {
+          return { line: i };
+      }
+  }
+
+  return null; // No existing import for the module
 }

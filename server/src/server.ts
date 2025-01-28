@@ -27,17 +27,13 @@ import source from './docs/source.json'
 import modules from "./docs/modules/modules.json";
 
 import { findDeclaration, createContext, getAllOccurrencesInScope } from 'js-slang'
-import { Chapter, Variant } from 'js-slang/dist/types'
+import { Chapter, Node, Variant } from 'js-slang/dist/types'
 import { looseParse, parseWithComments } from 'js-slang/dist/parser/utils'
-import { getAllNames, mapDeclarationKindToSymbolKind, sourceLocToRange } from './utils';
-import { getProgramNames } from 'js-slang/dist/name-extractor';
+import { findExistingImportLine, FunctionNodeToSymbol, getAllNames, ImportNodeToSymbol, mapDeclarationKindToSymbolKind, mapMetaToCompletionItemKind, sourceLocToRange, VariableNodeToSymbol } from './utils';
+import { getProgramNames, DeclarationKind, NameDeclaration } from 'js-slang/dist/name-extractor';
+import { AUTOCOMPLETE_TYPES, CompletionItemData, DECLARATIONS, ImportedSymbols, ModuleSymbolSpecifier, ProgramSymbols } from './types';
 
-
-enum AUTOCOMPLETE_TYPES {
-	BUILTIN,
-	SYMBOL,
-	MODULE
-}
+import { ImportDeclaration, ImportSpecifier, Identifier } from "estree";
 
 const chapter_names = {
 	"Source 1": Chapter.SOURCE_1,
@@ -49,9 +45,15 @@ const chapter_names = {
 const autocomplete_labels = source.map(version => version.map((doc, idx): CompletionItem => {
 	return {
 		label: doc.label,
-		labelDetails: {detail: ` (${doc.meta})`},
-		kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function, 
-		data: [AUTOCOMPLETE_TYPES.BUILTIN, idx]
+		labelDetails: { detail: ` (${doc.meta})` },
+		detail: doc.title,
+		documentation: {
+			kind: MarkupKind.Markdown,
+			value: doc.description
+		},
+		kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
+		data: { type: AUTOCOMPLETE_TYPES.BUILTIN, idx: idx, parameters: doc.parameters} as CompletionItemData,
+		sortText: '' + AUTOCOMPLETE_TYPES.BUILTIN
 	}
 }));
 
@@ -63,14 +65,19 @@ for (const key in modules) {
 	module.forEach((doc, idx) => {
 		module_autocomplete.push({
 			label: doc.label,
-			labelDetails: {detail: ` (${doc.meta})`},
-			kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function, 
-			data: [AUTOCOMPLETE_TYPES.MODULE, idx, key]
+			labelDetails: { detail: ` (${doc.meta})` },
+			detail: doc.title,
+			documentation: {
+				kind: MarkupKind.Markdown,
+				value: doc.description
+			},
+			kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
+			// @ts-ignore
+			data: { type: AUTOCOMPLETE_TYPES.MODULE, idx: idx, module_name: key, parameters: doc.parameters } as CompletionItemData,
+			sortText: '' + AUTOCOMPLETE_TYPES.MODULE
 		})
 	})
 }
-
-console.debug(module_autocomplete);
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -82,7 +89,7 @@ let documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
 let hasDiagnosticRelatedInformationCapability: boolean = false;
-let source_version = 1;
+let context = createContext(Chapter.SOURCE_1, Variant.DEFAULT);
 
 connection.onInitialize((params: InitializeParams) => {
 	let capabilities = params.capabilities;
@@ -183,11 +190,11 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 
 
 // Custom request to set the language version
-connection.onRequest("setLanguageVersion", (params: {version: string }) => {
-	source_version = chapter_names[params.version as keyof typeof chapter_names];
+connection.onRequest("setLanguageVersion", (params: { version: string }) => {
+	context = createContext(chapter_names[params.version as keyof typeof chapter_names], Variant.DEFAULT);
 	connection.console.log(`Set language version to ${params.version}`);
 	return { success: true };
-  });
+});
 
 
 // Only keep settings for open documents
@@ -230,7 +237,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 						uri: textDocument.uri,
 						range: Object.assign({}, diagnostic.range)
 					},
-					message: source_version + ''
+					message: "test"
 				}
 			];
 		}
@@ -256,37 +263,60 @@ connection.onCompletion(
 		const pos = textDocumentPosition.position;
 		const [program, comments] = parseWithComments(text)
 
-		const [names, _success] = await getProgramNames(program, comments, {line: pos.line+1, column: pos.character});
+		// This implementation in js-slang only gets the program names thats in the scope of the cursor location
+		// However, one issue is that any imported names dont contain information of which module they are from
+		// along with other info like function parameters. So we remove the imported names and they are added back
+		// when we concat the module docs, and change their item.data.type to SYMBOL
+		const [names, _success] = await getProgramNames(program, comments, { line: pos.line + 1, column: pos.character });
 
-		const new_labels: CompletionItem[] = names.map((name, idx) => ({
+		const imported_names = new Map<string, Set<string>>();
+		(await getAllNames<ModuleSymbolSpecifier>(program, {type: DECLARATIONS.IMPORT, callback: (node: Node): ModuleSymbolSpecifier[] => {
+			node = node as ImportDeclaration
+			
+			return node.specifiers.map((specifier): ModuleSymbolSpecifier => ({
+				name: ((specifier as ImportSpecifier).imported as Identifier).name,
+				module_name: node.source.value as string
+			  }));
+		}})).forEach(el => {
+			if (imported_names.has(el.module_name)) {
+				imported_names.get(el.module_name)?.add(el.name);
+			}
+			else {
+				imported_names.set(el.module_name, new Set([el.name]));
+			}
+		});;
+
+		const labels: CompletionItem[] = names.filter((name: NameDeclaration) => 
+			name.meta !== "import"
+		).map((name, idx) => ({
 			label: name.name,
-			labelDetails: {detail: ` (${name.meta})`},
-			kind: CompletionItemKind.Text,
-			data: AUTOCOMPLETE_TYPES.SYMBOL
+			labelDetails: { detail: ` (${name.meta})` },
+			kind: mapMetaToCompletionItemKind(name.meta),
+			data: { type: AUTOCOMPLETE_TYPES.SYMBOL, idx: idx } as CompletionItemData,
+			sortText: '' + AUTOCOMPLETE_TYPES.SYMBOL
 		}))
 
-		const temp = autocomplete_labels[source_version-1].concat(module_autocomplete).concat(new_labels);
-		console.debug(temp);
-		return temp;
+		return autocomplete_labels[context.chapter - 1]
+			.concat(labels)
+			.concat(module_autocomplete.map((item: CompletionItem): CompletionItem => {
+				if (imported_names.get(item.data.module_name)?.has(item.label)) {
+					return {
+						...item,
+						detail: `Imported from ${item.data.module_name}`,
+						data: {type: AUTOCOMPLETE_TYPES.SYMBOL, ...item.data}
+					};
+				}
+				else return item;
+	}));
 	}
 );
 
 // This handler resolves additional information for the item selected in
 // the completion list.
-connection.onCompletionResolve(
-	(item: CompletionItem): CompletionItem => {
-		if (item.data[0] === AUTOCOMPLETE_TYPES.BUILTIN || item.data[0] === AUTOCOMPLETE_TYPES.MODULE) {
-			const doc = item.data[0] === AUTOCOMPLETE_TYPES.BUILTIN ? source[source_version-1][item.data[1]] : modules[item.data[2] as keyof typeof modules][item.data[1]];
-			item.detail = doc.title;
-			item.documentation = {
-				kind: MarkupKind.Markdown,
-				value: doc.description
-			};
-			if (doc.meta === "func") {
-				// @ts-ignore
-				item.insertText = `${item.label}(${doc.parameters})`;
-				item.insertTextFormat = InsertTextFormat.Snippet;
-			}
+connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
+		if (item.data.parameters) {
+			item.insertText = `${item.label}(${item.data.parameters})`;
+			item.insertTextFormat = InsertTextFormat.Snippet;
 		}
 
 		return item;
@@ -297,14 +327,13 @@ connection.onCompletionResolve(
 connection.onDeclaration(async (params) => {
 	const document = documents.get(params.textDocument.uri);
 	if (!document) return null;
-  
+
 	const text = document.getText();
 	const position = params.position;
 	const loc = {
-		line: position.line+1,
+		line: position.line + 1,
 		column: position.character
 	}
-	const context = createContext(source_version, Variant.DEFAULT);
 
 	const result = findDeclaration(text, context, loc);
 
@@ -328,7 +357,7 @@ connection.onDocumentHighlight((params: DocumentHighlightParams) => {
 	const text = document.getText();
 	const position = params.position;
 
-	const occurences = getAllOccurrencesInScope(text, createContext(source_version, Variant.DEFAULT), { line: position.line+1, column: position.character });
+	const occurences = getAllOccurrencesInScope(text, context, { line: position.line + 1, column: position.character });
 
 	return occurences.map(loc => ({
 		range: sourceLocToRange(loc)
@@ -340,11 +369,11 @@ connection.onDocumentSymbol(async (params: DocumentSymbolParams) => {
 	if (!document) return null;
 
 	const text = document.getText();
-	const names = await getAllNames(looseParse(text, createContext(source_version, Variant.DEFAULT)));
-	
+	const names = await getAllNames<ProgramSymbols>(looseParse(text, context), VariableNodeToSymbol, FunctionNodeToSymbol, ImportNodeToSymbol);
+
 	return names.map(name => ({
 		...name,
-		kind: mapDeclarationKindToSymbolKind(name.kind)
+		kind: mapDeclarationKindToSymbolKind(name.kind, context)
 	}));
 })
 
@@ -355,7 +384,7 @@ connection.onRenameRequest((params: RenameParams): WorkspaceEdit | null => {
 	const text = document.getText();
 	const position = params.position;
 
-	const occurences = getAllOccurrencesInScope(text, createContext(source_version, Variant.DEFAULT), { line: position.line+1, column: position.character });
+	const occurences = getAllOccurrencesInScope(text, context, { line: position.line + 1, column: position.character });
 
 	if (occurences.length === 0) {
 		return null;
