@@ -23,7 +23,8 @@ import {
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
-import source from '../docs/source.json'
+import source from './docs/source.json'
+import modules from "./docs/modules/modules.json";
 
 import { findDeclaration, createContext, getAllOccurrencesInScope } from 'js-slang'
 import { Chapter, Variant } from 'js-slang/dist/types'
@@ -32,15 +33,11 @@ import { getAllNames, mapDeclarationKindToSymbolKind, sourceLocToRange } from '.
 import { getProgramNames } from 'js-slang/dist/name-extractor';
 
 
-const autocomplete_labels = source.map(version => version.map((doc, idx): CompletionItem => {
-		return {
-			label: doc.label,
-			labelDetails: {detail: ` (${doc.meta})`},
-			kind: CompletionItemKind.Text, 
-			data: idx
-		}
-	})
-);
+enum AUTOCOMPLETE_TYPES {
+	BUILTIN,
+	SYMBOL,
+	MODULE
+}
 
 const chapter_names = {
 	"Source 1": Chapter.SOURCE_1,
@@ -48,6 +45,32 @@ const chapter_names = {
 	"Source 3": Chapter.SOURCE_3,
 	"Source 4": Chapter.SOURCE_4
 }
+
+const autocomplete_labels = source.map(version => version.map((doc, idx): CompletionItem => {
+	return {
+		label: doc.label,
+		labelDetails: {detail: ` (${doc.meta})`},
+		kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function, 
+		data: [AUTOCOMPLETE_TYPES.BUILTIN, idx]
+	}
+}));
+
+const module_autocomplete: CompletionItem[] = [];
+
+for (const key in modules) {
+	const module = modules[key as keyof typeof modules];
+
+	module.forEach((doc, idx) => {
+		module_autocomplete.push({
+			label: doc.label,
+			labelDetails: {detail: ` (${doc.meta})`},
+			kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function, 
+			data: [AUTOCOMPLETE_TYPES.MODULE, idx, key]
+		})
+	})
+}
+
+console.debug(module_autocomplete);
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -239,10 +262,12 @@ connection.onCompletion(
 			label: name.name,
 			labelDetails: {detail: ` (${name.meta})`},
 			kind: CompletionItemKind.Text,
-			data: autocomplete_labels[source_version-1].length + idx
+			data: AUTOCOMPLETE_TYPES.SYMBOL
 		}))
 
-		return autocomplete_labels[source_version-1].concat(new_labels);
+		const temp = autocomplete_labels[source_version-1].concat(module_autocomplete).concat(new_labels);
+		console.debug(temp);
+		return temp;
 	}
 );
 
@@ -250,14 +275,15 @@ connection.onCompletion(
 // the completion list.
 connection.onCompletionResolve(
 	(item: CompletionItem): CompletionItem => {
-		if (item.data < source[source_version-1].length) {
-			const doc = source[source_version-1][item.data];
+		if (item.data[0] === AUTOCOMPLETE_TYPES.BUILTIN || item.data[0] === AUTOCOMPLETE_TYPES.MODULE) {
+			const doc = item.data[0] === AUTOCOMPLETE_TYPES.BUILTIN ? source[source_version-1][item.data[1]] : modules[item.data[2] as keyof typeof modules][item.data[1]];
 			item.detail = doc.title;
 			item.documentation = {
 				kind: MarkupKind.Markdown,
 				value: doc.description
 			};
 			if (doc.meta === "func") {
+				// @ts-ignore
 				item.insertText = `${item.label}(${doc.parameters})`;
 				item.insertTextFormat = InsertTextFormat.Snippet;
 			}

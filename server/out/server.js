@@ -5,26 +5,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_1 = require("vscode-languageserver/node");
 const vscode_languageserver_textdocument_1 = require("vscode-languageserver-textdocument");
-const source_json_1 = __importDefault(require("../docs/source.json"));
+const source_json_1 = __importDefault(require("./docs/source.json"));
+const modules_json_1 = __importDefault(require("./docs/modules/modules.json"));
 const js_slang_1 = require("js-slang");
 const types_1 = require("js-slang/dist/types");
 const utils_1 = require("js-slang/dist/parser/utils");
 const utils_2 = require("./utils");
 const name_extractor_1 = require("js-slang/dist/name-extractor");
-const autocomplete_labels = source_json_1.default.map(version => version.map((doc, idx) => {
-    return {
-        label: doc.label,
-        labelDetails: { detail: ` (${doc.meta})` },
-        kind: node_1.CompletionItemKind.Text,
-        data: idx
-    };
-}));
+var AUTOCOMPLETE_TYPES;
+(function (AUTOCOMPLETE_TYPES) {
+    AUTOCOMPLETE_TYPES[AUTOCOMPLETE_TYPES["BUILTIN"] = 0] = "BUILTIN";
+    AUTOCOMPLETE_TYPES[AUTOCOMPLETE_TYPES["SYMBOL"] = 1] = "SYMBOL";
+    AUTOCOMPLETE_TYPES[AUTOCOMPLETE_TYPES["MODULE"] = 2] = "MODULE";
+})(AUTOCOMPLETE_TYPES || (AUTOCOMPLETE_TYPES = {}));
 const chapter_names = {
     "Source 1": types_1.Chapter.SOURCE_1,
     "Source 2": types_1.Chapter.SOURCE_2,
     "Source 3": types_1.Chapter.SOURCE_3,
     "Source 4": types_1.Chapter.SOURCE_4
 };
+const autocomplete_labels = source_json_1.default.map(version => version.map((doc, idx) => {
+    return {
+        label: doc.label,
+        labelDetails: { detail: ` (${doc.meta})` },
+        kind: doc.meta === "const" ? node_1.CompletionItemKind.Constant : node_1.CompletionItemKind.Function,
+        data: [AUTOCOMPLETE_TYPES.BUILTIN, idx]
+    };
+}));
+const module_autocomplete = [];
+for (const key in modules_json_1.default) {
+    const module = modules_json_1.default[key];
+    module.forEach((doc, idx) => {
+        module_autocomplete.push({
+            label: doc.label,
+            labelDetails: { detail: ` (${doc.meta})` },
+            kind: doc.meta === "const" ? node_1.CompletionItemKind.Constant : node_1.CompletionItemKind.Function,
+            data: [AUTOCOMPLETE_TYPES.MODULE, idx, key]
+        });
+    });
+}
+console.debug(module_autocomplete);
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = (0, node_1.createConnection)(node_1.ProposedFeatures.all);
@@ -176,21 +196,24 @@ connection.onCompletion(async (textDocumentPosition) => {
         label: name.name,
         labelDetails: { detail: ` (${name.meta})` },
         kind: node_1.CompletionItemKind.Text,
-        data: autocomplete_labels[source_version - 1].length + idx
+        data: AUTOCOMPLETE_TYPES.SYMBOL
     }));
-    return autocomplete_labels[source_version - 1].concat(new_labels);
+    const temp = autocomplete_labels[source_version - 1].concat(module_autocomplete).concat(new_labels);
+    console.debug(temp);
+    return temp;
 });
 // This handler resolves additional information for the item selected in
 // the completion list.
 connection.onCompletionResolve((item) => {
-    if (item.data < source_json_1.default[source_version - 1].length) {
-        const doc = source_json_1.default[source_version - 1][item.data];
+    if (item.data[0] === AUTOCOMPLETE_TYPES.BUILTIN || item.data[0] === AUTOCOMPLETE_TYPES.MODULE) {
+        const doc = item.data[0] === AUTOCOMPLETE_TYPES.BUILTIN ? source_json_1.default[source_version - 1][item.data[1]] : modules_json_1.default[item.data[2]][item.data[1]];
         item.detail = doc.title;
         item.documentation = {
             kind: node_1.MarkupKind.Markdown,
             value: doc.description
         };
         if (doc.meta === "func") {
+            // @ts-ignore
             item.insertText = `${item.label}(${doc.parameters})`;
             item.insertTextFormat = node_1.InsertTextFormat.Snippet;
         }
