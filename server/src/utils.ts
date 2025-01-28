@@ -129,15 +129,20 @@ export function mapMetaToCompletionItemKind(meta: string) {
 // The getNames function in js-slang has some issues, firstly it only get the names within a given scope, and it doesnt return the location of the name
 // This implementation doesn't care where the cursor is, and grabs the name of all variables and functions
 // @param prog Root node of the program, generated using looseParse
-// @returns ProgramSymbols[]
-export async function getAllNames<T>(prog: Node, ...nodeToSymbols: {type: string, callback: (node: Node) => T[]}[]): Promise<T[]> {
+// @param ...nodeCallbacks accepts a variable number of callback objects {type: string, callback: (node: Node) => T[]}
+// The type is the string that identifies the type of node
+// @returns Promise<T[]>
+export async function applyFunctionOnNode<T>(
+  prog: Node, 
+  ...nodeCallbacks: {type: string, callback: (node: Node) => T[]}[]
+): Promise<T[]> {
 	const queue: Node[] = [prog];
 	let symbols: T[] = [];
 
 	while (queue.length > 0) {
 		const node = queue.shift()!;
 
-    nodeToSymbols.forEach(x => {
+    nodeCallbacks.forEach(x => {
       if (node.type === x.type) {
         symbols = symbols.concat(x.callback(node));
       }
@@ -216,4 +221,12 @@ export function findExistingImportLine(code: string, moduleName: string): { line
   }
 
   return null; // No existing import for the module
+}
+
+// Helper function to find which range ends later
+export function findLastRange(r1: Range, r2: Range): Range {
+  if (r1.end.line > r2.end.line) return r1;
+  if (r1.end.line < r2.end.line) return r2;
+  if (r1.end.character < r2.end.character) return r2;
+  return r1;
 }

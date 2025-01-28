@@ -6,8 +6,9 @@ exports.getSubstrFromSouceLoc = getSubstrFromSouceLoc;
 exports.sourceLocToRange = sourceLocToRange;
 exports.mapDeclarationKindToSymbolKind = mapDeclarationKindToSymbolKind;
 exports.mapMetaToCompletionItemKind = mapMetaToCompletionItemKind;
-exports.getAllNames = getAllNames;
+exports.applyFunctionOnNode = applyFunctionOnNode;
 exports.findExistingImportLine = findExistingImportLine;
+exports.findLastRange = findLastRange;
 const types_1 = require("js-slang/dist/types");
 const vscode_languageserver_1 = require("vscode-languageserver");
 const name_extractor_1 = require("js-slang/dist/name-extractor");
@@ -129,13 +130,15 @@ function mapMetaToCompletionItemKind(meta) {
 // The getNames function in js-slang has some issues, firstly it only get the names within a given scope, and it doesnt return the location of the name
 // This implementation doesn't care where the cursor is, and grabs the name of all variables and functions
 // @param prog Root node of the program, generated using looseParse
-// @returns ProgramSymbols[]
-async function getAllNames(prog, ...nodeToSymbols) {
+// @param ...nodeCallbacks accepts a variable number of callback objects {type: string, callback: (node: Node) => T[]}
+// The type is the string that identifies the type of node
+// @returns Promise<T[]>
+async function applyFunctionOnNode(prog, ...nodeCallbacks) {
     const queue = [prog];
     let symbols = [];
     while (queue.length > 0) {
         const node = queue.shift();
-        nodeToSymbols.forEach(x => {
+        nodeCallbacks.forEach(x => {
             if (node.type === x.type) {
                 symbols = symbols.concat(x.callback(node));
             }
@@ -200,5 +203,15 @@ function findExistingImportLine(code, moduleName) {
         }
     }
     return null; // No existing import for the module
+}
+// Helper function to find which range ends later
+function findLastRange(r1, r2) {
+    if (r1.end.line > r2.end.line)
+        return r1;
+    if (r1.end.line < r2.end.line)
+        return r2;
+    if (r1.end.character < r2.end.character)
+        return r2;
+    return r1;
 }
 //# sourceMappingURL=utils.js.map

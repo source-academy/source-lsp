@@ -42,3 +42,13 @@ export interface ModuleSymbolSpecifier {
     name: string,
     module_name: string
 }
+
+export interface ImportedNameRanges {
+    name: string,
+    range: Range
+}
+
+export interface ModuleImportRanges {
+    module_name: string,
+    imports: ImportedNameRanges[]
+}

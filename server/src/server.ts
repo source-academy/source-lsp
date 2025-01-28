@@ -29,9 +29,9 @@ import modules from "./docs/modules/modules.json";
 import { findDeclaration, createContext, getAllOccurrencesInScope } from 'js-slang'
 import { Chapter, Node, Variant } from 'js-slang/dist/types'
 import { looseParse, parseWithComments } from 'js-slang/dist/parser/utils'
-import { findExistingImportLine, FunctionNodeToSymbol, getAllNames, ImportNodeToSymbol, mapDeclarationKindToSymbolKind, mapMetaToCompletionItemKind, sourceLocToRange, VariableNodeToSymbol } from './utils';
+import { findExistingImportLine, FunctionNodeToSymbol, applyFunctionOnNode, ImportNodeToSymbol, mapDeclarationKindToSymbolKind, mapMetaToCompletionItemKind, sourceLocToRange, VariableNodeToSymbol, findLastRange } from './utils';
 import { getProgramNames, DeclarationKind, NameDeclaration } from 'js-slang/dist/name-extractor';
-import { AUTOCOMPLETE_TYPES, CompletionItemData, DECLARATIONS, ImportedSymbols, ModuleSymbolSpecifier, ProgramSymbols } from './types';
+import { AUTOCOMPLETE_TYPES, CompletionItemData, DECLARATIONS, ImportedNameRanges, ImportedSymbols, ModuleImportRanges, ModuleSymbolSpecifier, ProgramSymbols } from './types';
 
 import { ImportDeclaration, ImportSpecifier, Identifier } from "estree";
 
@@ -269,22 +269,31 @@ connection.onCompletion(
 		// when we concat the module docs, and change their item.data.type to SYMBOL
 		const [names, _success] = await getProgramNames(program, comments, { line: pos.line + 1, column: pos.character });
 
-		const imported_names = new Map<string, Set<string>>();
-		(await getAllNames<ModuleSymbolSpecifier>(program, {type: DECLARATIONS.IMPORT, callback: (node: Node): ModuleSymbolSpecifier[] => {
+		// Get the imported names
+
+
+		const imported_names: {
+			[module_name: string]: Map<string, Range>
+		} = {};
+		(await applyFunctionOnNode<ModuleImportRanges>(program, {type: DECLARATIONS.IMPORT, callback: (node: Node): ModuleImportRanges[] => {
 			node = node as ImportDeclaration
-			
-			return node.specifiers.map((specifier): ModuleSymbolSpecifier => ({
-				name: ((specifier as ImportSpecifier).imported as Identifier).name,
-				module_name: node.source.value as string
-			  }));
+
+			return [{
+				module_name: node.source.value as string,
+				imports: node.specifiers.map((specifier): ImportedNameRanges => ({
+					name: ((specifier as ImportSpecifier).imported as Identifier).name,
+					range: sourceLocToRange(specifier.loc!)
+				}))
+			}];
 		}})).forEach(el => {
-			if (imported_names.has(el.module_name)) {
-				imported_names.get(el.module_name)?.add(el.name);
-			}
-			else {
-				imported_names.set(el.module_name, new Set([el.name]));
-			}
-		});;
+			if (!imported_names[el.module_name]) imported_names[el.module_name] = new Map();
+
+			el.imports.forEach(name => {
+				imported_names[el.module_name].set(name.name, name.range)
+			})
+		});
+
+		console.debug(imported_names);
 
 		const labels: CompletionItem[] = names.filter((name: NameDeclaration) => 
 			name.meta !== "import"
@@ -299,14 +308,33 @@ connection.onCompletion(
 		return autocomplete_labels[context.chapter - 1]
 			.concat(labels)
 			.concat(module_autocomplete.map((item: CompletionItem): CompletionItem => {
-				if (imported_names.get(item.data.module_name)?.has(item.label)) {
-					return {
-						...item,
-						detail: `Imported from ${item.data.module_name}`,
-						data: {type: AUTOCOMPLETE_TYPES.SYMBOL, ...item.data}
-					};
+				if (imported_names[item.data.module_name]){
+					if (imported_names[item.data.module_name].has(item.label)) {
+						return {
+							...item,
+							detail: `Imported from ${item.data.module_name}`,
+							data: {type: AUTOCOMPLETE_TYPES.SYMBOL, ...item.data}
+						};
+					}
+					else {
+						let last_imported_range: Range = {start: {line: 0, character: 0}, end: {line: 0, character: 0}};
+						imported_names[item.data.module_name].forEach(range => {
+							last_imported_range = findLastRange(last_imported_range, range);
+						})
+						return {
+							...item,
+							additionalTextEdits: [
+								TextEdit.insert(last_imported_range.end, `, ${item.label}`)
+							]
+						}
+					}
 				}
-				else return item;
+				else return {
+					...item,
+					additionalTextEdits: [
+						TextEdit.insert({line: 0, character: 0}, `import { ${item.label} } from "${item.data.module_name}"\n`)
+					]
+				};
 	}));
 	}
 );
@@ -369,7 +397,7 @@ connection.onDocumentSymbol(async (params: DocumentSymbolParams) => {
 	if (!document) return null;
 
 	const text = document.getText();
-	const names = await getAllNames<ProgramSymbols>(looseParse(text, context), VariableNodeToSymbol, FunctionNodeToSymbol, ImportNodeToSymbol);
+	const names = await applyFunctionOnNode<ProgramSymbols>(looseParse(text, context), VariableNodeToSymbol, FunctionNodeToSymbol, ImportNodeToSymbol);
 
 	return names.map(name => ({
 		...name,

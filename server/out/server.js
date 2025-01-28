@@ -203,24 +203,25 @@ connection.onCompletion(async (textDocumentPosition) => {
     // along with other info like function parameters. So we remove the imported names and they are added back
     // when we concat the module docs, and change their item.data.type to SYMBOL
     const [names, _success] = await (0, name_extractor_1.getProgramNames)(program, comments, { line: pos.line + 1, column: pos.character });
-    const imported_names = new Map();
-    (await (0, utils_2.getAllNames)(program, { type: types_2.DECLARATIONS.IMPORT, callback: (node) => {
+    // Get the imported names
+    const imported_names = {};
+    (await (0, utils_2.applyFunctionOnNode)(program, { type: types_2.DECLARATIONS.IMPORT, callback: (node) => {
             node = node;
-            return node.specifiers.map((specifier) => ({
-                name: specifier.imported.name,
-                module_name: node.source.value,
-                range: (0, utils_2.sourceLocToRange)(node.loc)
-            }));
+            return [{
+                    module_name: node.source.value,
+                    imports: node.specifiers.map((specifier) => ({
+                        name: specifier.imported.name,
+                        range: (0, utils_2.sourceLocToRange)(specifier.loc)
+                    }))
+                }];
         } })).forEach(el => {
-        console.debug(el.range);
-        if (imported_names.has(el.module_name)) {
-            imported_names.get(el.module_name)?.add(el.name);
-        }
-        else {
-            imported_names.set(el.module_name, new Set([el.name]));
-        }
+        if (!imported_names[el.module_name])
+            imported_names[el.module_name] = new Map();
+        el.imports.forEach(name => {
+            imported_names[el.module_name].set(name.name, name.range);
+        });
     });
-    ;
+    console.debug(imported_names);
     const labels = names.filter((name) => name.meta !== "import").map((name, idx) => ({
         label: name.name,
         labelDetails: { detail: ` (${name.meta})` },
@@ -231,15 +232,34 @@ connection.onCompletion(async (textDocumentPosition) => {
     return autocomplete_labels[context.chapter - 1]
         .concat(labels)
         .concat(module_autocomplete.map((item) => {
-        if (imported_names.get(item.data.module_name)?.has(item.label)) {
-            return {
-                ...item,
-                detail: `Imported from ${item.data.module_name}`,
-                data: { type: types_2.AUTOCOMPLETE_TYPES.SYMBOL, ...item.data }
-            };
+        if (imported_names[item.data.module_name]) {
+            if (imported_names[item.data.module_name].has(item.label)) {
+                return {
+                    ...item,
+                    detail: `Imported from ${item.data.module_name}`,
+                    data: { type: types_2.AUTOCOMPLETE_TYPES.SYMBOL, ...item.data }
+                };
+            }
+            else {
+                let last_imported_range = { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } };
+                imported_names[item.data.module_name].forEach(range => {
+                    last_imported_range = (0, utils_2.findLastRange)(last_imported_range, range);
+                });
+                return {
+                    ...item,
+                    additionalTextEdits: [
+                        node_1.TextEdit.insert(last_imported_range.end, `, ${item.label}`)
+                    ]
+                };
+            }
         }
         else
-            return item;
+            return {
+                ...item,
+                additionalTextEdits: [
+                    node_1.TextEdit.insert({ line: 0, character: 0 }, `import { ${item.label} } from "${item.data.module_name}"\n`)
+                ]
+            };
     }));
 });
 // This handler resolves additional information for the item selected in
@@ -290,7 +310,7 @@ connection.onDocumentSymbol(async (params) => {
     if (!document)
         return null;
     const text = document.getText();
-    const names = await (0, utils_2.getAllNames)((0, utils_1.looseParse)(text, context), utils_2.VariableNodeToSymbol, utils_2.FunctionNodeToSymbol, utils_2.ImportNodeToSymbol);
+    const names = await (0, utils_2.applyFunctionOnNode)((0, utils_1.looseParse)(text, context), utils_2.VariableNodeToSymbol, utils_2.FunctionNodeToSymbol, utils_2.ImportNodeToSymbol);
     return names.map(name => ({
         ...name,
         kind: (0, utils_2.mapDeclarationKindToSymbolKind)(name.kind, context)
