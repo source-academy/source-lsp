@@ -11,7 +11,7 @@ export enum AUTOCOMPLETE_TYPES {
 
 export enum DECLARATIONS {
     VARIABLE = "VariableDeclaration",
-    FUNCTION = "FunctionDelcaration",
+    FUNCTION = "FunctionDeclaration",
     IMPORT = "ImportDeclaration"
 }
 

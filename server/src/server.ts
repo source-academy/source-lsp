@@ -7,77 +7,35 @@ import {
 	InitializeParams,
 	DidChangeConfigurationNotification,
 	CompletionItem,
-	CompletionItemKind,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
 	InitializeResult,
-	MarkupKind,
 	InsertTextFormat,
 	Range,
 	DocumentHighlightParams,
 	DocumentSymbolParams,
 	RenameParams,
 	WorkspaceEdit,
-	TextEdit
+	TextEdit,
+	DocumentSymbol
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
-import source from './docs/source.json'
-import modules from "./docs/modules/modules.json";
-
 import { findDeclaration, createContext, getAllOccurrencesInScope } from 'js-slang'
-import { Chapter, Node, Variant } from 'js-slang/dist/types'
-import { looseParse, parseWithComments } from 'js-slang/dist/parser/utils'
-import { findExistingImportLine, FunctionNodeToSymbol, applyFunctionOnNode, ImportNodeToSymbol, mapDeclarationKindToSymbolKind, mapMetaToCompletionItemKind, sourceLocToRange, VariableNodeToSymbol, findLastRange } from './utils';
-import { getProgramNames, DeclarationKind, NameDeclaration } from 'js-slang/dist/name-extractor';
-import { AUTOCOMPLETE_TYPES, CompletionItemData, DECLARATIONS, ImportedNameRanges, ImportedSymbols, ModuleImportRanges, ModuleSymbolSpecifier, ProgramSymbols } from './types';
+import { Chapter, Variant } from 'js-slang/dist/types'
+import { looseParse } from 'js-slang/dist/parser/utils'
+import { FunctionNodeToSymbol, applyFunctionOnNode, ImportNodeToSymbol, mapDeclarationKindToSymbolKind, sourceLocToRange, VariableNodeToSymbol } from './utils';
+import { ProgramSymbols } from './types';
 
-import { ImportDeclaration, ImportSpecifier, Identifier } from "estree";
+import { getCompletionItems, getDocumentSymbols, renameSymbol } from './languageFeatures';
 
 const chapter_names = {
 	"Source 1": Chapter.SOURCE_1,
 	"Source 2": Chapter.SOURCE_2,
 	"Source 3": Chapter.SOURCE_3,
 	"Source 4": Chapter.SOURCE_4
-}
-
-const autocomplete_labels = source.map(version => version.map((doc, idx): CompletionItem => {
-	return {
-		label: doc.label,
-		labelDetails: { detail: ` (${doc.meta})` },
-		detail: doc.title,
-		documentation: {
-			kind: MarkupKind.Markdown,
-			value: doc.description
-		},
-		kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
-		data: { type: AUTOCOMPLETE_TYPES.BUILTIN, idx: idx, parameters: doc.parameters} as CompletionItemData,
-		sortText: '' + AUTOCOMPLETE_TYPES.BUILTIN
-	}
-}));
-
-const module_autocomplete: CompletionItem[] = [];
-
-for (const key in modules) {
-	const module = modules[key as keyof typeof modules];
-
-	module.forEach((doc, idx) => {
-		module_autocomplete.push({
-			label: doc.label,
-			labelDetails: { detail: ` (${doc.meta})` },
-			detail: doc.title,
-			documentation: {
-				kind: MarkupKind.Markdown,
-				value: doc.description
-			},
-			kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
-			// @ts-ignore
-			data: { type: AUTOCOMPLETE_TYPES.MODULE, idx: idx, module_name: key, parameters: doc.parameters } as CompletionItemData,
-			sortText: '' + AUTOCOMPLETE_TYPES.MODULE
-		})
-	})
-}
+};
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -184,18 +142,19 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 			section: 'languageServerExample'
 		});
 		documentSettings.set(resource, result);
-	}
+	};
 	return result;
 }
 
 
 // Custom request to set the language version
 connection.onRequest("setLanguageVersion", (params: { version: string }) => {
-	context = createContext(chapter_names[params.version as keyof typeof chapter_names], Variant.DEFAULT);
-	connection.console.log(`Set language version to ${params.version}`);
-	return { success: true };
+	if (Object.keys(chapter_names).includes(params.version)) {
+		context = createContext(chapter_names[params.version as keyof typeof chapter_names], Variant.DEFAULT);
+		return { success: true };
+	}
+	else return {success: false};
 });
-
 
 // Only keep settings for open documents
 documents.onDidClose(e => {
@@ -204,8 +163,10 @@ documents.onDidClose(e => {
 
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
+let timeout: NodeJS.Timeout | undefined = undefined;
 documents.onDidChangeContent(change => {
-	validateTextDocument(change.document);
+	if (timeout) clearTimeout(timeout); 
+	timeout = setTimeout(() => validateTextDocument(change.document), 300);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
@@ -261,94 +222,21 @@ connection.onCompletion(
 
 		const text = document.getText();
 		const pos = textDocumentPosition.position;
-		const [program, comments] = parseWithComments(text)
 
-		// This implementation in js-slang only gets the program names thats in the scope of the cursor location
-		// However, one issue is that any imported names dont contain information of which module they are from
-		// along with other info like function parameters. So we remove the imported names and they are added back
-		// when we concat the module docs, and change their item.data.type to SYMBOL
-		const [names, _success] = await getProgramNames(program, comments, { line: pos.line + 1, column: pos.character });
-
-		// Get the imported names
-
-
-		const imported_names: {
-			[module_name: string]: Map<string, Range>
-		} = {};
-		(await applyFunctionOnNode<ModuleImportRanges>(program, {type: DECLARATIONS.IMPORT, callback: (node: Node): ModuleImportRanges[] => {
-			node = node as ImportDeclaration
-
-			return [{
-				module_name: node.source.value as string,
-				imports: node.specifiers.map((specifier): ImportedNameRanges => ({
-					name: ((specifier as ImportSpecifier).imported as Identifier).name,
-					range: sourceLocToRange(specifier.loc!)
-				}))
-			}];
-		}})).forEach(el => {
-			if (!imported_names[el.module_name]) imported_names[el.module_name] = new Map();
-
-			el.imports.forEach(name => {
-				imported_names[el.module_name].set(name.name, name.range)
-			})
-		});
-
-		console.debug(imported_names);
-
-		const labels: CompletionItem[] = names.filter((name: NameDeclaration) => 
-			name.meta !== "import"
-		).map((name, idx) => ({
-			label: name.name,
-			labelDetails: { detail: ` (${name.meta})` },
-			kind: mapMetaToCompletionItemKind(name.meta),
-			data: { type: AUTOCOMPLETE_TYPES.SYMBOL, idx: idx } as CompletionItemData,
-			sortText: '' + AUTOCOMPLETE_TYPES.SYMBOL
-		}))
-
-		return autocomplete_labels[context.chapter - 1]
-			.concat(labels)
-			.concat(module_autocomplete.map((item: CompletionItem): CompletionItem => {
-				if (imported_names[item.data.module_name]){
-					if (imported_names[item.data.module_name].has(item.label)) {
-						return {
-							...item,
-							detail: `Imported from ${item.data.module_name}`,
-							data: {type: AUTOCOMPLETE_TYPES.SYMBOL, ...item.data}
-						};
-					}
-					else {
-						let last_imported_range: Range = {start: {line: 0, character: 0}, end: {line: 0, character: 0}};
-						imported_names[item.data.module_name].forEach(range => {
-							last_imported_range = findLastRange(last_imported_range, range);
-						})
-						return {
-							...item,
-							additionalTextEdits: [
-								TextEdit.insert(last_imported_range.end, `, ${item.label}`)
-							]
-						}
-					}
-				}
-				else return {
-					...item,
-					additionalTextEdits: [
-						TextEdit.insert({line: 0, character: 0}, `import { ${item.label} } from "${item.data.module_name}"\n`)
-					]
-				};
-	}));
+		return getCompletionItems(text, pos, context);
 	}
 );
 
 // This handler resolves additional information for the item selected in
 // the completion list.
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
-		if (item.data.parameters) {
-			item.insertText = `${item.label}(${item.data.parameters})`;
-			item.insertTextFormat = InsertTextFormat.Snippet;
-		}
+	if (item.data.parameters) {
+		item.insertText = `${item.label}(${item.data.parameters})`;
+		item.insertTextFormat = InsertTextFormat.Snippet;
+	};
 
-		return item;
-	}
+	return item;
+}
 );
 
 // This handler provides the declaration location of the name at the location provided
@@ -392,17 +280,12 @@ connection.onDocumentHighlight((params: DocumentHighlightParams) => {
 	}));
 })
 
-connection.onDocumentSymbol(async (params: DocumentSymbolParams) => {
+connection.onDocumentSymbol(async (params: DocumentSymbolParams) : Promise<DocumentSymbol[] | null> => {
 	const document = documents.get(params.textDocument.uri);
 	if (!document) return null;
 
 	const text = document.getText();
-	const names = await applyFunctionOnNode<ProgramSymbols>(looseParse(text, context), VariableNodeToSymbol, FunctionNodeToSymbol, ImportNodeToSymbol);
-
-	return names.map(name => ({
-		...name,
-		kind: mapDeclarationKindToSymbolKind(name.kind, context)
-	}));
+	return getDocumentSymbols(text, context);
 })
 
 connection.onRenameRequest((params: RenameParams): WorkspaceEdit | null => {
@@ -412,17 +295,7 @@ connection.onRenameRequest((params: RenameParams): WorkspaceEdit | null => {
 	const text = document.getText();
 	const position = params.position;
 
-	const occurences = getAllOccurrencesInScope(text, context, { line: position.line + 1, column: position.character });
-
-	if (occurences.length === 0) {
-		return null;
-	}
-
-	return {
-		changes: {
-			[params.textDocument.uri]: occurences.map(loc => TextEdit.replace(sourceLocToRange(loc), params.newName))
-		}
-	};
+	return renameSymbol(text, position, context, params.textDocument.uri, params.newName);
 })
 
 

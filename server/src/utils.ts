@@ -1,8 +1,50 @@
 import { Chapter, Context, Node } from "js-slang/dist/types"
 import * as es from "estree";
-import { CompletionItemKind, Range, SymbolKind } from "vscode-languageserver";
+import { CompletionItem, CompletionItemKind, MarkupKind, Range, SymbolKind } from "vscode-languageserver";
 import { DeclarationKind } from "js-slang/dist/name-extractor";
-import { DECLARATIONS, NodeToSymbol, ProgramSymbols } from "./types";
+import { AUTOCOMPLETE_TYPES, CompletionItemData, DECLARATIONS, NodeToSymbol, ProgramSymbols } from "./types";
+
+import source from './docs/source.json'
+import modules from "./docs/modules/modules.json";
+
+
+
+export const autocomplete_labels = source.map(version => version.map((doc, idx): CompletionItem => {
+	return {
+		label: doc.label,
+		labelDetails: { detail: ` (${doc.meta})` },
+		detail: doc.title,
+		documentation: {
+			kind: MarkupKind.Markdown,
+			value: doc.description
+		},
+		kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
+		data: { type: AUTOCOMPLETE_TYPES.BUILTIN, idx: idx, parameters: doc.parameters } as CompletionItemData,
+		sortText: '' + AUTOCOMPLETE_TYPES.BUILTIN
+	};
+}));
+
+export const module_autocomplete: CompletionItem[] = [];
+
+for (const key in modules) {
+	const module = modules[key as keyof typeof modules];
+
+	module.forEach((doc, idx) => {
+		module_autocomplete.push({
+			label: doc.label,
+			labelDetails: { detail: ` (${doc.meta})` },
+			detail: doc.title,
+			documentation: {
+				kind: MarkupKind.Markdown,
+				value: doc.description
+			},
+			kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
+			// @ts-ignore
+			data: { type: AUTOCOMPLETE_TYPES.MODULE, idx: idx, module_name: key, parameters: doc.parameters } as CompletionItemData,
+			sortText: '' + AUTOCOMPLETE_TYPES.MODULE
+		});
+	});
+}
 
 function isNotNull<T>(x: T): x is Exclude<T, null> {
   // This function exists to appease the mighty typescript type checker

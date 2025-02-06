@@ -20,6 +20,11 @@ cd server
 ./node_modules/bin/electron-rebuild -v <electron version>
 ```
 
+If you want to run tests, make sure the electron version used is the same as well in the package.json
+`"test": "npx electron@32.2.6 node_modules/mocha/bin/mocha.js server/out/test/*.js --ui tdd"`
+
+```
+
 Then now the plugin should be able to run, enter `code .` in the root folder to startup vscode
 
 Then in vscode, press ctrl + shift + b to build, then press F5 to run the plugin. You can open test.sourcejs for testing
