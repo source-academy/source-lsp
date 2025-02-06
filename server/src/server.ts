@@ -16,7 +16,6 @@ import {
 	DocumentSymbolParams,
 	RenameParams,
 	WorkspaceEdit,
-	TextEdit,
 	DocumentSymbol
 } from 'vscode-languageserver/node';
 
@@ -24,9 +23,7 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 
 import { findDeclaration, createContext, getAllOccurrencesInScope } from 'js-slang'
 import { Chapter, Variant } from 'js-slang/dist/types'
-import { looseParse } from 'js-slang/dist/parser/utils'
-import { FunctionNodeToSymbol, applyFunctionOnNode, ImportNodeToSymbol, mapDeclarationKindToSymbolKind, sourceLocToRange, VariableNodeToSymbol } from './utils';
-import { ProgramSymbols } from './types';
+import { sourceLocToRange } from './utils';
 
 import { getCompletionItems, getDocumentSymbols, renameSymbol } from './languageFeatures';
 
@@ -231,13 +228,15 @@ connection.onCompletion(
 // the completion list.
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
 	if (item.data.parameters) {
-		item.insertText = `${item.label}(${item.data.parameters})`;
+		item.insertText = `${item.label}(${item.data.parameters.map((param: string, idx: number) => `\${${idx+1}:${param}}`)})`;
 		item.insertTextFormat = InsertTextFormat.Snippet;
 	};
 
 	return item;
 }
 );
+
+
 
 // This handler provides the declaration location of the name at the location provided
 connection.onDeclaration(async (params) => {

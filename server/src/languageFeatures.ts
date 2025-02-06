@@ -1,13 +1,12 @@
-import { ImportDeclaration, ImportSpecifier, Identifier } from "estree";
+import { ImportDeclaration, ImportSpecifier, Identifier, FunctionDeclaration } from "estree";
 import { Context, getAllOccurrencesInScope } from "js-slang";
 import { getProgramNames, NameDeclaration } from "js-slang/dist/name-extractor";
 import { looseParse, parseWithComments } from "js-slang/dist/parser/utils";
 import { Node } from "js-slang/dist/types";
-import { CompletionItem, DocumentSymbol, Position, Range, TextEdit, WorkspaceEdit } from "vscode-languageserver";
-import { ModuleImportRanges, DECLARATIONS, ImportedNameRanges, AUTOCOMPLETE_TYPES, CompletionItemData, ProgramSymbols } from "./types";
+import { CompletionItem, CompletionItemKind, DocumentSymbol, Position, Range, TextEdit, WorkspaceEdit } from "vscode-languageserver";
+import { ModuleImportRanges, DECLARATIONS, ImportedNameRanges, AUTOCOMPLETE_TYPES, CompletionItemData, ProgramSymbols, FunctionSymbol } from "./types";
 import { applyFunctionOnNode, sourceLocToRange, mapMetaToCompletionItemKind, findLastRange, FunctionNodeToSymbol, ImportNodeToSymbol, mapDeclarationKindToSymbolKind, VariableNodeToSymbol } from "./utils";
 import { autocomplete_labels, module_autocomplete } from "./utils";
-import { text } from "stream/consumers";
 
 export async function getCompletionItems(
     text: string,
@@ -21,15 +20,19 @@ export async function getCompletionItems(
     // along with other info like function parameters. So we remove the imported names and they are added back
     // when we concat the module docs, and change their item.data.type to SYMBOL
     const [names, _success] = await getProgramNames(program, comments, { line: pos.line + 1, column: pos.character });
+
+    const labels: CompletionItem[] = []
+
     // Get the imported names
     const imported_names: {
         [module_name: string]: Map<string, Range>
     } = {};
     (await applyFunctionOnNode<ModuleImportRanges>(program, {
         type: DECLARATIONS.IMPORT, callback: (node: Node): ModuleImportRanges[] => {
-            node = node as ImportDeclaration
+            node = node as ImportDeclaration;
 
             return [{
+                type: "import",
                 module_name: node.source.value as string,
                 imports: node.specifiers.map((specifier): ImportedNameRanges => ({
                     name: ((specifier as ImportSpecifier).imported as Identifier).name,
@@ -37,23 +40,28 @@ export async function getCompletionItems(
                 }))
             }];
         }
+    }, {
+        type: DECLARATIONS.FUNCTION, callback: (node: Node): ModuleImportRanges[] => {
+            node = node as FunctionDeclaration;
+            labels.push({
+                label: node.id!.name,
+                labelDetails: { detail: " (func)" },
+                kind: CompletionItemKind.Function,
+                data: { type: AUTOCOMPLETE_TYPES.SYMBOL, parameters: node.params.map(param => (param as Identifier).name)},
+                sortText: '' + AUTOCOMPLETE_TYPES.SYMBOL
+            });
+
+            return [];
+        }
     })).forEach(el => {
-        if (!imported_names[el.module_name]) imported_names[el.module_name] = new Map();
+        if (el.type === "import") {
+            if (!imported_names[el.module_name]) imported_names[el.module_name] = new Map();
 
-        el.imports.forEach(name => {
-            imported_names[el.module_name].set(name.name, name.range)
-        });
+            el.imports.forEach(name => {
+                imported_names[el.module_name].set(name.name, name.range)
+            });
+        }
     });
-
-    const labels: CompletionItem[] = names.filter((name: NameDeclaration) =>
-        name.meta !== "import"
-    ).map((name, idx) => ({
-        label: name.name,
-        labelDetails: { detail: ` (${name.meta})` },
-        kind: mapMetaToCompletionItemKind(name.meta),
-        data: { type: AUTOCOMPLETE_TYPES.SYMBOL, idx: idx } as CompletionItemData,
-        sortText: '' + AUTOCOMPLETE_TYPES.SYMBOL
-    }));
 
     return autocomplete_labels[context.chapter - 1]
         .concat(labels)

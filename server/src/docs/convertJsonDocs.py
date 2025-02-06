@@ -27,10 +27,7 @@ if __name__ == "__main__":
                                 "parameters": (
                                     patches[key]
                                     if key in patches
-                                    else [
-                                        f"${{{i+1}:{v.strip()}}}"
-                                        for i, v in enumerate(params.split(","))
-                                    ]
+                                    else [param.strip() for param in params.split(",")]
                                 )
                                 if len(
                                     params := re.findall(

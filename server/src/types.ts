@@ -49,6 +49,13 @@ export interface ImportedNameRanges {
 }
 
 export interface ModuleImportRanges {
+    type: "import",
     module_name: string,
     imports: ImportedNameRanges[]
+}
+
+export interface FunctionSymbol {
+    type: "function",
+    name: string,
+    params: string[]
 }
