@@ -1,12 +1,13 @@
-import { ImportDeclaration, ImportSpecifier, Identifier, FunctionDeclaration } from "estree";
+import { ImportDeclaration, ImportSpecifier, Identifier, FunctionDeclaration, VariableDeclaration } from "estree";
 import { Context, getAllOccurrencesInScope } from "js-slang";
-import { getProgramNames, NameDeclaration } from "js-slang/dist/name-extractor";
+import { DeclarationKind, getProgramNames, NameDeclaration } from "js-slang/dist/name-extractor";
 import { looseParse, parseWithComments } from "js-slang/dist/parser/utils";
 import { Node } from "js-slang/dist/types";
 import { CompletionItem, CompletionItemKind, DocumentSymbol, Position, Range, TextEdit, WorkspaceEdit } from "vscode-languageserver";
 import { ModuleImportRanges, DECLARATIONS, ImportedNameRanges, AUTOCOMPLETE_TYPES, CompletionItemData, ProgramSymbols, FunctionSymbol } from "./types";
-import { applyFunctionOnNode, sourceLocToRange, mapMetaToCompletionItemKind, findLastRange, FunctionNodeToSymbol, ImportNodeToSymbol, mapDeclarationKindToSymbolKind, VariableNodeToSymbol } from "./utils";
+import { applyFunctionOnNode, sourceLocToRange, findLastRange, FunctionNodeToSymbol, ImportNodeToSymbol, mapDeclarationKindToSymbolKind, VariableNodeToSymbol, VsPosInSourceLoc } from "./utils";
 import { autocomplete_labels, module_autocomplete } from "./utils";
+import { AST } from "./ast";
 
 export async function getCompletionItems(
     text: string,
@@ -20,6 +21,7 @@ export async function getCompletionItems(
     // along with other info like function parameters. So we remove the imported names and they are added back
     // when we concat the module docs, and change their item.data.type to SYMBOL
     const [names, _success] = await getProgramNames(program, comments, { line: pos.line + 1, column: pos.character });
+
 
     const labels: CompletionItem[] = []
 
@@ -41,7 +43,9 @@ export async function getCompletionItems(
             }];
         }
     }, {
-        type: DECLARATIONS.FUNCTION, callback: (node: Node): ModuleImportRanges[] => {
+        // We also parse through the ast for function and variable declarations,
+        // probably a better way to do this but it works for now
+        type: DECLARATIONS.FUNCTION, callback: (node: Node) => {
             node = node as FunctionDeclaration;
             labels.push({
                 label: node.id!.name,
@@ -52,6 +56,23 @@ export async function getCompletionItems(
             });
 
             return [];
+        }
+    }, {
+        type: DECLARATIONS.VARIABLE, callback: (node: Node) => {
+            node = node as VariableDeclaration;
+
+            node.declarations.forEach(declaration => {
+                if (VsPosInSourceLoc(pos, node.loc!)) {
+                    labels.push({
+                        label: (declaration.id as Identifier).name,
+                        labelDetails: {detail: ` (${node.kind})`},
+                        kind: node.kind === 'var' || node.kind === 'let' ? CompletionItemKind.Variable : CompletionItemKind.Constant,
+                        data: { type: AUTOCOMPLETE_TYPES.SYMBOL },
+                        sortText: '' + AUTOCOMPLETE_TYPES.SYMBOL
+                    })
+                }
+            });
+            return []
         }
     })).forEach(el => {
         if (el.type === "import") {
@@ -75,8 +96,8 @@ export async function getCompletionItems(
                     };
                 }
                 else {
+                    // Not sure if the ast preserves the order that names are imported
                     let last_imported_range: Range = { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } };
-                    // Sets should be unordered so i need to do this
                     imported_names[item.data.module_name].forEach(range => {
                         last_imported_range = findLastRange(last_imported_range, range);
                     });
@@ -95,36 +116,4 @@ export async function getCompletionItems(
                 ]
             };
         }));
-}
-
-export async function getDocumentSymbols(
-    text: string,
-    context: Context
-): Promise<DocumentSymbol[]> {
-    const names = await applyFunctionOnNode<ProgramSymbols>(looseParse(text, context), VariableNodeToSymbol, FunctionNodeToSymbol, ImportNodeToSymbol);
-
-    return names.map(name => ({
-        ...name,
-        kind: mapDeclarationKindToSymbolKind(name.kind, context)
-    }));
-}
-
-export function renameSymbol(
-    text: string,
-    position: Position,
-    context: Context,
-    uri: string,
-    newName: string
-): WorkspaceEdit | null {
-    const occurences = getAllOccurrencesInScope(text, context, { line: position.line + 1, column: position.character });
-
-	if (occurences.length === 0) {
-		return null;
-	}
-
-	return {
-		changes: {
-			[uri]: occurences.map(loc => TextEdit.replace(sourceLocToRange(loc), newName))
-		}
-	};
 }

@@ -21,11 +21,12 @@ import {
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
-import { findDeclaration, createContext, getAllOccurrencesInScope } from 'js-slang'
+import { createContext, getAllOccurrencesInScope } from 'js-slang'
 import { Chapter, Variant } from 'js-slang/dist/types'
 import { sourceLocToRange } from './utils';
 
-import { getCompletionItems, getDocumentSymbols, renameSymbol } from './languageFeatures';
+import { getCompletionItems } from './languageFeatures';
+import { AST } from './ast';
 
 const chapter_names = {
 	"Source 1": Chapter.SOURCE_1,
@@ -45,6 +46,16 @@ let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
 let hasDiagnosticRelatedInformationCapability: boolean = false;
 let context = createContext(Chapter.SOURCE_1, Variant.DEFAULT);
+
+let astCache: Map<string, AST> = new Map();
+
+function getAST(uri: string): AST {
+	if(astCache.has(uri)) return astCache.get(uri)!;
+
+	const ast = new AST(documents.get(uri)!.getText(), context, uri);
+	astCache.set(uri, ast);
+	return ast;
+}
 
 connection.onInitialize((params: InitializeParams) => {
 	let capabilities = params.capabilities;
@@ -148,6 +159,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 connection.onRequest("setLanguageVersion", (params: { version: string }) => {
 	if (Object.keys(chapter_names).includes(params.version)) {
 		context = createContext(chapter_names[params.version as keyof typeof chapter_names], Variant.DEFAULT);
+		astCache.clear();
 		return { success: true };
 	}
 	else return {success: false};
@@ -163,7 +175,10 @@ documents.onDidClose(e => {
 let timeout: NodeJS.Timeout | undefined = undefined;
 documents.onDidChangeContent(change => {
 	if (timeout) clearTimeout(timeout); 
-	timeout = setTimeout(() => validateTextDocument(change.document), 300);
+	timeout = setTimeout(() => {
+		validateTextDocument(change.document);
+		astCache.delete(change.document.uri);
+	}, 300);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
@@ -240,17 +255,9 @@ connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
 
 // This handler provides the declaration location of the name at the location provided
 connection.onDeclaration(async (params) => {
-	const document = documents.get(params.textDocument.uri);
-	if (!document) return null;
-
-	const text = document.getText();
 	const position = params.position;
-	const loc = {
-		line: position.line + 1,
-		column: position.character
-	}
 
-	const result = findDeclaration(text, context, loc);
+	const result = getAST(params.textDocument.uri).findDeclaration(position);
 
 	if (result) {
 		const range: Range = sourceLocToRange(result);
@@ -269,32 +276,20 @@ connection.onDocumentHighlight((params: DocumentHighlightParams) => {
 	const document = documents.get(params.textDocument.uri);
 	if (!document) return null;
 
-	const text = document.getText();
-	const position = params.position;
-
-	const occurences = getAllOccurrencesInScope(text, context, { line: position.line + 1, column: position.character });
-
-	return occurences.map(loc => ({
-		range: sourceLocToRange(loc)
-	}));
+	return getAST(params.textDocument.uri).getOccurences(params.position);
 })
 
 connection.onDocumentSymbol(async (params: DocumentSymbolParams) : Promise<DocumentSymbol[] | null> => {
-	const document = documents.get(params.textDocument.uri);
-	if (!document) return null;
-
-	const text = document.getText();
-	return getDocumentSymbols(text, context);
+	return getAST(params.textDocument.uri).getDocumentSymbols();
 })
 
 connection.onRenameRequest((params: RenameParams): WorkspaceEdit | null => {
 	const document = documents.get(params.textDocument.uri);
 	if (!document) return null;
 
-	const text = document.getText();
 	const position = params.position;
 
-	return renameSymbol(text, position, context, params.textDocument.uri, params.newName);
+	return getAST(params.textDocument.uri).renameSymbol(position, params.newName);
 })
 
 

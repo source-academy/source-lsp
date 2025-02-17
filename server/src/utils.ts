@@ -1,6 +1,6 @@
 import { Chapter, Context, Node } from "js-slang/dist/types"
 import * as es from "estree";
-import { CompletionItem, CompletionItemKind, MarkupKind, Range, SymbolKind } from "vscode-languageserver";
+import { CompletionItem, CompletionItemKind, MarkupKind, Position, Range, SymbolKind } from "vscode-languageserver";
 import { DeclarationKind } from "js-slang/dist/name-extractor";
 import { AUTOCOMPLETE_TYPES, CompletionItemData, DECLARATIONS, NodeToSymbol, ProgramSymbols } from "./types";
 
@@ -178,11 +178,21 @@ export async function applyFunctionOnNode<T>(
   prog: Node, 
   ...nodeCallbacks: {type: string, callback: (node: Node) => T[]}[]
 ): Promise<T[]> {
+  return applyFunctionOnNodeWithCursor<T>(prog, null, ...nodeCallbacks);
+}
+
+export async function applyFunctionOnNodeWithCursor<T>(
+  prog: Node, 
+  cursorLoc: Position | null,
+  ...nodeCallbacks: {type: string, callback: (node: Node) => T[]}[]
+): Promise<T[]> {
 	const queue: Node[] = [prog];
 	let symbols: T[] = [];
 
 	while (queue.length > 0) {
 		const node = queue.shift()!;
+
+    // console.debug(node);
 
     nodeCallbacks.forEach(x => {
       if (node.type === x.type) {
@@ -190,7 +200,10 @@ export async function applyFunctionOnNode<T>(
       }
     });
 
-		queue.push(...getNodeChildren(node));
+
+    if (cursorLoc === null || (node.loc && VsPosInSourceLoc(cursorLoc, node.loc))) {
+		  queue.push(...getNodeChildren(node));
+    }
 	}
 
 	return symbols;
@@ -271,4 +284,14 @@ export function findLastRange(r1: Range, r2: Range): Range {
   if (r1.end.line < r2.end.line) return r2;
   if (r1.end.character < r2.end.character) return r2;
   return r1;
+}
+
+export function VsPosInSourceLoc(pos: Position, loc: es.SourceLocation) {
+  function before(first: es.Position, second: es.Position) {
+    return first.line < second.line || (first.line === second.line && first.column <= second.column)
+  }
+
+  const esPos: es.Position = { line: pos.line+1, column: pos.character }
+
+  return before(loc.start, esPos) && before(esPos, loc.end);
 }

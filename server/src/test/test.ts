@@ -1,9 +1,10 @@
 import { createContext } from "js-slang";
-import { getCompletionItems, getDocumentSymbols, renameSymbol } from "../languageFeatures";
+import { getCompletionItems } from "../languageFeatures";
 import { Chapter, Variant } from "js-slang/dist/types";
 import assert from "assert";
-import { autocomplete_labels, module_autocomplete } from "../utils";
+import { autocomplete_labels } from "../utils";
 import { TextDocument } from "vscode-languageserver-textdocument";
+import { AST } from "../ast";
 
 const context = createContext(Chapter.SOURCE_4, Variant.DEFAULT);
 
@@ -17,7 +18,7 @@ suite("Autocompletion", () => {
         assert.ok(autocomplete_labels[context.chapter-1].every(i => items.includes(i)));
     });
 
-    test("Scoping1", async () => {
+    test("Scoping", async () => {
         const items = await getCompletionItems(
             "let x = 1; {let y = 1;}",
             {line: 0, character: 0},
@@ -32,11 +33,9 @@ suite("Rename", () => {
     test("Rename1", () => {
         const text = "let x = 1; { let x = 2; }";
         const doc = TextDocument.create("test://test/test.sourcejs", 'sourcejs', 0, text);
-        const edits = renameSymbol(
-            text,
+        const ast = new AST(text, context, doc.uri);
+        const edits = ast.renameSymbol(
             {line: 0, character: 4},
-            context,
-            doc.uri,
             'y'
         )
 
@@ -55,11 +54,9 @@ suite("Rename", () => {
     test("Rename2", () => {
         const text = "let x = 1; { let x = 2; x = 3; }";
         const doc = TextDocument.create("test://test/test.sourcejs", 'sourcejs', 0, text);
-        const edits = renameSymbol(
-            text,
+        const ast = new AST(text, context, doc.uri);
+        const edits = ast.renameSymbol(
             {line: 0, character: 17},
-            context,
-            doc.uri,
             'y'
         )
 
@@ -82,11 +79,9 @@ suite("Rename", () => {
     test("Rename3", () => {
         const text = "let x = 1; { x = 3; }";
         const doc = TextDocument.create("test://test/test.sourcejs", 'sourcejs', 0, text);
-        const edits = renameSymbol(
-            text,
+        const ast = new AST(text, context, doc.uri);
+        const edits = ast.renameSymbol(
             {line: 0, character: 4},
-            context,
-            doc.uri,
             'y'
         )
 
@@ -109,12 +104,13 @@ suite("Rename", () => {
 
 suite("Document Symbols", () => {
     test("Imports", async () => {
-        const symbols = await getDocumentSymbols(
+        const ast =  new AST(
             'import { black } from "rune"; import { black } from "rune_in_words";',
-            context
+            context,
+            ""
         );
 
-        assert.deepStrictEqual(symbols, [
+        assert.deepStrictEqual(ast.getDocumentSymbols(), [
             {
                 "name": "black",
                 "kind": 3,
@@ -168,12 +164,13 @@ suite("Document Symbols", () => {
     });
 
     test("Variables", async () => {
-        const symbols = await getDocumentSymbols(
+        const ast = new AST(
             'let x = 1; { let y = 2; }',
-            context
+            context,
+            ""
         )
 
-        assert.deepStrictEqual(symbols, [
+        assert.deepStrictEqual(ast.getDocumentSymbols(), [
             {
                 "name": "x",
                 "kind": 13,
@@ -227,14 +224,15 @@ suite("Document Symbols", () => {
     });
 
     test("Functions", async() => {
-        const symbols = await getDocumentSymbols(
+        const ast = new AST(
             `const mult = (x, y) => {
                 return x * y;
             }`,
-            context
+            context,
+            ""
         );
 
-        assert.deepEqual(symbols, [
+        assert.deepEqual(ast.getDocumentSymbols(), [
             {
                 "name": "mult",
                 "kind": 14,
