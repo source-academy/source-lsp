@@ -1,5 +1,4 @@
 import { DeclarationKind } from "js-slang/dist/name-extractor";
-import { Node } from "js-slang/dist/types";
 import { Range } from "vscode-languageserver/node";
 import * as es from 'estree';
 
@@ -23,28 +22,7 @@ export interface DeclarationSymbol {
     declarationKind: DeclarationKind,
     range: Range,
     selectionRange: Range,
-    children?: Array<ReferenceSymbol>
-}
-
-export interface ReferenceSymbol {
-    name: string,
-    range: Range
-}
-
-export interface ProgramSymbols {
-    name: string,
-    kind: DeclarationKind,
-    range: Range,
-    selectionRange: Range,
-}
-
-export interface ImportedSymbols extends ProgramSymbols {
-    module_name: string
-}
-
-export interface NodeToSymbol {
-    type: string,
-    callback: (node: Node) => ProgramSymbols[]
+    parameters?: Array<DeclarationSymbol>
 }
 
 export interface CompletionItemData {
@@ -52,26 +30,4 @@ export interface CompletionItemData {
     idx: number
     module_name?: string,
     parameters?: string[]
-}
-
-export interface ModuleSymbolSpecifier {
-    name: string,
-    module_name: string
-}
-
-export interface ImportedNameRanges {
-    name: string,
-    range: Range
-}
-
-export interface ModuleImportRanges {
-    type: "import",
-    module_name: string,
-    imports: ImportedNameRanges[]
-}
-
-export interface FunctionSymbol {
-    type: "function",
-    name: string,
-    params: string[]
 }

@@ -21,11 +21,10 @@ import {
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
-import { createContext, getAllOccurrencesInScope } from 'js-slang'
+import { createContext } from 'js-slang'
 import { Chapter, Variant } from 'js-slang/dist/types'
 import { sourceLocToRange } from './utils';
 
-import { getCompletionItems } from './languageFeatures';
 import { AST } from './ast';
 
 const chapter_names = {
@@ -232,10 +231,12 @@ connection.onCompletion(
 		const document = documents.get(textDocumentPosition.textDocument.uri);
 		if (!document) return [];
 
-		const text = document.getText();
-		const pos = textDocumentPosition.position;
+		// const text = document.getText();
+		// const pos = textDocumentPosition.position;
 
-		return getCompletionItems(text, pos, context);
+		// return getCompletionItems(text, pos, context);
+
+		return getAST(textDocumentPosition.textDocument.uri).getCompletionItems(textDocumentPosition.position);
 	}
 );
 

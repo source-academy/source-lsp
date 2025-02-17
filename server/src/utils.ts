@@ -1,8 +1,8 @@
 import { Chapter, Context, Node } from "js-slang/dist/types"
 import * as es from "estree";
-import { CompletionItem, CompletionItemKind, MarkupKind, Position, Range, SymbolKind } from "vscode-languageserver";
+import { CompletionItem, CompletionItemKind, DocumentSymbol, MarkupKind, Position, Range, SymbolKind } from "vscode-languageserver";
 import { DeclarationKind } from "js-slang/dist/name-extractor";
-import { AUTOCOMPLETE_TYPES, CompletionItemData, DECLARATIONS, NodeToSymbol, ProgramSymbols } from "./types";
+import { AUTOCOMPLETE_TYPES, CompletionItemData, DeclarationSymbol } from "./types";
 
 import source from './docs/source.json'
 import modules from "./docs/modules/modules.json";
@@ -119,12 +119,6 @@ export function getNodeChildren(node: Node): es.Node[] {
   }
 }
 
-export function getSubstrFromSouceLoc(text: string[], loc: es.SourceLocation): string {
-  return loc.start.line === loc.end.line ?
-    text[loc.start.line - 1].substring(loc.start.column, loc.end.column)
-    : [text[loc.start.line - 1].substring(loc.start.column), ...text.slice(loc.start.line, loc.end.line - 1), text[loc.end.line - 1].substring(0, loc.end.column)].join('\n');
-}
-
 export function sourceLocToRange(loc: es.SourceLocation): Range {
   return {
     start: {
@@ -168,114 +162,15 @@ export function mapMetaToCompletionItemKind(meta: string) {
   }
 }
 
-// The getNames function in js-slang has some issues, firstly it only get the names within a given scope, and it doesnt return the location of the name
-// This implementation doesn't care where the cursor is, and grabs the name of all variables and functions
-// @param prog Root node of the program, generated using looseParse
-// @param ...nodeCallbacks accepts a variable number of callback objects {type: string, callback: (node: Node) => T[]}
-// The type is the string that identifies the type of node
-// @returns Promise<T[]>
-export async function applyFunctionOnNode<T>(
-  prog: Node, 
-  ...nodeCallbacks: {type: string, callback: (node: Node) => T[]}[]
-): Promise<T[]> {
-  return applyFunctionOnNodeWithCursor<T>(prog, null, ...nodeCallbacks);
-}
 
-export async function applyFunctionOnNodeWithCursor<T>(
-  prog: Node, 
-  cursorLoc: Position | null,
-  ...nodeCallbacks: {type: string, callback: (node: Node) => T[]}[]
-): Promise<T[]> {
-	const queue: Node[] = [prog];
-	let symbols: T[] = [];
-
-	while (queue.length > 0) {
-		const node = queue.shift()!;
-
-    // console.debug(node);
-
-    nodeCallbacks.forEach(x => {
-      if (node.type === x.type) {
-        symbols = symbols.concat(x.callback(node));
-      }
-    });
-
-
-    if (cursorLoc === null || (node.loc && VsPosInSourceLoc(cursorLoc, node.loc))) {
-		  queue.push(...getNodeChildren(node));
-    }
-	}
-
-	return symbols;
-}
-
-function variableDeclarationToSymbol(node: Node): ProgramSymbols[] {
-  node = node as es.VariableDeclaration;
-  return node.declarations.map((declaration): ProgramSymbols => ({
-    name: (declaration.id as es.Identifier).name,
-    kind: node.kind === 'var' || node.kind === 'let' ? DeclarationKind.KIND_LET : DeclarationKind.KIND_CONST,
-    range: sourceLocToRange(declaration.loc!),
-    selectionRange: sourceLocToRange(declaration.id.loc!)
-  }));
-}
-
-function functionDeclarationToSymbol(node: Node): ProgramSymbols[] {
-  node = node as es.FunctionDeclaration;
-  const ret = node.params.map((param): ProgramSymbols => ({
-        name: (param as es.Identifier).name,
-				kind: DeclarationKind.KIND_PARAM,
-				range: sourceLocToRange(param.loc!),
-				selectionRange: sourceLocToRange(param.loc!)
-  }));
-  
-  ret.push({
-        name: node.id!.name,
-				kind: DeclarationKind.KIND_FUNCTION,
-				range: sourceLocToRange(node.loc!),
-				selectionRange: sourceLocToRange(node.id!.loc!)
+export function mapDeclarationSymbolToDocumentSymbol(declaration: DeclarationSymbol, context: Context): DocumentSymbol {
+  return ({
+    name: declaration.name,
+    kind: mapDeclarationKindToSymbolKind(declaration.declarationKind, context),
+    range: declaration.range,
+    selectionRange: declaration.selectionRange,
+    ...declaration.parameters && { children: declaration.parameters.map(x => mapDeclarationSymbolToDocumentSymbol(x, context)) }
   });
-
-  return ret;
-}
-
-function importDeclarationToSymbol(node: Node): ProgramSymbols[] {
-  node = node as es.ImportDeclaration;
-
-  return node.specifiers.map((specifier): ProgramSymbols => ({
-    name: ((specifier as es.ImportSpecifier).imported as es.Identifier).name,
-    kind: DeclarationKind.KIND_IMPORT,
-    range: sourceLocToRange(node.loc!),
-    selectionRange: sourceLocToRange(specifier.loc!)
-  }))
-}
-
-export const VariableNodeToSymbol: NodeToSymbol = {
-  type: DECLARATIONS.VARIABLE,
-  callback: variableDeclarationToSymbol
-}
-
-export const FunctionNodeToSymbol: NodeToSymbol = {
-  type: DECLARATIONS.FUNCTION,
-  callback: functionDeclarationToSymbol
-}
-
-export const ImportNodeToSymbol: NodeToSymbol = {
-  type: DECLARATIONS.IMPORT,
-  callback: importDeclarationToSymbol
-}
-
-export function findExistingImportLine(code: string, moduleName: string): { line: number } | null {
-  const importRegex = `import\\s*{\\s*([^}]*)\\s*}\\s*from\\s*["']${moduleName}["'];`;
-  const lines = code.split("\n");
-
-  for (let i = 0; i < lines.length; i++) {
-      const match = lines[i].match(importRegex);
-      if (match) {
-          return { line: i };
-      }
-  }
-
-  return null; // No existing import for the module
 }
 
 // Helper function to find which range ends later
@@ -294,4 +189,8 @@ export function VsPosInSourceLoc(pos: Position, loc: es.SourceLocation) {
   const esPos: es.Position = { line: pos.line+1, column: pos.character }
 
   return before(loc.start, esPos) && before(esPos, loc.end);
+}
+
+export function sourceLocInSourceLoc(inner: es.SourceLocation, outer: es.SourceLocation) {
+  return VsPosInSourceLoc({line: inner.start.line - 1, character: inner.start.column}, outer) && VsPosInSourceLoc({line: inner.end.line - 1, character: inner.end.column}, outer);
 }

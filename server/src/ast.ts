@@ -3,9 +3,9 @@ import { findDeclarationNode, findIdentifierNode } from "js-slang/dist/finder";
 import { Comment } from 'acorn';
 import { Identifier, ImportSpecifier, Program, SourceLocation } from 'estree';
 import { parseWithComments } from "js-slang/dist/parser/utils";
-import { DECLARATIONS, DeclarationSymbol } from "./types";
-import { getNodeChildren, mapDeclarationKindToSymbolKind, sourceLocToRange } from "./utils";
-import { DocumentHighlight, DocumentSymbol, Position, TextEdit, WorkspaceEdit } from "vscode-languageserver";
+import { AUTOCOMPLETE_TYPES, DECLARATIONS, DeclarationSymbol } from "./types";
+import { autocomplete_labels, findLastRange, getNodeChildren, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, sourceLocInSourceLoc, sourceLocToRange, VsPosInSourceLoc } from "./utils";
+import { CompletionItem, DocumentHighlight, DocumentSymbol, Position, Range, TextEdit, WorkspaceEdit } from "vscode-languageserver";
 import { DeclarationKind } from "js-slang/dist/name-extractor";
 import { getAllOccurrencesInScopeHelper } from "js-slang/dist/scope-refactoring";
 
@@ -13,7 +13,10 @@ export class AST {
     private ast: Node;
     private comments: Comment[];
     private context: Context;
-    readonly declarations: Map<string, Array<DeclarationSymbol>> = new Map();
+    private declarations: Map<string, Array<DeclarationSymbol>> = new Map();
+    private imported_names: {
+        [module_name: string]: Map<string, Range>
+    } = {};
     private uri: string;
 
     constructor(text: string, context: Context, uri: string) {
@@ -23,14 +26,18 @@ export class AST {
 
 
         const queue: Node[] = [this.ast];
-        while(queue.length > 0) {
+        while (queue.length > 0) {
             const parent = queue.shift()!;
 
             // We iterate over the children here to maintain the parent pointer to store the scope.
             getNodeChildren(parent).forEach((child: Node) => {
                 if (child.type === DECLARATIONS.IMPORT) {
+                    const module_name = child.source.value as string
+                    if (!this.imported_names[module_name]) this.imported_names[module_name] = new Map();
+
                     child.specifiers.forEach(specifier => {
                         const name = ((specifier as ImportSpecifier).imported as Identifier).name;
+                        this.imported_names[module_name].set(name, sourceLocToRange(specifier.loc!));
                         this.addDeclaration(name, {
                             name: name,
                             scope: parent.loc!,
@@ -58,25 +65,28 @@ export class AST {
 
                 else if (child.type === DECLARATIONS.FUNCTION) {
                     const name = child.id!.name;
-                    this.addDeclaration(name, {
+                    const functionDeclaration: DeclarationSymbol = {
                         name: name,
                         scope: parent.loc!,
                         meta: "func",
                         declarationKind: DeclarationKind.KIND_FUNCTION,
                         range: sourceLocToRange(child.loc!),
-                        selectionRange: sourceLocToRange(child.id!.loc!)
-                    });
+                        selectionRange: sourceLocToRange(child.id!.loc!),
+                        parameters: []
+                    }
+                    this.addDeclaration(name, functionDeclaration);
 
                     child.params.forEach(param => {
                         const name = (param as Identifier).name;
-                        this.addDeclaration(name, {
+                        const param_declaration: DeclarationSymbol = {
                             name: name,
                             scope: child.body.loc!,
                             meta: context.chapter == Chapter.SOURCE_1 || context.chapter === Chapter.SOURCE_2 ? "const" : "let",
                             declarationKind: DeclarationKind.KIND_PARAM,
                             range: sourceLocToRange(param.loc!),
                             selectionRange: sourceLocToRange(param.loc!)
-                        });
+                        }
+                        functionDeclaration.parameters?.push(param_declaration);
                     })
 
                     queue.push(child.body);
@@ -90,39 +100,35 @@ export class AST {
     }
 
     private addDeclaration(name: string, declaration: DeclarationSymbol): void {
-        if(!this.declarations.has(name)) this.declarations.set(name, []);
+        if (!this.declarations.has(name)) this.declarations.set(name, []);
         this.declarations.get(name)!.push(declaration);
     }
 
     public findDeclaration(pos: Position): SourceLocation | null | undefined {
-        const identifier = findIdentifierNode(this.ast, this.context, {line: pos.line+1, column: pos.character});
+        const identifier = findIdentifierNode(this.ast, this.context, { line: pos.line + 1, column: pos.character });
         if (!identifier) return null;
-        
+
         const declaration = findDeclarationNode(this.ast, identifier);
-        if (!declaration)  return null;
+        if (!declaration) return null;
 
         return declaration.loc;
     }
 
     public getOccurences(pos: Position): DocumentHighlight[] {
-        const identifier = findIdentifierNode(this.ast, this.context, {line: pos.line+1, column: pos.character});
+        const identifier = findIdentifierNode(this.ast, this.context, { line: pos.line + 1, column: pos.character });
         if (!identifier) return [];
-        
-        const declaration = findDeclarationNode(this.ast, identifier);
-        if (!declaration)  return [];
 
-        return getAllOccurrencesInScopeHelper(declaration.loc!, this.ast as Program, identifier.name).map(loc => ({range: sourceLocToRange(loc)}));
+        const declaration = findDeclarationNode(this.ast, identifier);
+        if (!declaration) return [];
+
+        return getAllOccurrencesInScopeHelper(declaration.loc!, this.ast as Program, identifier.name).map(loc => ({ range: sourceLocToRange(loc) }));
     }
 
     public getDocumentSymbols(): DocumentSymbol[] {
+
         let ret: DocumentSymbol[] = []
         this.declarations.forEach((value, key) => {
-            ret = ret.concat(value.map((declaration: DeclarationSymbol): DocumentSymbol => ({
-                name: declaration.name,
-                kind: mapDeclarationKindToSymbolKind(declaration.declarationKind, this.context),
-                range: declaration.range,
-                selectionRange: declaration.selectionRange
-            })))
+            ret = ret.concat(value.map((declaration: DeclarationSymbol): DocumentSymbol => mapDeclarationSymbolToDocumentSymbol(declaration, this.context)))
         })
 
         return ret;
@@ -137,5 +143,66 @@ export class AST {
                 [this.uri]: occurences.map(loc => TextEdit.replace(loc.range, newName))
             }
         };
+    }
+
+    public getCompletionItems(pos: Position): CompletionItem[] {
+        let ret: CompletionItem[] = [];
+        this.declarations.forEach(value => {
+            // Find the most specific scope
+            let mostSpecificDeclaration: DeclarationSymbol | undefined;
+            value.forEach(declaration => {
+                if (declaration.declarationKind != DeclarationKind.KIND_IMPORT && VsPosInSourceLoc(pos, declaration.scope)) {
+                    if (mostSpecificDeclaration === undefined || sourceLocInSourceLoc(declaration.scope, mostSpecificDeclaration.scope)) {
+                        mostSpecificDeclaration = declaration
+                    }
+                }
+            })
+
+            if (mostSpecificDeclaration) {
+                ret.push({
+                    label: mostSpecificDeclaration.name,
+                    labelDetails: { detail: ` (${mostSpecificDeclaration.meta})` },
+                    kind: mapMetaToCompletionItemKind(mostSpecificDeclaration.meta),
+                    data: {
+                        type: AUTOCOMPLETE_TYPES.SYMBOL,
+                        ...mostSpecificDeclaration.parameters && { parameters: mostSpecificDeclaration.parameters.map(x => x.name) }
+                    },
+                    sortText: '' + AUTOCOMPLETE_TYPES.SYMBOL
+                })
+            }
+        })
+
+        return autocomplete_labels[this.context.chapter - 1]
+            .concat(ret)
+            .concat(module_autocomplete.map((item: CompletionItem): CompletionItem => {
+                if (this.imported_names[item.data.module_name]) {
+                    if (this.imported_names[item.data.module_name].has(item.label)) {
+                        return {
+                            ...item,
+                            detail: `Imported from ${item.data.module_name}`,
+                            data: { type: AUTOCOMPLETE_TYPES.SYMBOL, ...item.data }
+                        };
+                    }
+                    else {
+                        // Not sure if the map preserves the order that names were inserted
+                        let last_imported_range: Range = { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } };
+                        this.imported_names[item.data.module_name].forEach(range => {
+                            last_imported_range = findLastRange(last_imported_range, range);
+                        });
+                        return {
+                            ...item,
+                            additionalTextEdits: [
+                                TextEdit.insert(last_imported_range.end, `, ${item.label}`)
+                            ]
+                        };
+                    };
+                }
+                else return {
+                    ...item,
+                    additionalTextEdits: [
+                        TextEdit.insert({ line: 0, character: 0 }, `import { ${item.label} } from "${item.data.module_name};"\n`)
+                    ]
+                };
+            }));
     }
 }

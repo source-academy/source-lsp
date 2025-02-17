@@ -1,1 +1,1 @@
-{"root":["./src/ast.ts","./src/languageFeatures.ts","./src/server.ts","./src/types.ts","./src/utils.ts","./src/test/test.ts"],"version":"5.7.3"}
+{"root":["./src/ast.ts","./src/server.ts","./src/types.ts","./src/utils.ts","./src/test/test.ts"],"version":"5.7.3"}

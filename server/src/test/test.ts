@@ -1,5 +1,4 @@
 import { createContext } from "js-slang";
-import { getCompletionItems } from "../languageFeatures";
 import { Chapter, Variant } from "js-slang/dist/types";
 import assert from "assert";
 import { autocomplete_labels } from "../utils";
@@ -10,19 +9,17 @@ const context = createContext(Chapter.SOURCE_4, Variant.DEFAULT);
 
 suite("Autocompletion", () => {
     test("Builtins", async () => {
-        const items = await getCompletionItems(
-            "",
-            {line: 0, character: 0},
-            context
+        const ast = new AST("", context, "");
+        const items = ast.getCompletionItems(
+            {line: 0, character: 0}
         );
         assert.ok(autocomplete_labels[context.chapter-1].every(i => items.includes(i)));
     });
 
     test("Scoping", async () => {
-        const items = await getCompletionItems(
-            "let x = 1; {let y = 1;}",
-            {line: 0, character: 0},
-            context
+        const ast = new AST("let x = 1; {let y = 1;}", context, "");
+        const items = ast.getCompletionItems(
+            {line: 0, character: 0}
         );
 
         assert.ok(items.some(i => i.label === "x") && items.every(i => i.label !== "y"));
