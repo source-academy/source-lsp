@@ -27,11 +27,12 @@ import { sourceLocToRange } from './utils';
 
 import { AST } from './ast';
 
+const SECTION = "\u00A7";
 const chapter_names = {
-	"Source 1": Chapter.SOURCE_1,
-	"Source 2": Chapter.SOURCE_2,
-	"Source 3": Chapter.SOURCE_3,
-	"Source 4": Chapter.SOURCE_4
+	[`Source ${SECTION}1`]: Chapter.SOURCE_1,
+	[`Source ${SECTION}2`]: Chapter.SOURCE_2,
+	[`Source ${SECTION}3`]: Chapter.SOURCE_3,
+	[`Source ${SECTION}4`]: Chapter.SOURCE_4
 };
 
 // Create a connection for the server, using Node's IPC as a transport.
@@ -175,49 +176,17 @@ let timeout: NodeJS.Timeout | undefined = undefined;
 documents.onDidChangeContent(change => {
 	if (timeout) clearTimeout(timeout); 
 	timeout = setTimeout(() => {
-		validateTextDocument(change.document);
 		astCache.delete(change.document.uri);
+		validateTextDocument(change.document);
 	}, 300);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// In this simple example we get the settings for every validate run.
-	let settings = await getDocumentSettings(textDocument.uri);
-
-	// The validator creates diagnostics for all uppercase words length 2 and more
-	let text = textDocument.getText();
-	let pattern = /\b[A-Z]{2,}\b/g;
-	let m: RegExpExecArray | null;
-
-	let problems = 0;
-	let diagnostics: Diagnostic[] = [];
-	while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
-		problems++;
-		let diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is all uppercase.`,
-			source: 'ex'
-		};
-		if (hasDiagnosticRelatedInformationCapability) {
-			diagnostic.relatedInformation = [
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: "test"
-				}
-			];
-		}
-		diagnostics.push(diagnostic);
+	const document = documents.get(textDocument.uri);
+	if (document) {
+		connection.sendDiagnostics({ uri: textDocument.uri, diagnostics: getAST(textDocument.uri).diagnostics });
 	}
-
-	// Send the computed diagnostics to VS Code.
-	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }
 
 connection.onDidChangeWatchedFiles(_change => {

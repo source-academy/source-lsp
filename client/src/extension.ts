@@ -19,6 +19,7 @@ import {
 } from 'vscode'
 
 let client: LanguageClient;
+const SECTION = "\u00A7";
 
 export function activate(context: ExtensionContext) {
 	// The server is implemented in node
@@ -60,7 +61,7 @@ export function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(
 		commands.registerCommand("sourcejs.setLanguageVersion", async () => {
-			const versions = ["Source 1", "Source 2", "Source 3", "Source 4"]
+			const versions = [`Source ${SECTION}1`, `Source ${SECTION}2`, `Source ${SECTION}3`, `Source ${SECTION}4`]
 			const selectedVersion = await window.showQuickPick(versions, {
 				placeHolder: "Select the language version",
 			});

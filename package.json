@@ -33,14 +33,8 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "Example configuration",
+      "title": "configuration",
       "properties": {
-        "languageServerExample.maxNumberOfProblems": {
-          "scope": "resource",
-          "type": "number",
-          "default": 100,
-          "description": "Controls the maximum number of problems produced by the server."
-        },
         "languageServerExample.trace.server": {
           "scope": "window",
           "type": "string",

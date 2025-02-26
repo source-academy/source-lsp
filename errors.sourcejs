@@ -1,0 +1,3 @@
+// Syntax errors
+display(1)
+const arr = [1,];
