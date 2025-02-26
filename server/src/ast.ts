@@ -1,6 +1,6 @@
-import { Chapter, Context, Node, SourceError } from "js-slang/dist/types";
+import { Chapter, Context, FunctionDeclarationExpression, Node, SourceError } from "js-slang/dist/types";
 import { findDeclarationNode, findIdentifierNode } from "js-slang/dist/finder";
-import { Identifier, ImportSpecifier, Program, SourceLocation } from 'estree';
+import { ArrowFunctionExpression, Identifier, ImportSpecifier, Program, SourceLocation } from 'estree';
 import { createAcornParserOptions, looseParse } from "js-slang/dist/parser/utils";
 import { AUTOCOMPLETE_TYPES, DECLARATIONS, DeclarationSymbol } from "./types";
 import { autocomplete_labels, findLastRange, getNodeChildren, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, sourceLocInSourceLoc, sourceLocToRange, VsPosInSourceLoc } from "./utils";
@@ -20,7 +20,7 @@ export class AST {
     [module_name: string]: Map<string, Range>
   } = {};
   private uri: string;
-  public diagnostics: Diagnostic[] = [];
+  private diagnostics: Diagnostic[] = [];
 
   constructor(text: string, context: Context, uri: string) {
     const acornOptions: AcornOptions = createAcornParserOptions(
@@ -34,7 +34,7 @@ export class AST {
             range: {
               start: { line: loc!.line - 1, character: loc!.column },
               end: { line: loc!.line - 1, character: loc!.column + 1 }
-            }
+            },
           })
         },
         onTrailingComma: (pos, loc) => {
@@ -88,14 +88,36 @@ export class AST {
         else if (child.type === DECLARATIONS.VARIABLE) {
           child.declarations.forEach(declaration => {
             const name = (declaration.id as Identifier).name;
-            this.addDeclaration(name, {
+            const variableDeclaration: DeclarationSymbol = {
               name: name,
               scope: parent.loc!,
               meta: child.kind === "var" || child.kind === "let" ? "let" : "const",
               declarationKind: child.kind === "var" || child.kind === "let" ? DeclarationKind.KIND_LET : DeclarationKind.KIND_CONST,
               range: sourceLocToRange(declaration.loc!),
-              selectionRange: sourceLocToRange(declaration.id.loc!)
-            });
+              selectionRange: sourceLocToRange(declaration.id.loc!),
+            }
+            this.addDeclaration(name, variableDeclaration);
+
+
+            if (declaration.init!.type == DECLARATIONS.LAMBDA) {
+              const lambda = declaration.init as ArrowFunctionExpression;
+              if (lambda.params.length !== 0) variableDeclaration.parameters = [];
+
+              lambda.params.forEach(param => {
+                const name = (param as Identifier).name;
+                const param_declaration: DeclarationSymbol = {
+                  name: name,
+                  scope: lambda.body.loc!,
+                  meta: context.chapter == Chapter.SOURCE_1 || context.chapter === Chapter.SOURCE_2 ? "const" : "let",
+                  declarationKind: DeclarationKind.KIND_PARAM,
+                  range: sourceLocToRange(param.loc!),
+                  selectionRange: sourceLocToRange(param.loc!),
+                  showInDocumentSymbols: false
+                }
+                variableDeclaration.parameters!.push(param_declaration);
+                this.addDeclaration(name, param_declaration);
+              })
+            }
           })
         }
 
@@ -120,9 +142,11 @@ export class AST {
               meta: context.chapter == Chapter.SOURCE_1 || context.chapter === Chapter.SOURCE_2 ? "const" : "let",
               declarationKind: DeclarationKind.KIND_PARAM,
               range: sourceLocToRange(param.loc!),
-              selectionRange: sourceLocToRange(param.loc!)
+              selectionRange: sourceLocToRange(param.loc!),
+              showInDocumentSymbols: false
             }
-            functionDeclaration.parameters?.push(param_declaration);
+            functionDeclaration.parameters!.push(param_declaration);
+            this.addDeclaration(name, param_declaration);
           })
 
           queue.push(child.body);
@@ -133,6 +157,7 @@ export class AST {
         }
       })
     }
+    console.debug(JSON.stringify(this.ast, null, 2));
   }
 
   private addDeclaration(name: string, declaration: DeclarationSymbol): void {
@@ -164,7 +189,7 @@ export class AST {
 
     let ret: DocumentSymbol[] = []
     this.declarations.forEach((value, key) => {
-      ret = ret.concat(value.map((declaration: DeclarationSymbol): DocumentSymbol => mapDeclarationSymbolToDocumentSymbol(declaration, this.context)))
+      ret = ret.concat(value.filter(x => x.showInDocumentSymbols !== false).map((declaration: DeclarationSymbol): DocumentSymbol => mapDeclarationSymbolToDocumentSymbol(declaration, this.context)))
     })
 
     return ret;
@@ -240,5 +265,12 @@ export class AST {
           ]
         };
       }));
+  }
+
+  public getDiagnostics(): Diagnostic[] {
+    return this.diagnostics.map(diagnostic => ({
+      ...diagnostic,
+      source: `Source ${this.context.chapter}`
+    }))
   }
 }

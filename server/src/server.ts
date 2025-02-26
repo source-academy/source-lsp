@@ -139,22 +139,6 @@ connection.onDidChangeConfiguration(change => {
 
 
 
-function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
-	if (!hasConfigurationCapability) {
-		return Promise.resolve(globalSettings);
-	}
-	let result = documentSettings.get(resource);
-	if (!result) {
-		result = connection.workspace.getConfiguration({
-			scopeUri: resource,
-			section: 'languageServerExample'
-		});
-		documentSettings.set(resource, result);
-	};
-	return result;
-}
-
-
 // Custom request to set the language version
 connection.onRequest("setLanguageVersion", (params: { version: string }) => {
 	if (Object.keys(chapter_names).includes(params.version)) {
@@ -185,7 +169,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// In this simple example we get the settings for every validate run.
 	const document = documents.get(textDocument.uri);
 	if (document) {
-		connection.sendDiagnostics({ uri: textDocument.uri, diagnostics: getAST(textDocument.uri).diagnostics });
+		connection.sendDiagnostics({ uri: textDocument.uri, diagnostics: getAST(textDocument.uri).getDiagnostics()});
 	}
 }
 
@@ -199,11 +183,6 @@ connection.onCompletion(
 	async (textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> => {
 		const document = documents.get(textDocumentPosition.textDocument.uri);
 		if (!document) return [];
-
-		// const text = document.getText();
-		// const pos = textDocumentPosition.position;
-
-		// return getCompletionItems(text, pos, context);
 
 		return getAST(textDocumentPosition.textDocument.uri).getCompletionItems(textDocumentPosition.position);
 	}

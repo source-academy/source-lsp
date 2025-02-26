@@ -12,7 +12,8 @@ export enum AUTOCOMPLETE_TYPES {
 export enum DECLARATIONS {
     VARIABLE = "VariableDeclaration",
     FUNCTION = "FunctionDeclaration",
-    IMPORT = "ImportDeclaration"
+    IMPORT = "ImportDeclaration",
+    LAMBDA = "ArrowFunctionExpression"
 }
 
 export interface DeclarationSymbol {
@@ -22,7 +23,8 @@ export interface DeclarationSymbol {
     declarationKind: DeclarationKind,
     range: Range,
     selectionRange: Range,
-    parameters?: Array<DeclarationSymbol>
+    parameters?: Array<DeclarationSymbol>,
+    showInDocumentSymbols?: boolean;
 }
 
 export interface CompletionItemData {
