@@ -8,6 +8,8 @@ import source from './docs/source.json'
 import modules from "./docs/modules/modules.json";
 
 
+export const source_functions = source.map(version => version.filter(doc => doc.meta === "func").reduce((a, v) => ({...a, [v.label]: v}), {}));
+export const imported_types: Map<string, Map<string, "const" | "func">> = new Map();
 
 export const autocomplete_labels = source.map(version => version.map((doc, idx): CompletionItem => {
 	return {
@@ -19,7 +21,7 @@ export const autocomplete_labels = source.map(version => version.map((doc, idx):
 			value: doc.description
 		},
 		kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
-		data: { type: AUTOCOMPLETE_TYPES.BUILTIN, idx: idx, parameters: doc.parameters } as CompletionItemData,
+		data: { type: AUTOCOMPLETE_TYPES.BUILTIN, idx: idx, parameters: doc.parameters, optional_params: doc.optional_params } as CompletionItemData,
 		sortText: '' + AUTOCOMPLETE_TYPES.BUILTIN
 	};
 }));
@@ -28,8 +30,10 @@ export const module_autocomplete: CompletionItem[] = [];
 
 for (const key in modules) {
 	const module = modules[key as keyof typeof modules];
+  imported_types.set(key, new Map());
 
 	module.forEach((doc, idx) => {
+    imported_types.get(key)!.set(doc.label, doc.meta === "func" ? "func" : "const");
 		module_autocomplete.push({
 			label: doc.label,
 			labelDetails: { detail: ` (${doc.meta})` },
@@ -40,7 +44,7 @@ for (const key in modules) {
 			},
 			kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
 			// @ts-ignore
-			data: { type: AUTOCOMPLETE_TYPES.MODULE, idx: idx, module_name: key, parameters: doc.parameters } as CompletionItemData,
+			data: { type: AUTOCOMPLETE_TYPES.MODULE, idx: idx, module_name: key, parameters: doc.parameters, optional_params: doc.optional_params } as CompletionItemData,
 			sortText: '' + AUTOCOMPLETE_TYPES.MODULE
 		});
 	});
@@ -83,6 +87,10 @@ export function getNodeChildren(node: Node): es.Node[] {
       return node.declarations.flatMap(getNodeChildren)
     case 'VariableDeclarator':
       return node.init ? [node.init] : []
+    case 'ImportDeclaration':
+      return node.specifiers.flatMap(getNodeChildren)
+    case 'ImportSpecifier':
+      return [node.imported, node.local]
     case 'ArrowFunctionExpression':
       return [node.body]
     case 'FunctionExpression':

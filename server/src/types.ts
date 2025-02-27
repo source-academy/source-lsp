@@ -9,6 +9,12 @@ export enum AUTOCOMPLETE_TYPES {
 	MODULE
 }
 
+export enum NODES {
+    IDENTIFIER = "Identifier",
+    REST = "RestElement",
+    IMPORT_SPECIFIER = "ImportSpecifier"
+}
+
 export enum DECLARATIONS {
     VARIABLE = "VariableDeclaration",
     FUNCTION = "FunctionDeclaration",
@@ -16,7 +22,19 @@ export enum DECLARATIONS {
     LAMBDA = "ArrowFunctionExpression"
 }
 
+export enum STATEMENTS {
+    EXPRESSION = "ExpressionStatement"
+}
+
+export enum EXPRESSIONS {
+    BINARY = "BinaryExpression",
+    TERNARY = "ConditionalExpression",
+    LITERAL = "Literal",
+    CALL = "CallExpression"
+}
+
 export interface DeclarationSymbol {
+    type: "declaration",
     name: string,
     scope: es.SourceLocation,
     meta: "const" | "let" | "func",
@@ -31,5 +49,6 @@ export interface CompletionItemData {
     type: AUTOCOMPLETE_TYPES,
     idx: number
     module_name?: string,
-    parameters?: string[]
+    parameters?: string[],
+    optional_params?: string[]
 }

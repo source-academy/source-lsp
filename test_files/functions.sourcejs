@@ -1,0 +1,4 @@
+function test(arg1, ...args) {
+}
+
+(() => () => 0)();

@@ -1,0 +1,47 @@
+{
+    "rename_params": {
+        "accumulate": [
+            "(x, y) => ",
+            "initial",
+            "xs"
+        ],
+        "build_list": [
+            "x => ",
+            "n"
+        ],
+        "build_stream": [
+            "x => ",
+            "n"
+        ],
+        "filter": [
+            "x => ",
+            "xs"
+        ],
+        "for_each": [
+            "x => ",
+            "xs"
+        ],
+        "map": [
+            "x => ",
+            "xs"
+        ],
+        "stream_filter": [
+            "x => ",
+            "xs"
+        ],
+        "stream_for_each": [
+            "x => ",
+            "xs"
+        ],
+        "stream_map": [
+            "x => ",
+            "xs"
+        ]
+    },
+    "optional_params": {
+        "display": ["s"],
+        "display_list": ["s"],
+        "error": ["s"]
+    },
+    "hasRestElement": ["list", "stream", "draw_data"]
+}

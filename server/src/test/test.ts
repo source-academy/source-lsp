@@ -11,15 +11,15 @@ suite("Autocompletion", () => {
     test("Builtins", async () => {
         const ast = new AST("", context, "");
         const items = ast.getCompletionItems(
-            {line: 0, character: 0}
+            { line: 0, character: 0 }
         );
-        assert.ok(autocomplete_labels[context.chapter-1].every(i => items.includes(i)));
+        assert.ok(autocomplete_labels[context.chapter - 1].every(i => items.includes(i)));
     });
 
     test("Scoping", async () => {
         const ast = new AST("let x = 1; {let y = 1;}", context, "");
         const items = ast.getCompletionItems(
-            {line: 0, character: 0}
+            { line: 0, character: 0 }
         );
 
         assert.ok(items.some(i => i.label === "x") && items.every(i => i.label !== "y"));
@@ -32,7 +32,7 @@ suite("Rename", () => {
         const doc = TextDocument.create("test://test/test.sourcejs", 'sourcejs', 0, text);
         const ast = new AST(text, context, doc.uri);
         const edits = ast.renameSymbol(
-            {line: 0, character: 4},
+            { line: 0, character: 4 },
             'y'
         )
 
@@ -40,10 +40,10 @@ suite("Rename", () => {
             changes: {
                 [doc.uri]: [
                     {
-                        range: { start: {line: 0, character: 4}, end: {line: 0, character: 5}},
+                        range: { start: { line: 0, character: 4 }, end: { line: 0, character: 5 } },
                         newText: 'y'
                     }
-                ] 
+                ]
             }
         });
     });
@@ -53,7 +53,7 @@ suite("Rename", () => {
         const doc = TextDocument.create("test://test/test.sourcejs", 'sourcejs', 0, text);
         const ast = new AST(text, context, doc.uri);
         const edits = ast.renameSymbol(
-            {line: 0, character: 17},
+            { line: 0, character: 17 },
             'y'
         )
 
@@ -61,24 +61,24 @@ suite("Rename", () => {
             changes: {
                 [doc.uri]: [
                     {
-                        range: { start: {line: 0, character: 17}, end: {line: 0, character: 18}},
+                        range: { start: { line: 0, character: 17 }, end: { line: 0, character: 18 } },
                         newText: 'y'
                     },
                     {
-                        range: { start: {line: 0, character: 24}, end: {line: 0, character: 25}},
+                        range: { start: { line: 0, character: 24 }, end: { line: 0, character: 25 } },
                         newText: 'y'
                     }
-                ] 
+                ]
             }
         });
-    }); 
+    });
 
     test("Rename3", () => {
         const text = "let x = 1; { x = 3; }";
         const doc = TextDocument.create("test://test/test.sourcejs", 'sourcejs', 0, text);
         const ast = new AST(text, context, doc.uri);
         const edits = ast.renameSymbol(
-            {line: 0, character: 4},
+            { line: 0, character: 4 },
             'y'
         )
 
@@ -86,22 +86,22 @@ suite("Rename", () => {
             changes: {
                 [doc.uri]: [
                     {
-                        range: { start: {line: 0, character: 4}, end: {line: 0, character: 5}},
+                        range: { start: { line: 0, character: 4 }, end: { line: 0, character: 5 } },
                         newText: 'y'
                     },
                     {
-                        range: { start: {line: 0, character: 13}, end: {line: 0, character: 14}},
+                        range: { start: { line: 0, character: 13 }, end: { line: 0, character: 14 } },
                         newText: 'y'
                     }
-                ] 
+                ]
             }
         });
-    }); 
+    });
 });
 
 suite("Document Symbols", () => {
     test("Imports", async () => {
-        const ast =  new AST(
+        const ast = new AST(
             'import { black } from "rune"; import { black } from "rune_in_words";',
             context,
             ""
@@ -220,7 +220,7 @@ suite("Document Symbols", () => {
         )
     });
 
-    test("Functions", async() => {
+    test("Functions", async () => {
         const ast = new AST(
             `const mult = (x, y) => {
                 return x * y;
@@ -228,6 +228,7 @@ suite("Document Symbols", () => {
             context,
             ""
         );
+
 
         assert.deepEqual(ast.getDocumentSymbols(), [
             {
@@ -252,7 +253,57 @@ suite("Document Symbols", () => {
                         "line": 0,
                         "character": 10
                     }
-                }
+                },
+                "children": [
+                    {
+                        "name": "x",
+                        "kind": 13,
+                        "range": {
+                            "start": {
+                                "line": 0,
+                                "character": 14
+                            },
+                            "end": {
+                                "line": 0,
+                                "character": 15
+                            }
+                        },
+                        "selectionRange": {
+                            "start": {
+                                "line": 0,
+                                "character": 14
+                            },
+                            "end": {
+                                "line": 0,
+                                "character": 15
+                            }
+                        }
+                    },
+                    {
+                        "name": "y",
+                        "kind": 13,
+                        "range": {
+                            "start": {
+                                "line": 0,
+                                "character": 17
+                            },
+                            "end": {
+                                "line": 0,
+                                "character": 18
+                            }
+                        },
+                        "selectionRange": {
+                            "start": {
+                                "line": 0,
+                                "character": 17
+                            },
+                            "end": {
+                                "line": 0,
+                                "character": 18
+                            }
+                        }
+                    }
+                ]
             }
         ]
         )

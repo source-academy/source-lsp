@@ -1,14 +1,9 @@
-import sys
 import json
 from markdownify import markdownify as md
 import re
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        print("usage: python3 convertJsonDocs.py file1.json file2.json ...")
-        exit()
-
-    patches = json.loads(open("param_patches.json").read())
+    patches = json.loads(open("patches.json").read())
 
     with open("source.json", "w") as f:
         # one liner :)
@@ -25,8 +20,8 @@ if __name__ == "__main__":
                         item.update(
                             {
                                 "parameters": (
-                                    patches[key]
-                                    if key in patches
+                                    patches["rename_params"][key]
+                                    if key in patches["rename_params"]
                                     else [param.strip() for param in params.split(",")]
                                 )
                                 if len(
@@ -40,10 +35,15 @@ if __name__ == "__main__":
                         )
                         if item["meta"] == "func"
                         else 0,
+                        item.update(
+                            {"optional_params": patches["optional_params"][key]}
+                        )
+                        if key in patches["optional_params"]
+                        else 0,
                     ][0]
                     for key, val in json.loads(open(i).read()).items()
                 ]
-                for i in sys.argv[1:]
+                for i in [f"source_{i}.json" for i in range(1, 5)]
             ],
             f,
         )

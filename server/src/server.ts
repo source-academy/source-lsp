@@ -138,7 +138,6 @@ connection.onDidChangeConfiguration(change => {
 });
 
 
-
 // Custom request to set the language version
 connection.onRequest("setLanguageVersion", (params: { version: string }) => {
 	if (Object.keys(chapter_names).includes(params.version)) {
@@ -192,7 +191,7 @@ connection.onCompletion(
 // the completion list.
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
 	if (item.data.parameters) {
-		item.insertText = `${item.label}(${item.data.parameters.map((param: string, idx: number) => `\${${idx+1}:${param}}`)})`;
+		item.insertText = `${item.label}(${item.data.parameters.filter((x: string) => item.data.optional_params ? !item.data.optional_params.includes(x) : true).map((param: string, idx: number) => `\${${idx+1}:${param}}`)})`;
 		item.insertTextFormat = InsertTextFormat.Snippet;
 	};
 
