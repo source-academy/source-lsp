@@ -2,13 +2,14 @@ import { Chapter, Context, Node } from "js-slang/dist/types"
 import * as es from "estree";
 import { CompletionItem, CompletionItemKind, DocumentSymbol, MarkupKind, Position, Range, SymbolKind } from "vscode-languageserver";
 import { DeclarationKind } from "js-slang/dist/name-extractor";
-import { AUTOCOMPLETE_TYPES, CompletionItemData, DeclarationSymbol } from "./types";
+import { AUTOCOMPLETE_TYPES, CompletionItemData, DeclarationSymbol, Documentation } from "./types";
 
 import source from './docs/source.json'
 import modules from "./docs/modules/modules.json";
 
 
-export const source_functions = source.map(version => version.filter(doc => doc.meta === "func").reduce((a, v) => ({...a, [v.label]: v}), {}));
+export const builtin_functions: Array<{[key: string]: Documentation}> = source.map(version => version.filter(doc => doc.meta === "func").reduce((a, v) => ({...a, [v.label]: v}), {}));
+export const builtin_constants: Array<{[key: string]: Documentation}> = source.map(version => version.filter(doc => doc.meta === "const").reduce((a, v) => ({...a, [v.label]: v}), {}));
 export const imported_types: Map<string, Map<string, "const" | "func">> = new Map();
 
 export const autocomplete_labels = source.map(version => version.map((doc, idx): CompletionItem => {
@@ -21,7 +22,7 @@ export const autocomplete_labels = source.map(version => version.map((doc, idx):
 			value: doc.description
 		},
 		kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
-		data: { type: AUTOCOMPLETE_TYPES.BUILTIN, idx: idx, parameters: doc.parameters, optional_params: doc.optional_params } as CompletionItemData,
+		data: { type: AUTOCOMPLETE_TYPES.BUILTIN, idx: idx, parameters: doc.parameters, optional_params: doc.optional_params, hasRestElement: doc.hasRestElement} as CompletionItemData,
 		sortText: '' + AUTOCOMPLETE_TYPES.BUILTIN
 	};
 }));
@@ -139,6 +140,22 @@ export function sourceLocToRange(loc: es.SourceLocation): Range {
     }
   }
 }
+export function rangeToSourceLoc(loc: Range): es.SourceLocation {
+  return {
+    start: {
+      line: loc.start.line + 1,
+      column: loc.start.character
+    },
+    end: {
+      line: loc.end.line + 1,
+      column: loc.end.character
+    }
+  }
+}
+
+export function vsPosToEsPos(pos: Position): es.Position {
+  return { line: pos.line+1, column: pos.character }
+}
 
 export function mapDeclarationKindToSymbolKind(kind: DeclarationKind, context: Context): SymbolKind {
   switch (kind) {
@@ -189,16 +206,28 @@ export function findLastRange(r1: Range, r2: Range): Range {
   return r1;
 }
 
-export function VsPosInSourceLoc(pos: Position, loc: es.SourceLocation) {
-  function before(first: es.Position, second: es.Position) {
-    return first.line < second.line || (first.line === second.line && first.column <= second.column)
-  }
+export function before(first: es.Position, second: es.Position) {
+  return first.line < second.line || (first.line === second.line && first.column <= second.column)
+}
 
-  const esPos: es.Position = { line: pos.line+1, column: pos.character }
+export function vsPosInSourceLoc(pos: Position, loc: es.SourceLocation) {
+  const esPos: es.Position = vsPosToEsPos(pos);
 
   return before(loc.start, esPos) && before(esPos, loc.end);
 }
 
 export function sourceLocInSourceLoc(inner: es.SourceLocation, outer: es.SourceLocation) {
-  return VsPosInSourceLoc({line: inner.start.line - 1, character: inner.start.column}, outer) && VsPosInSourceLoc({line: inner.end.line - 1, character: inner.end.column}, outer);
+  return vsPosInSourceLoc({line: inner.start.line - 1, character: inner.start.column}, outer) && vsPosInSourceLoc({line: inner.end.line - 1, character: inner.end.column}, outer);
+}
+
+export function sourceLocEquals(s1: es.SourceLocation, s2: es.SourceLocation) {
+  return s1.start.column === s2.start.column && s1.start.line === s2.start.line && s1.end.column === s2.end.column && s1.end.line === s2.end.line;
+}
+
+export function isBuiltinFunction(name: string, context: Context) {
+  return name in builtin_functions[context.chapter-1];
+}
+
+export function isBuiltinConst(name: string, context: Context) {
+  return name in builtin_constants[context.chapter-1];
 }

@@ -30,7 +30,8 @@ export enum EXPRESSIONS {
     BINARY = "BinaryExpression",
     TERNARY = "ConditionalExpression",
     LITERAL = "Literal",
-    CALL = "CallExpression"
+    CALL = "CallExpression",
+    ASSIGNMENT = "AssignmentExpression"
 }
 
 export interface DeclarationSymbol {
@@ -41,8 +42,22 @@ export interface DeclarationSymbol {
     declarationKind: DeclarationKind,
     range: Range,
     selectionRange: Range,
-    parameters?: Array<DeclarationSymbol>,
+    parameters?: Array<ParameterSymbol>,
     showInDocumentSymbols?: boolean;
+}
+
+export interface ParameterSymbol extends DeclarationSymbol {
+    isRestElement: boolean
+}
+
+export interface Documentation {
+    label: string,
+    title: string,
+    description: string,
+    meta: "const" | "func",
+    parameters?: string[],
+    optional_params?: string[],
+    hasRestElement? : boolean
 }
 
 export interface CompletionItemData {
@@ -50,5 +65,6 @@ export interface CompletionItemData {
     idx: number
     module_name?: string,
     parameters?: string[],
-    optional_params?: string[]
+    optional_params?: string[],
+    hasRestElement?: boolean
 }

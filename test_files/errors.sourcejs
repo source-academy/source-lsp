@@ -1,16 +1,19 @@
-import { black } from "rune";
 // Syntax errors
-display(1)
-const arr = [1,];
-function test(arg1, ...args, arg2, arg3) {}
-function test2(arg1, arg2, ...arg1) {}
+{
+    display(1)
+    const arr = [1,];
+    function test(arg1, ...args, arg2, arg3) {}
+    function test2(arg1, arg2, ...arg1) {}
+    const x = x;
+}
 
 // Function related errors
-{function test3(){}}
-test3();
-const not_a_function = 1;
-not_a_function();
-black(rune)
+{
+    {function test3(){}}
+    test3();
+    const not_a_function = 1;
+    not_a_function();
+}
 
 // Incomplete statements
 const x = ;
