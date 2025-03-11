@@ -10,7 +10,6 @@ import modules from "./docs/modules/modules.json";
 
 export const builtin_functions: Array<{[key: string]: Documentation}> = source.map(version => version.filter(doc => doc.meta === "func").reduce((a, v) => ({...a, [v.label]: v}), {}));
 export const builtin_constants: Array<{[key: string]: Documentation}> = source.map(version => version.filter(doc => doc.meta === "const").reduce((a, v) => ({...a, [v.label]: v}), {}));
-export const imported_types: Map<string, Map<string, "const" | "func">> = new Map();
 
 export const autocomplete_labels = source.map(version => version.map((doc, idx): CompletionItem => {
 	return {
@@ -30,11 +29,9 @@ export const autocomplete_labels = source.map(version => version.map((doc, idx):
 export const module_autocomplete: CompletionItem[] = [];
 
 for (const key in modules) {
-	const module = modules[key as keyof typeof modules];
-  imported_types.set(key, new Map());
+	const module = modules[key as keyof typeof modules] as {[key: string]: Documentation}; 
 
-	module.forEach((doc, idx) => {
-    imported_types.get(key)!.set(doc.label, doc.meta === "func" ? "func" : "const");
+	Object.values(module).forEach((doc, idx) => {
 		module_autocomplete.push({
 			label: doc.label,
 			labelDetails: { detail: ` (${doc.meta})` },
@@ -49,6 +46,18 @@ for (const key in modules) {
 			sortText: '' + AUTOCOMPLETE_TYPES.MODULE
 		});
 	});
+}
+
+export function moduleExists(module_name: string): boolean {
+  return module_name in modules;
+}
+
+export function getImportedName(module_name: string, name: string): Documentation | undefined {
+  if (module_name in modules) {
+    const module = modules[module_name as keyof typeof modules] as {[key: string]: Documentation}; 
+    return module[name];
+  }
+  return undefined;
 }
 
 function isNotNull<T>(x: T): x is Exclude<T, null> {

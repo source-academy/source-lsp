@@ -14,7 +14,9 @@ import {
 	DocumentSymbolParams,
 	RenameParams,
 	WorkspaceEdit,
-	DocumentSymbol
+	DocumentSymbol,
+	HoverParams,
+	Hover
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -82,7 +84,8 @@ connection.onInitialize((params: InitializeParams) => {
 			declarationProvider: true,
 			documentHighlightProvider: true,
 			documentSymbolProvider: true,
-			renameProvider: true
+			renameProvider: true,
+			hoverProvider: true
 		}
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -236,6 +239,15 @@ connection.onRenameRequest((params: RenameParams): WorkspaceEdit | null => {
 	const position = params.position;
 
 	return getAST(params.textDocument.uri).renameSymbol(position, params.newName);
+})
+
+connection.onHover((params: HoverParams): Hover | null => {
+	const document = documents.get(params.textDocument.uri);
+	if (!document) return null;
+
+	const position = params.position;
+
+	return getAST(params.textDocument.uri).onHover(position);
 })
 
 

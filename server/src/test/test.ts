@@ -102,7 +102,7 @@ suite("Rename", () => {
 suite("Document Symbols", () => {
     test("Imports", async () => {
         const ast = new AST(
-            'import { black } from "rune"; import { black } from "rune_in_words";',
+            'import { black } from "rune";',
             context,
             ""
         );
@@ -129,30 +129,6 @@ suite("Document Symbols", () => {
                     "end": {
                         "line": 0,
                         "character": 14
-                    }
-                }
-            },
-            {
-                "name": "black",
-                "kind": 3,
-                "range": {
-                    "start": {
-                        "line": 0,
-                        "character": 30
-                    },
-                    "end": {
-                        "line": 0,
-                        "character": 68
-                    }
-                },
-                "selectionRange": {
-                    "start": {
-                        "line": 0,
-                        "character": 39
-                    },
-                    "end": {
-                        "line": 0,
-                        "character": 44
                     }
                 }
             }

@@ -2,9 +2,9 @@ import { Chapter, Context, Node } from "js-slang/dist/types";
 import { findDeclarationNode, findIdentifierNode } from "js-slang/dist/finder";
 import { CallExpression, Identifier, Literal, Program, SourceLocation } from 'estree';
 import { createAcornParserOptions, looseParse } from "js-slang/dist/parser/utils";
-import { AUTOCOMPLETE_TYPES, DECLARATIONS, DeclarationSymbol, EXPRESSIONS, NODES, ParameterSymbol, STATEMENTS } from "./types";
-import { autocomplete_labels, before, builtin_functions, findLastRange, getNodeChildren, imported_types, isBuiltinConst, isBuiltinFunction, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, rangeToSourceLoc, sourceLocEquals, sourceLocInSourceLoc, sourceLocToRange, vsPosInSourceLoc, vsPosToEsPos } from "./utils";
-import { CompletionItem, Diagnostic, DiagnosticSeverity, DocumentHighlight, DocumentSymbol, Position, Range, TextEdit, WorkspaceEdit } from "vscode-languageserver";
+import { AUTOCOMPLETE_TYPES, DECLARATIONS, DeclarationSymbol, Documentation, EXPRESSIONS, ImportedSymbol, NODES, ParameterSymbol, STATEMENTS } from "./types";
+import { autocomplete_labels, before, builtin_constants, builtin_functions, findLastRange, getImportedName, getNodeChildren, isBuiltinConst, isBuiltinFunction, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, moduleExists, rangeToSourceLoc, sourceLocEquals, sourceLocInSourceLoc, sourceLocToRange, vsPosInSourceLoc, vsPosToEsPos } from "./utils";
+import { CompletionItem, Diagnostic, DiagnosticSeverity, DiagnosticTag, DocumentHighlight, DocumentSymbol, Hover, Position, Range, TextEdit, WorkspaceEdit } from "vscode-languageserver";
 import { DeclarationKind } from "js-slang/dist/name-extractor";
 import { getAllOccurrencesInScopeHelper } from "js-slang/dist/scope-refactoring";
 import { AcornOptions } from "js-slang/dist/parser/types";
@@ -81,6 +81,26 @@ export class AST {
     this.diagnosticsCallbacks.forEach(val => {
       val[0](val[1]);
     })
+
+    const shadowedDeclarations: number[] = [];
+    this.declarations.forEach(declarationList => {
+      for (let i = 0; i < declarationList.length; i++) {
+        const declaration = declarationList[i]
+        if (declaration.unused)
+          this.addDiagnostic("Unused name", DiagnosticSeverity.Warning, rangeToSourceLoc(declaration.selectionRange), [DiagnosticTag.Unnecessary]);
+
+        for (let j = i + 1; j < declarationList.length; j++) {
+          if (!shadowedDeclarations.includes(j)) {
+            const inner = declarationList[j];
+            if (sourceLocInSourceLoc(inner.scope, declaration.scope)) {
+              this.addDiagnostic("Variable name is already used in outer scope", DiagnosticSeverity.Warning, rangeToSourceLoc(inner.selectionRange));
+              shadowedDeclarations.push(j);
+            }
+          }
+        }
+      }
+    })
+    this.declarations.forEach(x => console.debug(JSON.stringify(x, null, 2)));
   }
 
   private processDiagnostics(child: Node, parent: Node) {
@@ -106,7 +126,7 @@ export class AST {
 
         break;
       case (EXPRESSIONS.ASSIGNMENT):
-        if (child.left.type === "Identifier" && !this.isDummy(child.left) ) {
+        if (child.left.type === "Identifier" && !this.isDummy(child.left)) {
           this.addDiagnosticCallback((node: Node) => {
             const identifier = node as Identifier;
             if (identifier.loc) {
@@ -152,13 +172,22 @@ export class AST {
             const callee = call_expression.callee as Identifier;
             if (callee.loc) {
               const loc = callee.loc;
-              const declaration = this.findDeclarationByName(callee.name, loc)
+              let declaration = this.findDeclarationByName(callee.name, loc)
               if (declaration !== undefined) {
                 if (declaration.meta !== "func")
                   this.addDiagnostic(`'${callee.name}' is not a function`, DiagnosticSeverity.Error, loc);
-                if (declaration.parameters !== undefined) {
-                  const hasRestElement = declaration.parameters.some(x => x.isRestElement);
-                  const num_params = declaration.parameters.length - (hasRestElement ? 1 : 0);
+                if (declaration.parameters !== undefined || declaration.declarationKind === DeclarationKind.KIND_IMPORT) {
+                  let hasRestElement = false;
+                  let num_params = 0;
+                  if (declaration.declarationKind === DeclarationKind.KIND_IMPORT) {
+                    const imported = getImportedName((declaration as ImportedSymbol).module_name, (declaration as ImportedSymbol).real_name)!;
+                    num_params = imported.parameters ? imported.parameters.length : 0;
+                  }
+                  else {
+                    hasRestElement = declaration.parameters!.some(x => x.isRestElement);
+                    num_params = declaration.parameters!.length - (hasRestElement ? 1 : 0);
+                  }
+
 
                   if (hasRestElement) {
                     if (call_expression.arguments.length < num_params)
@@ -170,32 +199,26 @@ export class AST {
                   }
                 }
               }
-              else {
-                if (!isBuiltinFunction(callee.name, this.context))
-                  this.addDiagnostic(`'${callee.name}' is not a function`, DiagnosticSeverity.Error, loc);
-                else {
-                  if (callee.name in builtin_functions[this.context.chapter - 1]) {
-                    const doc = builtin_functions[this.context.chapter - 1][callee.name];
-                    // parameters must exist
-                    const num_params = doc.parameters!.length
+              else if (callee.name in builtin_functions[this.context.chapter - 1]) {
+                const doc = builtin_functions[this.context.chapter - 1][callee.name];
+                // parameters must exist
+                const num_params = doc.parameters!.length
 
-                    // In the documentation, there is no parameter for the rest element, so we dont have to num_params-1 if the function has a rest element
-                    // There is also no occurence of an optional param with a rest element
-                    if (doc.hasRestElement === true) {
-                      if (call_expression.arguments.length < num_params)
-                        this.addDiagnostic(`Expected ${num_params} or more arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
-                    }
-                    else {
-                      if (doc.optional_params) {
-                        const min_params = num_params - doc.optional_params.length;
-                        if (call_expression.arguments.length < min_params || call_expression.arguments.length > num_params)
-                          this.addDiagnostic(`Expected between ${min_params} and ${num_params} arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
-                      }
-                      else {
-                        if (call_expression.arguments.length !== num_params)
-                          this.addDiagnostic(`Expected ${num_params} arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
-                      }
-                    }
+                // In the documentation, there is no parameter for the rest element, so we dont have to num_params-1 if the function has a rest element
+                // There is also no occurence of an optional param with a rest element
+                if (doc.hasRestElement === true) {
+                  if (call_expression.arguments.length < num_params)
+                    this.addDiagnostic(`Expected ${num_params} or more arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
+                }
+                else {
+                  if (doc.optional_params) {
+                    const min_params = num_params - doc.optional_params.length;
+                    if (call_expression.arguments.length < min_params || call_expression.arguments.length > num_params)
+                      this.addDiagnostic(`Expected between ${min_params} and ${num_params} arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
+                  }
+                  else {
+                    if (call_expression.arguments.length !== num_params)
+                      this.addDiagnostic(`Expected ${num_params} arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
                   }
                 }
               }
@@ -213,14 +236,19 @@ export class AST {
               const declaration = this.findDeclarationByName(identifier.name, loc)
               if (declaration === undefined && !(isBuiltinConst(identifier.name, this.context) || isBuiltinFunction(identifier.name, this.context)))
                 this.addDiagnostic(`Name '${identifier.name}' not declared`, DiagnosticSeverity.Error, loc);
-              if (declaration !== undefined && !before(vsPosToEsPos(declaration.range.end), loc.start))
+              if (declaration !== undefined && sourceLocEquals(declaration.scope, parent.loc!) && !before(vsPosToEsPos(declaration.range.end), loc.start))
                 this.addDiagnostic(`Can't access lexical declaration '${identifier.name}' before initialization`, DiagnosticSeverity.Error, loc)
             }
           }, child)
         }
 
+        const declaration = this.findDeclarationByName(child.name, child.loc!);
+        if (declaration && !sourceLocEquals(rangeToSourceLoc(declaration.selectionRange), child.loc!)) {
+          declaration.unused = false;
+        }
+
         break;
-      case (DECLARATIONS.IMPORT): 
+      case (DECLARATIONS.IMPORT):
         if (this.isDummy(child.source))
           this.addDiagnostic("Expected module name", DiagnosticSeverity.Error, child.loc!);
         break;
@@ -238,7 +266,7 @@ export class AST {
   }
 
   // Wrapper around isDummy due to type checking issues
-  private isDummy(node: Identifier | Literal) : boolean {
+  private isDummy(node: Identifier | Literal): boolean {
     const dummy = "✖"
     if (node.type === NODES.IDENTIFIER)
       return node.name === dummy;
@@ -247,36 +275,43 @@ export class AST {
     return false;
   }
 
-  private addDiagnostic(message: string, severity: DiagnosticSeverity, loc: SourceLocation) {
+  private addDiagnostic(message: string, severity: DiagnosticSeverity, loc: SourceLocation, tags: DiagnosticTag[] = []) {
     this.diagnostics.push({
       message: message,
       severity: severity,
-      range: sourceLocToRange(loc)
+      range: sourceLocToRange(loc),
+      tags: tags
     })
   }
 
   private processDeclarations(child: Node, parent: Node) {
     if (child.type === DECLARATIONS.IMPORT) {
       const module_name = child.source.value as string
-      if (imported_types.has(module_name)) {
+      if (moduleExists(module_name)) {
         if (!this.imported_names[module_name]) this.imported_names[module_name] = new Map();
 
         child.specifiers.forEach(specifier => {
           // Namespace and default imports are not allowed
           if (specifier.type === NODES.IMPORT_SPECIFIER) {
-            const real_name = (specifier.imported as Identifier).name;
-            const name = specifier.local.name;
-            if (imported_types.get(module_name)!.has(real_name)) {
-              this.imported_names[module_name].set(real_name, { range: sourceLocToRange(specifier.loc!), local: name });
-              this.addDeclaration(name, {
-                type: "declaration",
-                name: name,
-                scope: parent.loc!,
-                meta: imported_types.get(module_name)!.get(real_name)!,
-                declarationKind: DeclarationKind.KIND_IMPORT,
-                range: sourceLocToRange(child.loc!),
-                selectionRange: sourceLocToRange(specifier.loc!)
-              })
+            if (specifier.imported.type === "Identifier") {
+              const real_name = specifier.imported.name;
+              const name = specifier.local.name;
+              let imported: Documentation | undefined;
+              if ((imported = getImportedName(module_name, real_name)) !== undefined) {
+                this.imported_names[module_name].set(real_name, { range: sourceLocToRange(specifier.loc!), local: name });
+                const declaration: ImportedSymbol = {
+                  name: name,
+                  scope: parent.loc!,
+                  meta: imported.meta,
+                  declarationKind: DeclarationKind.KIND_IMPORT,
+                  range: sourceLocToRange(child.loc!),
+                  selectionRange: sourceLocToRange(specifier.loc!),
+                  module_name: module_name,
+                  real_name: real_name,
+                  unused: true,
+                }
+                this.addDeclaration(name, declaration)
+              }
             }
           }
         })
@@ -289,13 +324,13 @@ export class AST {
 
           const name = declaration.id.name;
           const variableDeclaration: DeclarationSymbol = {
-            type: "declaration",
             name: name,
             scope: parent.loc!,
             meta: child.kind === "var" || child.kind === "let" ? "let" : "const",
             declarationKind: child.kind === "var" || child.kind === "let" ? DeclarationKind.KIND_LET : DeclarationKind.KIND_CONST,
             range: sourceLocToRange(declaration.loc!),
             selectionRange: sourceLocToRange(declaration.id.loc!),
+            unused: true
           }
           this.addDeclaration(name, variableDeclaration);
 
@@ -317,7 +352,6 @@ export class AST {
                   return;
                 }
                 const param_declaration: ParameterSymbol = {
-                  type: "declaration",
                   name: name,
                   scope: lambda.body.loc!,
                   meta: this.context.chapter == Chapter.SOURCE_1 || this.context.chapter === Chapter.SOURCE_2 ? "const" : "let",
@@ -325,7 +359,8 @@ export class AST {
                   range: sourceLocToRange(param.loc!),
                   selectionRange: sourceLocToRange(param.loc!),
                   showInDocumentSymbols: false,
-                  isRestElement: param.type === NODES.REST
+                  isRestElement: param.type === NODES.REST,
+                  unused: true
                 }
                 variableDeclaration.parameters!.push(param_declaration);
                 this.addDeclaration(name, param_declaration);
@@ -339,14 +374,14 @@ export class AST {
     else if (child.type === DECLARATIONS.FUNCTION) {
       const name = child.id!.name;
       const functionDeclaration: DeclarationSymbol = {
-        type: "declaration",
         name: name,
         scope: parent.loc!,
         meta: "func",
         declarationKind: DeclarationKind.KIND_FUNCTION,
         range: sourceLocToRange(child.loc!),
         selectionRange: sourceLocToRange(child.id!.loc!),
-        parameters: []
+        parameters: [],
+        unused: true
       }
       this.addDeclaration(name, functionDeclaration);
 
@@ -363,7 +398,6 @@ export class AST {
             return;
           }
           const param_declaration: ParameterSymbol = {
-            type: "declaration",
             name: name,
             scope: child.body.loc!,
             meta: this.context.chapter == Chapter.SOURCE_1 || this.context.chapter === Chapter.SOURCE_2 ? "const" : "let",
@@ -371,7 +405,8 @@ export class AST {
             range: sourceLocToRange(loc),
             selectionRange: sourceLocToRange(loc),
             showInDocumentSymbols: false,
-            isRestElement: param.type === NODES.REST
+            isRestElement: param.type === NODES.REST,
+            unused: true
           }
           functionDeclaration.parameters!.push(param_declaration);
           this.addDeclaration(name, param_declaration);
@@ -383,13 +418,13 @@ export class AST {
       child.params.forEach(param => {
         const name = (param as Identifier).name;
         const param_declaration: DeclarationSymbol = {
-          type: "declaration",
           name: name,
           scope: child.body.loc!,
           meta: this.context.chapter == Chapter.SOURCE_1 || this.context.chapter === Chapter.SOURCE_2 ? "const" : "let",
           declarationKind: DeclarationKind.KIND_PARAM,
           range: sourceLocToRange(param.loc!),
-          selectionRange: sourceLocToRange(param.loc!)
+          selectionRange: sourceLocToRange(param.loc!),
+          unused: true
         }
         this.addDeclaration(name, param_declaration);
       })
@@ -429,7 +464,7 @@ export class AST {
   }
 
   public getOccurences(pos: Position): DocumentHighlight[] {
-    const identifier = findIdentifierNode(this.ast, this.context, { line: pos.line + 1, column: pos.character });
+    const identifier = findIdentifierNode(this.ast, this.context, vsPosToEsPos(pos));
     if (!identifier) return [];
 
     const declaration = findDeclarationNode(this.ast, identifier);
@@ -457,6 +492,33 @@ export class AST {
         [this.uri]: occurences.map(loc => TextEdit.replace(loc.range, newName))
       }
     };
+  }
+
+  public onHover(pos: Position): Hover | null {
+    const identifier = findIdentifierNode(this.ast, this.context, vsPosToEsPos(pos));
+    let value: string | undefined = undefined;
+    if (identifier) {
+      const declaration = this.findDeclarationByName(identifier.name, identifier.loc!);
+      if (declaration) {
+        if (declaration.declarationKind === DeclarationKind.KIND_IMPORT) {
+          const importedDeclaration = declaration as ImportedSymbol
+          value = getImportedName(importedDeclaration.module_name, importedDeclaration.real_name)!.description
+        }
+        else value = declaration.meta
+      }
+      else if (isBuiltinConst(identifier.name, this.context))
+        value = builtin_constants[this.context.chapter-1][identifier.name].description
+      else if (isBuiltinFunction(identifier.name, this.context))
+        value = builtin_functions[this.context.chapter-1][identifier.name].description
+    }
+    if (value === undefined)
+      return null;
+    else return {
+      contents: {
+        kind: "markdown",
+        value: value
+      }
+    }
   }
 
   public getCompletionItems(pos: Position): CompletionItem[] {

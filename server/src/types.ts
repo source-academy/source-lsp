@@ -35,7 +35,6 @@ export enum EXPRESSIONS {
 }
 
 export interface DeclarationSymbol {
-    type: "declaration",
     name: string,
     scope: es.SourceLocation,
     meta: "const" | "let" | "func",
@@ -44,10 +43,16 @@ export interface DeclarationSymbol {
     selectionRange: Range,
     parameters?: Array<ParameterSymbol>,
     showInDocumentSymbols?: boolean;
+    unused: boolean
 }
 
 export interface ParameterSymbol extends DeclarationSymbol {
     isRestElement: boolean
+}
+
+export interface ImportedSymbol extends DeclarationSymbol {
+    module_name: string,
+    real_name: string
 }
 
 export interface Documentation {
