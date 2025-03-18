@@ -1,6 +1,6 @@
-import { Chapter, Context, Node } from "js-slang/dist/types";
+import { Chapter, Context } from "js-slang/dist/types";
 import { findDeclarationNode, findIdentifierNode } from "js-slang/dist/finder";
-import { CallExpression, Identifier, Literal, Program, SourceLocation } from 'estree';
+import { CallExpression, Identifier, Literal, Program, SourceLocation, Node } from 'estree';
 import { createAcornParserOptions, looseParse } from "js-slang/dist/parser/utils";
 import { AUTOCOMPLETE_TYPES, DECLARATIONS, DeclarationSymbol, Documentation, EXPRESSIONS, ImportedSymbol, NODES, ParameterSymbol, STATEMENTS } from "./types";
 import { autocomplete_labels, before, builtin_constants, builtin_functions, findLastRange, getImportedName, getNodeChildren, isBuiltinConst, isBuiltinFunction, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, moduleExists, rangeToSourceLoc, sourceLocEquals, sourceLocInSourceLoc, sourceLocToRange, vsPosInSourceLoc, vsPosToEsPos } from "./utils";
@@ -9,7 +9,7 @@ import { DeclarationKind } from "js-slang/dist/name-extractor";
 import { getAllOccurrencesInScopeHelper } from "js-slang/dist/scope-refactoring";
 import { AcornOptions } from "js-slang/dist/parser/types";
 import { parse as acornParse } from 'acorn';
-import { isDummy } from 'acorn-loose';
+import { rules, bannedNodes } from "./rules";
 
 export const DEFAULT_ECMA_VERSION = 6;
 
@@ -82,200 +82,43 @@ export class AST {
       val[0](val[1]);
     })
 
-    const shadowedDeclarations: number[] = [];
     this.declarations.forEach(declarationList => {
       for (let i = 0; i < declarationList.length; i++) {
         const declaration = declarationList[i]
         if (declaration.unused)
           this.addDiagnostic("Unused name", DiagnosticSeverity.Warning, rangeToSourceLoc(declaration.selectionRange), [DiagnosticTag.Unnecessary]);
-
-        for (let j = i + 1; j < declarationList.length; j++) {
-          if (!shadowedDeclarations.includes(j)) {
-            const inner = declarationList[j];
-            if (sourceLocInSourceLoc(inner.scope, declaration.scope)) {
-              this.addDiagnostic("Variable name is already used in outer scope", DiagnosticSeverity.Warning, rangeToSourceLoc(inner.selectionRange));
-              shadowedDeclarations.push(j);
-            }
-          }
-        }
       }
     })
-    this.declarations.forEach(x => console.debug(JSON.stringify(x, null, 2)));
+    // this.declarations.forEach(x => console.debug(JSON.stringify(x, null, 2)));
   }
 
   private processDiagnostics(child: Node, parent: Node) {
-    switch (child.type) {
-      case (STATEMENTS.EXPRESSION):
-        const expression = child.expression;
-        if (expression.type === EXPRESSIONS.BINARY)
-          this.checkIncompleteBinaryStatement(expression.left, expression.right, expression.loc!, "Incomplete binary expression");
-        else if (expression.type === EXPRESSIONS.TERNARY)
-          this.checkIncompleteBinaryStatement(expression.consequent, expression.alternate, expression.loc!, "Incomplete ternary");
-        else if (expression.type === EXPRESSIONS.LITERAL) {
-          if (typeof expression.value === "string") {
-            if (expression.raw!.length < 2 || !expression.raw!.endsWith("\""))
-              this.addDiagnostic("Incomplete string expression", DiagnosticSeverity.Error, expression.loc!);
-          }
-        }
-
-        break;
-      case (DECLARATIONS.VARIABLE):
-        child.declarations.forEach(declaration => {
-          this.checkIncompleteBinaryStatement(declaration.id, declaration.init, child.loc!, "Incomplete variable declaration");
-        });
-
-        break;
-      case (EXPRESSIONS.ASSIGNMENT):
-        if (child.left.type === "Identifier" && !this.isDummy(child.left)) {
-          this.addDiagnosticCallback((node: Node) => {
-            const identifier = node as Identifier;
-            if (identifier.loc) {
-              const declaration = this.findDeclarationByName(identifier.name, identifier.loc);
-              if (declaration !== undefined && (declaration.meta === "const" || declaration.meta === "func"))
-                this.addDiagnostic(`Cannot assign new value to constant ${identifier.name}`, DiagnosticSeverity.Error, identifier.loc);
-            }
-          }, child.left)
-        }
-
-        break;
-      case (DECLARATIONS.FUNCTION):
-        if (child.id !== null && this.isDummy(child.id))
-          this.addDiagnostic("Missing function name", DiagnosticSeverity.Error, child.loc!)
-
-        let hasRestElement = false;
-        for (const param of child.params) {
-          if (hasRestElement) {
-            this.addDiagnostic("No params allowed after rest element", DiagnosticSeverity.Error, { start: param.loc!.start, end: child.params[child.params.length - 1].loc!.end });
-            break;
-          }
-
-          hasRestElement = param.type === "RestElement";
-        }
-
-        const paramNames = new Set();
-        for (const param of child.params) {
-          if (param.type === NODES.IDENTIFIER || (param.type === NODES.REST && param.argument.type === NODES.IDENTIFIER)) {
-            const name = param.type === NODES.IDENTIFIER ? param.name : (param.argument as Identifier).name;
-
-            if (paramNames.has(name))
-              this.addDiagnostic("No duplicate param names", DiagnosticSeverity.Error, param.loc!);
-            else
-              paramNames.add(name);
-          }
-        }
-
-        break;
-      case (EXPRESSIONS.CALL):
-        if (child.callee.type === NODES.IDENTIFIER) {
-          this.addDiagnosticCallback((node: Node) => {
-            const call_expression = node as CallExpression;
-            const callee = call_expression.callee as Identifier;
-            if (callee.loc) {
-              const loc = callee.loc;
-              let declaration = this.findDeclarationByName(callee.name, loc)
-              if (declaration !== undefined) {
-                if (declaration.meta !== "func")
-                  this.addDiagnostic(`'${callee.name}' is not a function`, DiagnosticSeverity.Error, loc);
-                if (declaration.parameters !== undefined || declaration.declarationKind === DeclarationKind.KIND_IMPORT) {
-                  let hasRestElement = false;
-                  let num_params = 0;
-                  if (declaration.declarationKind === DeclarationKind.KIND_IMPORT) {
-                    const imported = getImportedName((declaration as ImportedSymbol).module_name, (declaration as ImportedSymbol).real_name)!;
-                    num_params = imported.parameters ? imported.parameters.length : 0;
-                  }
-                  else {
-                    hasRestElement = declaration.parameters!.some(x => x.isRestElement);
-                    num_params = declaration.parameters!.length - (hasRestElement ? 1 : 0);
-                  }
-
-
-                  if (hasRestElement) {
-                    if (call_expression.arguments.length < num_params)
-                      this.addDiagnostic(`Expected ${num_params} or more arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
-                  }
-                  else {
-                    if (call_expression.arguments.length !== num_params)
-                      this.addDiagnostic(`Expected ${num_params} arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
-                  }
-                }
-              }
-              else if (callee.name in builtin_functions[this.context.chapter - 1]) {
-                const doc = builtin_functions[this.context.chapter - 1][callee.name];
-                // parameters must exist
-                const num_params = doc.parameters!.length
-
-                // In the documentation, there is no parameter for the rest element, so we dont have to num_params-1 if the function has a rest element
-                // There is also no occurence of an optional param with a rest element
-                if (doc.hasRestElement === true) {
-                  if (call_expression.arguments.length < num_params)
-                    this.addDiagnostic(`Expected ${num_params} or more arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
-                }
-                else {
-                  if (doc.optional_params) {
-                    const min_params = num_params - doc.optional_params.length;
-                    if (call_expression.arguments.length < min_params || call_expression.arguments.length > num_params)
-                      this.addDiagnostic(`Expected between ${min_params} and ${num_params} arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
-                  }
-                  else {
-                    if (call_expression.arguments.length !== num_params)
-                      this.addDiagnostic(`Expected ${num_params} arguments, but got ${call_expression.arguments.length}`, DiagnosticSeverity.Error, loc);
-                  }
-                }
-              }
-            }
-          }, child);
-        }
-
-        break;
-      case (NODES.IDENTIFIER):
-        if (parent.type !== DECLARATIONS.IMPORT) {
-          this.addDiagnosticCallback((node: Node) => {
-            const identifier = node as Identifier;
-            if (identifier.loc) {
-              const loc = identifier.loc;
-              const declaration = this.findDeclarationByName(identifier.name, loc)
-              if (declaration === undefined && !(isBuiltinConst(identifier.name, this.context) || isBuiltinFunction(identifier.name, this.context)))
-                this.addDiagnostic(`Name '${identifier.name}' not declared`, DiagnosticSeverity.Error, loc);
-              if (declaration !== undefined && sourceLocEquals(declaration.scope, parent.loc!) && !before(vsPosToEsPos(declaration.range.end), loc.start))
-                this.addDiagnostic(`Can't access lexical declaration '${identifier.name}' before initialization`, DiagnosticSeverity.Error, loc)
-            }
-          }, child)
-        }
-
-        const declaration = this.findDeclarationByName(child.name, child.loc!);
-        if (declaration && !sourceLocEquals(rangeToSourceLoc(declaration.selectionRange), child.loc!)) {
-          declaration.unused = false;
-        }
-
-        break;
-      case (DECLARATIONS.IMPORT):
-        if (this.isDummy(child.source))
-          this.addDiagnostic("Expected module name", DiagnosticSeverity.Error, child.loc!);
-        break;
-    }
+    if (bannedNodes.has(child.type))
+      this.addDiagnostic(`${child.type} is not allowed`, DiagnosticSeverity.Error, child.loc!);
+    else
+      rules.get(child.type)?.process(child, parent, this.context, this);
   }
 
-  private addDiagnosticCallback(callback: (child: Node) => void, child: Node): void {
+  public addDiagnosticCallback(callback: (child: Node) => void, child: Node): void {
     this.diagnosticsCallbacks.push([callback, child]);
   }
 
-  private checkIncompleteBinaryStatement(left: any, right: any, loc: SourceLocation, message: string) {
-    if (left === null || right === null || (left.type === NODES.IDENTIFIER && isDummy(left)) || (right.type === NODES.IDENTIFIER && isDummy(right))) {
+  public checkIncompleteLeftRightStatement(left: any, right: any, loc: SourceLocation, message: string) {
+    if (left === null || right === null || (left.type === NODES.IDENTIFIER && this.isDummy(left)) || (right.type === NODES.IDENTIFIER && this.isDummy(right))) {
       this.addDiagnostic(message, DiagnosticSeverity.Error, loc);
     }
   }
 
-  // Wrapper around isDummy due to type checking issues
-  private isDummy(node: Identifier | Literal): boolean {
+  public isDummy(node: Identifier | Literal): boolean {
     const dummy = "✖"
     if (node.type === NODES.IDENTIFIER)
       return node.name === dummy;
-    if (node.type === EXPRESSIONS.LITERAL)
+    if (node.type === NODES.LITERAL)
       return node.value === dummy
     return false;
   }
 
-  private addDiagnostic(message: string, severity: DiagnosticSeverity, loc: SourceLocation, tags: DiagnosticTag[] = []) {
+  public addDiagnostic(message: string, severity: DiagnosticSeverity, loc: SourceLocation, tags: DiagnosticTag[] = []) {
     this.diagnostics.push({
       message: message,
       severity: severity,
@@ -314,6 +157,8 @@ export class AST {
               }
             }
           }
+          else
+            this.addDiagnostic("Only normal imports are allowed", DiagnosticSeverity.Error, specifier.loc!)
         })
       }
     }
@@ -450,7 +295,7 @@ export class AST {
     return declaration.loc;
   }
 
-  private findDeclarationByName(name: string, loc: SourceLocation): DeclarationSymbol | undefined {
+  public findDeclarationByName(name: string, loc: SourceLocation): DeclarationSymbol | undefined {
     if (this.declarations.has(name)) {
       let mostSpecificDeclaration: DeclarationSymbol | undefined;
       this.declarations.get(name)!.forEach(declaration => {
@@ -504,12 +349,14 @@ export class AST {
           const importedDeclaration = declaration as ImportedSymbol
           value = getImportedName(importedDeclaration.module_name, importedDeclaration.real_name)!.description
         }
-        else value = declaration.meta
+        else value = declaration.meta === "func" ? "Function" :
+          declaration.meta === "const" ? "Constant" :
+            declaration.meta === "let" ? "Variable" : undefined;
       }
       else if (isBuiltinConst(identifier.name, this.context))
-        value = builtin_constants[this.context.chapter-1][identifier.name].description
+        value = builtin_constants[this.context.chapter - 1][identifier.name].description
       else if (isBuiltinFunction(identifier.name, this.context))
-        value = builtin_functions[this.context.chapter-1][identifier.name].description
+        value = builtin_functions[this.context.chapter - 1][identifier.name].description
     }
     if (value === undefined)
       return null;

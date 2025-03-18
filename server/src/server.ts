@@ -144,6 +144,7 @@ connection.onRequest("setLanguageVersion", (params: { version: string }) => {
 	if (Object.keys(chapter_names).includes(params.version)) {
 		context = createContext(chapter_names[params.version as keyof typeof chapter_names], Variant.DEFAULT);
 		astCache.clear();
+		documents.all().forEach(validateTextDocument);
 		return { success: true };
 	}
 	else return {success: false};
@@ -165,12 +166,9 @@ documents.onDidChangeContent(change => {
 	}, 300);
 });
 
-async function validateTextDocument(textDocument: TextDocument): Promise<void> {
+async function validateTextDocument(document: TextDocument): Promise<void> {
 	// In this simple example we get the settings for every validate run.
-	const document = documents.get(textDocument.uri);
-	if (document) {
-		connection.sendDiagnostics({ uri: textDocument.uri, diagnostics: getAST(textDocument.uri).getDiagnostics()});
-	}
+	connection.sendDiagnostics({ uri: document.uri, diagnostics: getAST(document.uri).getDiagnostics()});
 }
 
 connection.onDidChangeWatchedFiles(_change => {

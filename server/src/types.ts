@@ -12,7 +12,10 @@ export enum AUTOCOMPLETE_TYPES {
 export enum NODES {
     IDENTIFIER = "Identifier",
     REST = "RestElement",
-    IMPORT_SPECIFIER = "ImportSpecifier"
+    SPREAD = "SpreadElement",
+    LITERAL = "Literal",
+    IMPORT_SPECIFIER = "ImportSpecifier",
+    TEMPLATE_LITERAL = "TemplateLiteral"
 }
 
 export enum DECLARATIONS {
@@ -23,15 +26,24 @@ export enum DECLARATIONS {
 }
 
 export enum STATEMENTS {
-    EXPRESSION = "ExpressionStatement"
+    EXPRESSION = "ExpressionStatement",
+    FOR = "ForStatement",
+    IF = "IfStatement",
+    WHILE = "WhileStatement",
+    BLOCK = "BlockStatement",
+    BREAK = "BreakStatement",
+    CONTINUE = "ContinueStatement",
+    RETURN = "ReturnStatement"
 }
 
 export enum EXPRESSIONS {
     BINARY = "BinaryExpression",
-    TERNARY = "ConditionalExpression",
-    LITERAL = "Literal",
+    UNARY = "UnaryExpression",
+    CONDITIONAL = "ConditionalExpression",
     CALL = "CallExpression",
-    ASSIGNMENT = "AssignmentExpression"
+    ASSIGNMENT = "AssignmentExpression",
+    MEMBER = "MemberExpression",
+    ARRAY = "ArrayExpression"
 }
 
 export interface DeclarationSymbol {

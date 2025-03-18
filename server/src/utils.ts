@@ -7,7 +7,6 @@ import { AUTOCOMPLETE_TYPES, CompletionItemData, DeclarationSymbol, Documentatio
 import source from './docs/source.json'
 import modules from "./docs/modules/modules.json";
 
-
 export const builtin_functions: Array<{[key: string]: Documentation}> = source.map(version => version.filter(doc => doc.meta === "func").reduce((a, v) => ({...a, [v.label]: v}), {}));
 export const builtin_constants: Array<{[key: string]: Documentation}> = source.map(version => version.filter(doc => doc.meta === "const").reduce((a, v) => ({...a, [v.label]: v}), {}));
 
@@ -59,6 +58,7 @@ export function getImportedName(module_name: string, name: string): Documentatio
   }
   return undefined;
 }
+
 
 function isNotNull<T>(x: T): x is Exclude<T, null> {
   // This function exists to appease the mighty typescript type checker
