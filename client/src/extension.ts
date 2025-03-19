@@ -24,7 +24,7 @@ const SECTION = "\u00A7";
 export function activate(context: ExtensionContext) {
 	// The server is implemented in node
 	const serverModule = context.asAbsolutePath(
-		path.join('server', 'out', 'server.js')
+		path.join("dist", 'source-lsp.js')
 	);
 
 	// If the extension is launched in debug mode then the debug server options are used
@@ -45,7 +45,7 @@ export function activate(context: ExtensionContext) {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		},
-		traceOutputChannel: window.createOutputChannel("Your Language Server Trace")
+		traceOutputChannel: window.createOutputChannel("source-lsp trace")
 	};
 
 	// Create the language client and start the client.
