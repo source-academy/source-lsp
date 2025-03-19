@@ -1,50 +1,49 @@
-import { Chapter, Context, Node } from "js-slang/dist/types"
+import { Chapter, Context } from "js-slang/dist/types"
 import * as es from "estree";
 import { CompletionItem, CompletionItemKind, DocumentSymbol, MarkupKind, Position, Range, SymbolKind } from "vscode-languageserver";
-import { DeclarationKind } from "js-slang/dist/name-extractor";
-import { AUTOCOMPLETE_TYPES, CompletionItemData, DeclarationSymbol, Documentation } from "./types";
+import { AUTOCOMPLETE_TYPES, CompletionItemData, DeclarationKind, DeclarationSymbol, Documentation } from "./types";
 
 import source from './docs/source.json'
 import modules from "./docs/modules/modules.json";
 
-export const builtin_functions: Array<{[key: string]: Documentation}> = source.map(version => version.filter(doc => doc.meta === "func").reduce((a, v) => ({...a, [v.label]: v}), {}));
-export const builtin_constants: Array<{[key: string]: Documentation}> = source.map(version => version.filter(doc => doc.meta === "const").reduce((a, v) => ({...a, [v.label]: v}), {}));
+export const builtin_functions: Array<{ [key: string]: Documentation }> = source.map(version => version.filter(doc => doc.meta === "func").reduce((a, v) => ({ ...a, [v.label]: v }), {}));
+export const builtin_constants: Array<{ [key: string]: Documentation }> = source.map(version => version.filter(doc => doc.meta === "const").reduce((a, v) => ({ ...a, [v.label]: v }), {}));
 
 export const autocomplete_labels = source.map(version => version.map((doc, idx): CompletionItem => {
-	return {
-		label: doc.label,
-		labelDetails: { detail: ` (${doc.meta})` },
-		detail: doc.title,
-		documentation: {
-			kind: MarkupKind.Markdown,
-			value: doc.description
-		},
-		kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
-		data: { type: AUTOCOMPLETE_TYPES.BUILTIN, idx: idx, parameters: doc.parameters, optional_params: doc.optional_params, hasRestElement: doc.hasRestElement} as CompletionItemData,
-		sortText: '' + AUTOCOMPLETE_TYPES.BUILTIN
-	};
+  return {
+    label: doc.label,
+    labelDetails: { detail: ` (${doc.meta})` },
+    detail: doc.title,
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: doc.description
+    },
+    kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
+    data: { type: AUTOCOMPLETE_TYPES.BUILTIN, idx: idx, parameters: doc.parameters, optional_params: doc.optional_params, hasRestElement: doc.hasRestElement } as CompletionItemData,
+    sortText: '' + AUTOCOMPLETE_TYPES.BUILTIN
+  };
 }));
 
 export const module_autocomplete: CompletionItem[] = [];
 
 for (const key in modules) {
-	const module = modules[key as keyof typeof modules] as {[key: string]: Documentation}; 
+  const module = modules[key as keyof typeof modules] as { [key: string]: Documentation };
 
-	Object.values(module).forEach((doc, idx) => {
-		module_autocomplete.push({
-			label: doc.label,
-			labelDetails: { detail: ` (${doc.meta})` },
-			detail: doc.title,
-			documentation: {
-				kind: MarkupKind.Markdown,
-				value: doc.description
-			},
-			kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
-			// @ts-ignore
-			data: { type: AUTOCOMPLETE_TYPES.MODULE, idx: idx, module_name: key, parameters: doc.parameters, optional_params: doc.optional_params } as CompletionItemData,
-			sortText: '' + AUTOCOMPLETE_TYPES.MODULE
-		});
-	});
+  Object.values(module).forEach((doc, idx) => {
+    module_autocomplete.push({
+      label: doc.label,
+      labelDetails: { detail: ` (${doc.meta})` },
+      detail: doc.title,
+      documentation: {
+        kind: MarkupKind.Markdown,
+        value: doc.description
+      },
+      kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
+      // @ts-ignore
+      data: { type: AUTOCOMPLETE_TYPES.MODULE, idx: idx, module_name: key, parameters: doc.parameters, optional_params: doc.optional_params } as CompletionItemData,
+      sortText: '' + AUTOCOMPLETE_TYPES.MODULE
+    });
+  });
 }
 
 export function moduleExists(module_name: string): boolean {
@@ -53,7 +52,7 @@ export function moduleExists(module_name: string): boolean {
 
 export function getImportedName(module_name: string, name: string): Documentation | undefined {
   if (module_name in modules) {
-    const module = modules[module_name as keyof typeof modules] as {[key: string]: Documentation}; 
+    const module = modules[module_name as keyof typeof modules] as { [key: string]: Documentation };
     return module[name];
   }
   return undefined;
@@ -71,7 +70,7 @@ function isNotNullOrUndefined<T>(x: T): x is Exclude<T, null | undefined> {
 }
 
 
-export function getNodeChildren(node: Node): es.Node[] {
+export function getNodeChildren(node: es.Node, allChildren = false): es.Node[] {
   switch (node.type) {
     case 'Program':
       return node.body
@@ -92,13 +91,16 @@ export function getNodeChildren(node: Node): es.Node[] {
     case 'ReturnStatement':
       return node.argument ? [node.argument] : []
     case 'FunctionDeclaration':
-      return [node.body]
+      const func_id: es.Node[] = (allChildren && node.id) ? [node.id] : []
+      return func_id.concat([node.body])
     case 'VariableDeclaration':
-      return node.declarations.flatMap(getNodeChildren)
+      return node.declarations.flatMap(x => getNodeChildren(x, allChildren))
     case 'VariableDeclarator':
-      return node.init ? [node.init] : []
+      const var_id: es.Node[] = (allChildren && node.id ) ? [node.id] : []
+      const init = node.init ? [node.init] : []
+      return var_id.concat(init);
     case 'ImportDeclaration':
-      return node.specifiers.flatMap(getNodeChildren)
+      return node.specifiers.flatMap(x => getNodeChildren(x, allChildren))
     case 'ImportSpecifier':
       return [node.imported, node.local]
     case 'ArrowFunctionExpression':
@@ -163,7 +165,7 @@ export function rangeToSourceLoc(loc: Range): es.SourceLocation {
 }
 
 export function vsPosToEsPos(pos: Position): es.Position {
-  return { line: pos.line+1, column: pos.character }
+  return { line: pos.line + 1, column: pos.character }
 }
 
 export function mapDeclarationKindToSymbolKind(kind: DeclarationKind, context: Context): SymbolKind {
@@ -221,12 +223,15 @@ export function before(first: es.Position, second: es.Position) {
 
 export function vsPosInSourceLoc(pos: Position, loc: es.SourceLocation) {
   const esPos: es.Position = vsPosToEsPos(pos);
+  return esPosInSourceLoc(esPos, loc);
+}
 
-  return before(loc.start, esPos) && before(esPos, loc.end);
+export function esPosInSourceLoc(pos: es.Position, loc: es.SourceLocation) {
+  return before(loc.start, pos) && before(pos, loc.end);
 }
 
 export function sourceLocInSourceLoc(inner: es.SourceLocation, outer: es.SourceLocation) {
-  return vsPosInSourceLoc({line: inner.start.line - 1, character: inner.start.column}, outer) && vsPosInSourceLoc({line: inner.end.line - 1, character: inner.end.column}, outer);
+  return vsPosInSourceLoc({ line: inner.start.line - 1, character: inner.start.column }, outer) && vsPosInSourceLoc({ line: inner.end.line - 1, character: inner.end.column }, outer);
 }
 
 export function sourceLocEquals(s1: es.SourceLocation, s2: es.SourceLocation) {
@@ -234,9 +239,9 @@ export function sourceLocEquals(s1: es.SourceLocation, s2: es.SourceLocation) {
 }
 
 export function isBuiltinFunction(name: string, context: Context) {
-  return name in builtin_functions[context.chapter-1];
+  return name in builtin_functions[context.chapter - 1];
 }
 
 export function isBuiltinConst(name: string, context: Context) {
-  return name in builtin_constants[context.chapter-1];
+  return name in builtin_constants[context.chapter - 1];
 }

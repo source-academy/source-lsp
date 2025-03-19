@@ -1,4 +1,3 @@
-import { DeclarationKind } from "js-slang/dist/name-extractor";
 import { Range } from "vscode-languageserver/node";
 import * as es from 'estree';
 
@@ -44,6 +43,17 @@ export enum EXPRESSIONS {
     ASSIGNMENT = "AssignmentExpression",
     MEMBER = "MemberExpression",
     ARRAY = "ArrayExpression"
+}
+
+
+// Taken from js-slang
+export enum DeclarationKind {
+  KIND_IMPORT = 'import',
+  KIND_FUNCTION = 'func',
+  KIND_LET = 'let',
+  KIND_PARAM = 'param',
+  KIND_CONST = 'const',
+  KIND_KEYWORD = 'keyword'
 }
 
 export interface DeclarationSymbol {

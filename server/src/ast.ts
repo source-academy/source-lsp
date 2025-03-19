@@ -1,14 +1,11 @@
 import { Chapter, Context } from "js-slang/dist/types";
-import { findDeclarationNode, findIdentifierNode } from "js-slang/dist/finder";
-import { CallExpression, Identifier, Literal, Program, SourceLocation, Node } from 'estree';
-import { createAcornParserOptions, looseParse } from "js-slang/dist/parser/utils";
-import { AUTOCOMPLETE_TYPES, DECLARATIONS, DeclarationSymbol, Documentation, EXPRESSIONS, ImportedSymbol, NODES, ParameterSymbol, STATEMENTS } from "./types";
-import { autocomplete_labels, before, builtin_constants, builtin_functions, findLastRange, getImportedName, getNodeChildren, isBuiltinConst, isBuiltinFunction, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, moduleExists, rangeToSourceLoc, sourceLocEquals, sourceLocInSourceLoc, sourceLocToRange, vsPosInSourceLoc, vsPosToEsPos } from "./utils";
+import { Identifier, Literal, Program, SourceLocation, Node, Position as EsPosition } from 'estree';
+import { AUTOCOMPLETE_TYPES, DeclarationKind, DECLARATIONS, DeclarationSymbol, Documentation, ImportedSymbol, NODES, ParameterSymbol } from "./types";
+import { autocomplete_labels, builtin_constants, builtin_functions, esPosInSourceLoc, findLastRange, getImportedName, getNodeChildren, isBuiltinConst, isBuiltinFunction, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, moduleExists, rangeToSourceLoc, sourceLocEquals, sourceLocInSourceLoc, sourceLocToRange, vsPosInSourceLoc, vsPosToEsPos } from "./utils";
 import { CompletionItem, Diagnostic, DiagnosticSeverity, DiagnosticTag, DocumentHighlight, DocumentSymbol, Hover, Position, Range, TextEdit, WorkspaceEdit } from "vscode-languageserver";
-import { DeclarationKind } from "js-slang/dist/name-extractor";
 import { getAllOccurrencesInScopeHelper } from "js-slang/dist/scope-refactoring";
-import { AcornOptions } from "js-slang/dist/parser/types";
-import { parse as acornParse } from 'acorn';
+import { parse as acornParse, Options } from 'acorn';
+import { parse as looseParse} from 'acorn-loose';
 import { rules, bannedNodes } from "./rules";
 
 export const DEFAULT_ECMA_VERSION = 6;
@@ -27,41 +24,39 @@ export class AST {
   private diagnosticsCallbacks: Array<[(child: Node) => void, Node]> = [];
 
   constructor(text: string, context: Context, uri: string) {
-    const acornOptions: AcornOptions = createAcornParserOptions(
-      DEFAULT_ECMA_VERSION,
-      undefined,
-      {
-        onInsertedSemicolon: (pos, loc) => {
-          this.diagnostics.push({
-            message: "Missing semicolon",
-            severity: DiagnosticSeverity.Error,
-            range: {
-              start: { line: loc!.line - 1, character: loc!.column },
-              end: { line: loc!.line - 1, character: loc!.column + 1 }
-            },
-          })
-        },
-        onTrailingComma: (pos, loc) => {
-          this.diagnostics.push({
-            message: "Trailing comma",
-            severity: DiagnosticSeverity.Error,
-            range: {
-              start: { line: loc!.line - 1, character: loc!.column },
-              end: { line: loc!.line - 1, character: loc!.column + 1 }
-            }
-          })
-        },
-        locations: true,
+    const acornOptions: Options = {
+      ecmaVersion: DEFAULT_ECMA_VERSION,
+      sourceType: "module",
+      locations: true,
+      onInsertedSemicolon: (pos, loc) => {
+        this.diagnostics.push({
+          message: "Missing semicolon",
+          severity: DiagnosticSeverity.Error,
+          range: {
+            start: { line: loc!.line - 1, character: loc!.column },
+            end: { line: loc!.line - 1, character: loc!.column + 1 }
+          },
+        })
+      },
+      onTrailingComma: (pos, loc) => {
+        this.diagnostics.push({
+          message: "Trailing comma",
+          severity: DiagnosticSeverity.Error,
+          range: {
+            start: { line: loc!.line - 1, character: loc!.column },
+            end: { line: loc!.line - 1, character: loc!.column + 1 }
+          }
+        })
       }
-    )
+    }
 
     try {
       this.ast = acornParse(text, acornOptions) as Node
     }
     catch (e) {
-      this.ast = looseParse(text, context) as Node
+      this.ast = looseParse(text, acornOptions) as Node
     }
-    console.debug(JSON.stringify(this.ast, null, 2));
+    // console.debug(JSON.stringify(this.ast, null, 2));
 
     this.context = context;
     this.uri = uri;
@@ -285,14 +280,31 @@ export class AST {
       declarations.push(declaration);
   }
 
+  private findIdentifierNode(pos: EsPosition): Identifier | undefined {
+    const queue: Node[] = [this.ast];
+    while (queue.length > 0) {
+      const node = queue.shift()!;
+
+      if (node.type === NODES.IDENTIFIER && node.loc && esPosInSourceLoc(pos, node.loc))
+        return node;
+
+      getNodeChildren(node, true).forEach(node => {
+        if (node.loc && esPosInSourceLoc(pos, node.loc))
+          queue.push(node);
+      })
+    }
+
+    return undefined;
+  }
+
   public findDeclaration(pos: Position): SourceLocation | null | undefined {
-    const identifier = findIdentifierNode(this.ast, this.context, { line: pos.line + 1, column: pos.character });
+    const identifier = this.findIdentifierNode(vsPosToEsPos(pos));
     if (!identifier) return null;
 
-    const declaration = findDeclarationNode(this.ast, identifier);
+    const declaration = this.findDeclarationByName(identifier.name, identifier.loc!);
     if (!declaration) return null;
 
-    return declaration.loc;
+    return rangeToSourceLoc(declaration.selectionRange);
   }
 
   public findDeclarationByName(name: string, loc: SourceLocation): DeclarationSymbol | undefined {
@@ -309,13 +321,32 @@ export class AST {
   }
 
   public getOccurences(pos: Position): DocumentHighlight[] {
-    const identifier = findIdentifierNode(this.ast, this.context, vsPosToEsPos(pos));
+    const identifier = this.findIdentifierNode(vsPosToEsPos(pos));
     if (!identifier) return [];
 
-    const declaration = findDeclarationNode(this.ast, identifier);
+    const declaration = this.findDeclarationByName(identifier.name, identifier.loc!);
     if (!declaration) return [];
 
-    return getAllOccurrencesInScopeHelper(declaration.loc!, this.ast as Program, identifier.name).map(loc => ({ range: sourceLocToRange(loc) }));
+    let scopeFound = false;
+    const ret: DocumentHighlight[] = [];
+    const queue: Node[] = [this.ast];
+
+    while (queue.length > 0) {
+      const node = queue.shift()!;
+
+      // Scope found
+      if (!scopeFound && node.loc && sourceLocEquals(node.loc, declaration.scope))
+        scopeFound = true;
+      if (scopeFound && node.type === NODES.IDENTIFIER && node.name === identifier.name)
+        ret.push({ range: sourceLocToRange(node.loc!) })
+
+      getNodeChildren(node, true).forEach(node => {
+        if (!scopeFound && node.loc && sourceLocInSourceLoc(declaration.scope, node.loc))
+          queue.push(node);
+      })
+    }
+
+    return ret;
   }
 
   public getDocumentSymbols(): DocumentSymbol[] {
@@ -340,7 +371,7 @@ export class AST {
   }
 
   public onHover(pos: Position): Hover | null {
-    const identifier = findIdentifierNode(this.ast, this.context, vsPosToEsPos(pos));
+    const identifier = this.findIdentifierNode(vsPosToEsPos(pos));
     let value: string | undefined = undefined;
     if (identifier) {
       const declaration = this.findDeclarationByName(identifier.name, identifier.loc!);
