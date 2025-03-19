@@ -1,8 +1,8 @@
 import { AST } from "../ast";
 import { Rule } from "./rule";
 import { VariableDeclaration, Node } from "estree"
-import { Chapter, Context } from "js-slang/dist/types";
 import { DiagnosticSeverity } from "vscode-languageserver";
+import { Chapter, Context } from "../types";
 
 export const variableDeclarationRule = new class extends Rule<VariableDeclaration> {
   public process(child: VariableDeclaration, parent: Node, context: Context, ast: AST): void {

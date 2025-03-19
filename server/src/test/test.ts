@@ -1,11 +1,10 @@
-import { createContext } from "js-slang";
-import { Chapter, Variant } from "js-slang/dist/types";
 import assert from "assert";
 import { autocomplete_labels } from "../utils";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { AST } from "../ast";
+import { Chapter, Context } from "../types";
 
-const context = createContext(Chapter.SOURCE_4, Variant.DEFAULT);
+const context: Context = { chapter: Chapter.SOURCE_4 };
 
 suite("Autocompletion", () => {
     test("Builtins", async () => {

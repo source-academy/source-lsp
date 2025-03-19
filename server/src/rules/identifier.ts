@@ -1,10 +1,10 @@
-import { Context } from "js-slang/dist/types";
 import { AST } from "../ast";
 import { Rule } from "./rule";
 import { Identifier, Node } from "estree"
 import { DiagnosticSeverity } from "vscode-languageserver";
 import { DECLARATIONS } from "../types";
 import { isBuiltinConst, isBuiltinFunction, sourceLocEquals, rangeToSourceLoc } from "../utils";
+import { Context } from "../types";
 
 export const identifierRule = new class extends Rule<Identifier> {
     public process(child: Identifier, parent: Node, context: Context, ast: AST): void {

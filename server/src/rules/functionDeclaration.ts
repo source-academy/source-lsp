@@ -1,9 +1,9 @@
-import { Context } from "js-slang/dist/types";
 import { AST } from "../ast";
 import { Rule } from "./rule";
 import { FunctionDeclaration, Identifier, Node } from "estree"
 import { DiagnosticSeverity } from "vscode-languageserver";
 import { NODES } from "../types";
+import { Context } from "../types";
 
 export const functionDeclarationRule = new class extends Rule<FunctionDeclaration> {
     public process(child: FunctionDeclaration, parent: Node, context: Context, ast: AST): void {

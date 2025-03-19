@@ -1,7 +1,6 @@
-import { Chapter, Context } from "js-slang/dist/types"
 import * as es from "estree";
 import { CompletionItem, CompletionItemKind, DocumentSymbol, MarkupKind, Position, Range, SymbolKind } from "vscode-languageserver";
-import { AUTOCOMPLETE_TYPES, CompletionItemData, DeclarationKind, DeclarationSymbol, Documentation } from "./types";
+import { AUTOCOMPLETE_TYPES, Chapter, CompletionItemData, Context, DeclarationKind, DeclarationSymbol, Documentation } from "./types";
 
 import source from './docs/source.json'
 import modules from "./docs/modules/modules.json";

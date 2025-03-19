@@ -1,5 +1,5 @@
-import { Context } from "js-slang/dist/types";
 import { AST } from "../ast";
+import { Context } from "../types";
 import { Rule } from "./rule";
 import { ReturnStatement, Node } from "estree"
 import { DiagnosticSeverity } from "vscode-languageserver";

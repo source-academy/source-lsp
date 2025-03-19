@@ -1,9 +1,7 @@
-import { Chapter, Context } from "js-slang/dist/types";
-import { Identifier, Literal, Program, SourceLocation, Node, Position as EsPosition } from 'estree';
-import { AUTOCOMPLETE_TYPES, DeclarationKind, DECLARATIONS, DeclarationSymbol, Documentation, ImportedSymbol, NODES, ParameterSymbol } from "./types";
+import { Identifier, Literal, SourceLocation, Node, Position as EsPosition } from 'estree';
+import { AUTOCOMPLETE_TYPES, Chapter, Context, DeclarationKind, DECLARATIONS, DeclarationSymbol, Documentation, ImportedSymbol, NODES, ParameterSymbol } from "./types";
 import { autocomplete_labels, builtin_constants, builtin_functions, esPosInSourceLoc, findLastRange, getImportedName, getNodeChildren, isBuiltinConst, isBuiltinFunction, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, moduleExists, rangeToSourceLoc, sourceLocEquals, sourceLocInSourceLoc, sourceLocToRange, vsPosInSourceLoc, vsPosToEsPos } from "./utils";
 import { CompletionItem, Diagnostic, DiagnosticSeverity, DiagnosticTag, DocumentHighlight, DocumentSymbol, Hover, Position, Range, TextEdit, WorkspaceEdit } from "vscode-languageserver";
-import { getAllOccurrencesInScopeHelper } from "js-slang/dist/scope-refactoring";
 import { parse as acornParse, Options } from 'acorn';
 import { parse as looseParse} from 'acorn-loose';
 import { rules, bannedNodes } from "./rules";
@@ -341,10 +339,17 @@ export class AST {
         ret.push({ range: sourceLocToRange(node.loc!) })
 
       getNodeChildren(node, true).forEach(node => {
-        if (!scopeFound && node.loc && sourceLocInSourceLoc(declaration.scope, node.loc))
+        if (
+          scopeFound 
+          // We want to ignore scopes where the variable was redeclared
+          // This occurs when there is an inner scope in the scope of our declaration, and the child node belongs in that scope
+          && !this.declarations.get(identifier.name)?.some(x => !sourceLocEquals(x.scope, declaration.scope) && sourceLocInSourceLoc(x.scope, declaration.scope) && sourceLocInSourceLoc(node.loc!, x.scope))
+          || (!scopeFound && node.loc && sourceLocInSourceLoc(declaration.scope, node.loc))
+        )
           queue.push(node);
       })
     }
+
 
     return ret;
   }

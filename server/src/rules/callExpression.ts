@@ -1,8 +1,7 @@
-import { Context } from "js-slang/dist/types";
 import { AST } from "../ast";
+import { Context, DeclarationKind } from "../types";
 import { Rule } from "./rule";
 import { CallExpression, Identifier, Node } from "estree"
-import { DeclarationKind } from "js-slang/dist/name-extractor";
 import { DiagnosticSeverity } from "vscode-languageserver";
 import { NODES, ImportedSymbol } from "../types";
 import { getImportedName, builtin_functions } from "../utils";

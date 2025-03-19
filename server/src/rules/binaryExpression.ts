@@ -1,9 +1,9 @@
 import { BinaryExpression, Node } from "estree";
 import { AST } from "../ast";
-import { Chapter, Context } from "js-slang/dist/types";
-import { EXPRESSIONS, NODES } from "../types";
+import { NODES } from "../types";
 import { DiagnosticSeverity } from "vscode-languageserver";
 import { Rule } from "./rule";
+import { Chapter, Context } from "../types";
 
 export const binaryExpressionRule = new class extends Rule<BinaryExpression> {
     private permitted_operators = [

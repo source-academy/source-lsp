@@ -1,9 +1,9 @@
-import { Chapter, Context } from "js-slang/dist/types";
 import { AST } from "../ast";
 import { Rule } from "./rule";
 import { IfStatement, Node } from "estree"
 import { STATEMENTS } from "../types";
 import { DiagnosticSeverity } from "vscode-languageserver";
+import { Chapter, Context } from "../types";
 
 export const ifStatementRule = new class extends Rule<IfStatement> {
   public process(child: IfStatement, parent: Node, context: Context, ast: AST): void {

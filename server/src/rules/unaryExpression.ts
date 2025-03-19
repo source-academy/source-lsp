@@ -1,8 +1,8 @@
-import { Context } from "js-slang/dist/types";
 import { AST } from "../ast";
 import { Rule } from "./rule";
 import { UnaryExpression, Node } from "estree"
 import { DiagnosticSeverity } from "vscode-languageserver";
+import { Context } from "../types";
 
 export const unaryExpressionRule = new class extends Rule<UnaryExpression> {
     private permitted_operators = ['-', '!'];

@@ -21,11 +21,10 @@ import {
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
-import { createContext } from 'js-slang'
-import { Chapter, Variant } from 'js-slang/dist/types'
 import { sourceLocToRange } from './utils';
 
 import { AST } from './ast';
+import { Chapter, Context } from './types';
 
 const SECTION = "\u00A7";
 const chapter_names = {
@@ -45,7 +44,7 @@ let documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
 let hasDiagnosticRelatedInformationCapability: boolean = false;
-let context = createContext(Chapter.SOURCE_1, Variant.DEFAULT);
+let context: Context = { chapter: Chapter.SOURCE_1 };
 
 let astCache: Map<string, AST> = new Map();
 
@@ -142,7 +141,7 @@ connection.onDidChangeConfiguration(change => {
 // Custom request to set the language version
 connection.onRequest("setLanguageVersion", (params: { version: string }) => {
 	if (Object.keys(chapter_names).includes(params.version)) {
-		context = createContext(chapter_names[params.version as keyof typeof chapter_names], Variant.DEFAULT);
+		context = { chapter: chapter_names[params.version as keyof typeof chapter_names] }
 		astCache.clear();
 		documents.all().forEach(validateTextDocument);
 		return { success: true };

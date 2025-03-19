@@ -1,5 +1,5 @@
-import { Context } from "js-slang/dist/types";
 import { AST } from "../ast";
+import { Context } from "../types";
 import { Rule } from "./rule";
 import { ConditionalExpression, Node } from "estree"
 

@@ -6,7 +6,8 @@
     "node": "*"
   },
   "dependencies": {
-    "js-slang": "^1.0.79",
+    "acorn": "^8.14.1",
+    "acorn-loose": "^8.4.0",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.11"
   },

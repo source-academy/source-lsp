@@ -1,9 +1,9 @@
-import { Chapter, Context } from "js-slang/dist/types";
 import { AST } from "../ast";
 import { Rule } from "./rule";
 import { MemberExpression, Node } from "estree"
 import { DiagnosticSeverity } from "vscode-languageserver";
 import { NODES } from "../types";
+import { Chapter, Context } from "../types";
 
 export const memberExpressionRule = new class extends Rule<MemberExpression> {
     public process(child: MemberExpression, parent: Node, context: Context, ast: AST): void {

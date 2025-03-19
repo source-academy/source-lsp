@@ -1,8 +1,8 @@
 import { AST } from "../ast";
 import { Rule } from "./rule";
 import { Literal, Node } from "estree"
-import { Chapter, Context } from "js-slang/dist/types";
 import { DiagnosticSeverity } from "vscode-languageserver";
+import { Chapter, Context } from "../types";
 
 export const literalRule = new class extends Rule<Literal> {
     public process(child: Literal, parent: Node, context: Context, ast: AST): void {

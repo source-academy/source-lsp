@@ -1,9 +1,9 @@
-import { Chapter, Context } from "js-slang/dist/types";
 import { AST } from "../ast";
 import { Rule } from "./rule";
 import { WhileStatement, Node } from "estree"
 import { DiagnosticSeverity } from "vscode-languageserver";
 import { STATEMENTS } from "../types";
+import { Chapter, Context } from "../types";
 
 export const whileStatementRule = new class extends Rule<WhileStatement> {
     public process(child: WhileStatement, parent: Node, context: Context, ast: AST): void {

@@ -45,17 +45,6 @@ export enum EXPRESSIONS {
     ARRAY = "ArrayExpression"
 }
 
-
-// Taken from js-slang
-export enum DeclarationKind {
-  KIND_IMPORT = 'import',
-  KIND_FUNCTION = 'func',
-  KIND_LET = 'let',
-  KIND_PARAM = 'param',
-  KIND_CONST = 'const',
-  KIND_KEYWORD = 'keyword'
-}
-
 export interface DeclarationSymbol {
     name: string,
     scope: es.SourceLocation,
@@ -94,4 +83,26 @@ export interface CompletionItemData {
     parameters?: string[],
     optional_params?: string[],
     hasRestElement?: boolean
+}
+
+
+// Taken from js-slang
+export enum DeclarationKind {
+  KIND_IMPORT = 'import',
+  KIND_FUNCTION = 'func',
+  KIND_LET = 'let',
+  KIND_PARAM = 'param',
+  KIND_CONST = 'const',
+  KIND_KEYWORD = 'keyword'
+}
+
+export enum Chapter {
+    SOURCE_1 = 1,
+    SOURCE_2 = 2,
+    SOURCE_3 = 3,
+    SOURCE_4 = 4,
+}
+
+export interface Context {
+    chapter: Chapter
 }
