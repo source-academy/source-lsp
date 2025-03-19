@@ -1,6 +1,6 @@
 # source-lsp
 
-A lsp server for [source](https://github.com/source-academy/js-slang)
+A LSP server for [source](https://github.com/source-academy/js-slang)
 
 # Setup
 
@@ -12,17 +12,4 @@ cd source-lsp
 npm i
 ```
 
-Now we need to rebuild js-slang. This is because vscode uses electron, which causes a node_module_version mismatch
-To fix this, we need to use electron-rebuild, we need to find our vscode electron version for this, which is in Help > About
-
-```console
-cd server
-./node_modules/bin/electron-rebuild -v <electron version>
-```
-
-If you want to run tests, make sure the electron version used is the same as well in the package.json
-`"test": "npx electron@32.2.6 node_modules/mocha/bin/mocha.js server/out/test/*.js --ui tdd"`
-
-Then now the plugin should be able to run, enter `code .` in the root folder to startup vscode
-
-Then in vscode, press ctrl + shift + b to build, then press F5 to run the plugin. You can open test.sourcejs for testing
+In vscode, press ctrl + shift + b to build, then press F5 to run the plugin. You can open the scripts in test_files for testing
