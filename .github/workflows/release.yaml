@@ -7,6 +7,9 @@ on:
     paths:
       - "package.json" # Triggers only when package.json changes
 
+permissions:
+  contents: write # Allows creating releases
+
 jobs:
   release:
     runs-on: ubuntu-latest
