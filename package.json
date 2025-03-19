@@ -59,8 +59,8 @@
     "vscode-languageserver": "^9.0.1"
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -b ./client && node esbuild.js",
+    "vscode:prepublish": "npm run build",
+    "build": "tsc -b ./client && node esbuild.js",
     "watch": "tsc -b -w",
     "lint": "eslint",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
