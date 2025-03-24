@@ -39,14 +39,14 @@ export const binaryExpressionRule = new class extends Rule<BinaryExpression> {
             // undefined is an identifier so we have to check this first
             if (child.left.type === NODES.IDENTIFIER && child.left.name === "undefined")
                 ast.addDiagnostic(`Expected string or number on left hand side of operation, got undefined`, DiagnosticSeverity.Error, child.left.loc!);
-            if (child.left.type === NODES.LITERAL) {
+            else if (child.left.type === NODES.LITERAL) {
                 const left_type = typeof child.left.value;
                 if (!(left_type === "string" || left_type === "number"))
                     ast.addDiagnostic(`Expected string or number on left hand side of operation, got ${child.left.value === null ? "null" : left_type}`, DiagnosticSeverity.Error, child.left.loc!);
 
-                if (child.right.type === NODES.IDENTIFIER && child.right.name === "undefined")
+                else if (child.right.type === NODES.IDENTIFIER && child.right.name === "undefined")
                     ast.addDiagnostic(`Expected ${left_type} on left hand side of operation, got undefined`, DiagnosticSeverity.Error, child.right.loc!);
-                if (child.right.type === NODES.LITERAL) {
+                else if (child.right.type === NODES.LITERAL) {
                     const right_type = typeof child.right.value;
                     if (left_type !== right_type)
                         ast.addDiagnostic(`Expected ${left_type} on right hand side of operation, got ${child.right.value === null ? "null" : right_type}`, DiagnosticSeverity.Error, child.right.loc!);
