@@ -1,9 +1,9 @@
 import { Identifier, Literal, SourceLocation, Node, Position as EsPosition } from 'estree';
-import { AUTOCOMPLETE_TYPES, Chapter, Context, DeclarationKind, DECLARATIONS, DeclarationSymbol, Documentation, ImportedSymbol, NODES, ParameterSymbol } from "./types";
+import { AUTOCOMPLETE_TYPES, Chapter, Context, DeclarationKind, DECLARATIONS, DeclarationSymbol, Documentation, EXPRESSIONS, ImportedSymbol, NODES, ParameterSymbol } from "./types";
 import { autocomplete_labels, builtin_constants, builtin_functions, esPosInSourceLoc, findLastRange, getImportedName, getNodeChildren, isBuiltinConst, isBuiltinFunction, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, moduleExists, rangeToSourceLoc, sourceLocEquals, sourceLocInSourceLoc, sourceLocToRange, vsPosInSourceLoc, vsPosToEsPos } from "./utils";
 import { CompletionItem, Diagnostic, DiagnosticSeverity, DiagnosticTag, DocumentHighlight, DocumentSymbol, Hover, Position, Range, TextEdit, WorkspaceEdit } from "vscode-languageserver";
 import { parse as acornParse, Options } from 'acorn';
-import { parse as looseParse} from 'acorn-loose';
+import { parse as looseParse } from 'acorn-loose';
 import { rules, bannedNodes } from "./rules";
 
 export const DEFAULT_ECMA_VERSION = 6;
@@ -54,7 +54,7 @@ export class AST {
     catch (e) {
       this.ast = looseParse(text, acornOptions) as Node
     }
-    // console.debug(JSON.stringify(this.ast, null, 2));
+    console.debug(JSON.stringify(this.ast, null, 2));
 
     this.context = context;
     this.uri = uri;
@@ -164,7 +164,7 @@ export class AST {
           const variableDeclaration: DeclarationSymbol = {
             name: name,
             scope: parent.loc!,
-            meta: child.kind === "var" || child.kind === "let" ? "let" : "const",
+            meta: child.kind === "var" || child.kind === "let" ? "let" : declaration.init?.type === EXPRESSIONS.LAMBDA ? "func" : "const",
             declarationKind: child.kind === "var" || child.kind === "let" ? DeclarationKind.KIND_LET : DeclarationKind.KIND_CONST,
             range: sourceLocToRange(declaration.loc!),
             selectionRange: sourceLocToRange(declaration.id.loc!),
@@ -173,9 +173,9 @@ export class AST {
           this.addDeclaration(name, variableDeclaration);
 
 
-          if (declaration.init && declaration.init.type == DECLARATIONS.LAMBDA) {
+          if (declaration.init && declaration.init.type == EXPRESSIONS.LAMBDA) {
             const lambda = declaration.init;
-            if (lambda.params.length !== 0) variableDeclaration.parameters = [];
+            variableDeclaration.parameters = [];
 
             lambda.params.forEach(param => {
               if (param.loc) {
@@ -252,9 +252,13 @@ export class AST {
       })
     }
     // Handle anonymous lambdas
-    else if (child.type === DECLARATIONS.LAMBDA && parent.type !== DECLARATIONS.VARIABLE) {
+    else if (child.type === EXPRESSIONS.LAMBDA && parent.type !== DECLARATIONS.VARIABLE) {
       child.params.forEach(param => {
-        const name = (param as Identifier).name;
+        let name = "";
+        if (param.type === NODES.IDENTIFIER)
+          name = param.name
+        else if (param.type === NODES.REST && param.argument.type === NODES.IDENTIFIER)
+          name = param.argument.name
         const param_declaration: DeclarationSymbol = {
           name: name,
           scope: child.body.loc!,
@@ -340,7 +344,7 @@ export class AST {
 
       getNodeChildren(node, true).forEach(node => {
         if (
-          scopeFound 
+          scopeFound
           // We want to ignore scopes where the variable was redeclared
           // This occurs when there is an inner scope in the scope of our declaration, and the child node belongs in that scope
           && !this.declarations.get(identifier.name)?.some(x => !sourceLocEquals(x.scope, declaration.scope) && sourceLocInSourceLoc(x.scope, declaration.scope) && sourceLocInSourceLoc(node.loc!, x.scope))

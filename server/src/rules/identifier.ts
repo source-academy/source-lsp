@@ -8,8 +8,6 @@ import { Context } from "../types";
 
 export const identifierRule = new class extends Rule<Identifier> {
     public process(child: Identifier, parent: Node, context: Context, ast: AST): void {
-        if (child.name === "eval")
-            ast.addDiagnostic("eval is not allowed", DiagnosticSeverity.Error, child.loc!);
         if (parent.type !== DECLARATIONS.IMPORT) {
             // Ensure that all declarations have been processed
             ast.addDiagnosticCallback((node: Node) => {

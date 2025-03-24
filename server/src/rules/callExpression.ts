@@ -17,7 +17,8 @@ export const callExpressionRule = new class extends Rule<CallExpression> {
               const loc = callee.loc;
               let declaration = ast.findDeclarationByName(callee.name, loc)
               if (declaration !== undefined) {
-                if (declaration.meta !== "func")
+                // We cannot check for let because they can be reassigned. Constants assigned to lambdas will still be "func"
+                if (declaration.meta === "const")
                   ast.addDiagnostic(`'${callee.name}' is not a function`, DiagnosticSeverity.Error, loc);
                 if (declaration.parameters !== undefined || declaration.declarationKind === DeclarationKind.KIND_IMPORT) {
                   let hasRestElement = false;

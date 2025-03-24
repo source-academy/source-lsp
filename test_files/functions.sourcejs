@@ -1,2 +1,15 @@
+import { black } from "rune";
 function test(arg1, ...args) {
 }
+
+const x = () => return 0
+x();
+
+let y = 1;
+y(); // Runtime error
+
+black();
+
+const z = (arg1, ...arg2, arg3) => {
+    return 1;
+};

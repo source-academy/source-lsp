@@ -78,11 +78,7 @@ connection.onInitialize((params: InitializeParams) => {
       documentHighlightProvider: true,
       documentSymbolProvider: true,
       renameProvider: true,
-      hoverProvider: true,
-      diagnosticProvider: {
-        interFileDependencies: false,
-        workspaceDiagnostics: false
-      }
+      hoverProvider: true
     }
   };
   if (hasWorkspaceFolderCapability) {

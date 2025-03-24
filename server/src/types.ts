@@ -20,8 +20,7 @@ export enum NODES {
 export enum DECLARATIONS {
     VARIABLE = "VariableDeclaration",
     FUNCTION = "FunctionDeclaration",
-    IMPORT = "ImportDeclaration",
-    LAMBDA = "ArrowFunctionExpression"
+    IMPORT = "ImportDeclaration"
 }
 
 export enum STATEMENTS {
@@ -42,7 +41,8 @@ export enum EXPRESSIONS {
     CALL = "CallExpression",
     ASSIGNMENT = "AssignmentExpression",
     MEMBER = "MemberExpression",
-    ARRAY = "ArrayExpression"
+    ARRAY = "ArrayExpression",
+    LAMBDA = "ArrowFunctionExpression"
 }
 
 export interface DeclarationSymbol {

@@ -3,7 +3,7 @@ import { DECLARATIONS, EXPRESSIONS, NODES, STATEMENTS } from '../types';
 import { Rule } from './rule';
 import { binaryExpressionRule } from './binaryExpression';
 import { conditonalExpressionRule } from './conditionalExpression';
-import { literalRule } from './literalExpression';
+import { literalRule } from './literal';
 import { variableDeclarationRule } from './variableDeclaration';
 import { assignmentExpressionRule } from './assignmentExpression';
 import { functionDeclarationRule } from './functionDeclaration';
@@ -21,6 +21,7 @@ import { returnStatementRule } from './returnStatement';
 import { spreadElementRule } from './spreadElement';
 import { templateLiteralRule } from './templateLiteral';
 import { unaryExpressionRule } from './unaryExpression';
+import { arrowFunctionExpressionRule } from './arrowFunctionExpression';
 
 export const rules: Map<string, Rule<Node>> = new Map();
 export const bannedNodes = new Set([
@@ -43,6 +44,7 @@ rules.set(EXPRESSIONS.ASSIGNMENT, assignmentExpressionRule);
 rules.set(EXPRESSIONS.CALL, callExpressionRule);
 rules.set(EXPRESSIONS.MEMBER, memberExpressionRule);
 rules.set(EXPRESSIONS.ARRAY, arrayExpressionRule);
+rules.set(EXPRESSIONS.LAMBDA, arrowFunctionExpressionRule);
 
 rules.set(DECLARATIONS.VARIABLE, variableDeclarationRule);
 rules.set(DECLARATIONS.FUNCTION, functionDeclarationRule);
