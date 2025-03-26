@@ -133,6 +133,8 @@ export function getNodeChildren(node: es.Node, allChildren = false): es.Node[] {
       return [...node.properties]
     case 'NewExpression':
       return [...node.arguments, node.callee]
+    case 'SpreadElement':
+      return [node.argument]
     default:
       return []
   }

@@ -8,5 +8,6 @@ export const breakStatementRule = new class extends Rule<BreakStatement> {
     public process(child: BreakStatement, parent: Node, context: Context, ast: AST): void {
         if (context.chapter < Chapter.SOURCE_3) 
             ast.addDiagnostic("Break statements are not allowed", DiagnosticSeverity.Error, child.loc!)
+        // TODO: detect unsyntatic breaks (breaks outside of loops)
     }
 }();

@@ -54,7 +54,7 @@ export class AST {
     catch (e) {
       this.ast = looseParse(text, acornOptions) as Node
     }
-    console.debug(JSON.stringify(this.ast, null, 2));
+    // console.debug(JSON.stringify(this.ast, null, 2));
 
     this.context = context;
     this.uri = uri;
@@ -77,8 +77,8 @@ export class AST {
 
     this.declarations.forEach(declarationList => {
       for (let i = 0; i < declarationList.length; i++) {
-        const declaration = declarationList[i]
-        if (declaration.unused)
+        const declaration = declarationList[i];
+        if (declaration.unused && declaration.name !== "✖")
           this.addDiagnostic("Unused name", DiagnosticSeverity.Warning, rangeToSourceLoc(declaration.selectionRange), [DiagnosticTag.Unnecessary]);
       }
     })
@@ -259,6 +259,10 @@ export class AST {
           name = param.name
         else if (param.type === NODES.REST && param.argument.type === NODES.IDENTIFIER)
           name = param.argument.name
+        else {
+          this.addDiagnostic("Unexpected token", DiagnosticSeverity.Error, param.loc!);
+          return;
+        }
         const param_declaration: DeclarationSymbol = {
           name: name,
           scope: child.body.loc!,

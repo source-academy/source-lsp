@@ -10,6 +10,6 @@ export const whileStatementRule = new class extends Rule<WhileStatement> {
         if (context.chapter < Chapter.SOURCE_3)
             ast.addDiagnostic("While statements are not allowed", DiagnosticSeverity.Error, { start: child.loc!.start, end: child.body.loc!.start })
         if (child.body.type !== STATEMENTS.BLOCK)
-            ast.addDiagnostic("Missing curly braces around while", DiagnosticSeverity.Error, child.loc!);
+            ast.addDiagnostic("Missing curly braces around while", DiagnosticSeverity.Error, { start: child.loc!.start, end: child.body.loc!.start });
     }
 }();
