@@ -113,7 +113,7 @@ true == 1;
 Only permitted operators defined in Source is allowed. Binary operators like `^` or `instanceof` is banned, unary operators like `typeof` is also banned.
 ```javascript
 100^5;
-typeof 1 === "number"
+typeof 1 === "number";
 ```
 The two expressions will throw an error.
 
