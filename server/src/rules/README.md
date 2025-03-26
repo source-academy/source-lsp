@@ -146,7 +146,7 @@ Cannot call identifiers that are not a function
 const x = 1;
 x();
 let y = 1;
-y()
+y();
 ```
 The function application on `x` will throw an error, however the function application on `y` will not, as y 
 can be reassigned, hence it will be a runtime error.
