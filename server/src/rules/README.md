@@ -19,7 +19,7 @@ The variable `pi` should have a warning.
 
 Identifies statements that are missing semicolons.
 ```javascript
-const x = 1;
+const x = 1
 ```
 The line ending should have an error.
 
