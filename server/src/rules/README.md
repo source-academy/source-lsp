@@ -19,7 +19,7 @@ The variable `pi` should have a warning.
 
 Identifies statements that are missing semicolons.
 ```javascript
-const x = 1;
+const x = 1
 ```
 The line ending should have an error.
 
@@ -113,7 +113,7 @@ true == 1;
 Only permitted operators defined in Source is allowed. Binary operators like `^` or `instanceof` is banned, unary operators like `typeof` is also banned.
 ```javascript
 100^5;
-typeof 1 === "number"
+typeof 1 === "number";
 ```
 The two expressions will throw an error.
 
@@ -146,7 +146,7 @@ Cannot call identifiers that are not a function
 const x = 1;
 x();
 let y = 1;
-y()
+y();
 ```
 The function application on `x` will throw an error, however the function application on `y` will not, as y 
 can be reassigned, hence it will be a runtime error.
