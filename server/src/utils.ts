@@ -3,7 +3,7 @@ import { CompletionItem, CompletionItemKind, DocumentSymbol, MarkupKind, Positio
 import { AUTOCOMPLETE_TYPES, Chapter, CompletionItemData, Context, DeclarationKind, DeclarationSymbol, Documentation } from "./types";
 
 import source from './docs/source.json'
-import modules from "./docs/modules/modules.json";
+import modules from "./docs/modules.json";
 
 export const builtin_functions: Array<{ [key: string]: Documentation }> = source.map(version => version.filter(doc => doc.meta === "func").reduce((a, v) => ({ ...a, [v.label]: v }), {}));
 export const builtin_constants: Array<{ [key: string]: Documentation }> = source.map(version => version.filter(doc => doc.meta === "const").reduce((a, v) => ({ ...a, [v.label]: v }), {}));

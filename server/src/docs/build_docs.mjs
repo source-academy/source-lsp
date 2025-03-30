@@ -1,7 +1,6 @@
 // @ts-check
 
 import fs from 'fs/promises';
-import pathlib from "path";
 import TurndownService from 'turndown';
 import { JSDOM } from 'jsdom';
 import patches from "./patches.json" with { type: "json" };
@@ -11,7 +10,6 @@ const FUNC_DECL = "func";
 
 const BASE_URL = "https://docs.sourceacademy.org"
 const SRC_FILENAME = "global.html"
-const OUT_DIR = "./"
 
 const TARGETS = [
   "source_1",
@@ -101,19 +99,69 @@ async function processDirGlobals(global, target, index) {
   const functions = document.getElementsByClassName('function-entry')
   Array.prototype.forEach.call(functions, ele => processFunction(names, ele, document));
 
-  const outFile = pathlib.join(OUT_DIR, target + '.json');
-  await fs.writeFile(outFile, JSON.stringify(names, null, 2), 'utf-8')
   global[index] = (names);
   return undefined
 }
 
-await fs.mkdir(OUT_DIR, { recursive: true })
+console.log('Building built in autocomplete documentation')
 
 const global = [];
 // Exit with error code if the there was some error
 const errors = await Promise.all(TARGETS.map((x, i) => processDirGlobals(global, x, i)));
 if (errors.find(each => each !== undefined)) process.exit(1);
-const outFile = pathlib.join(OUT_DIR, FINAL_TARGET + '.json');
-await fs.writeFile(outFile, JSON.stringify(global, null, 2), 'utf-8')
+await fs.writeFile(FINAL_TARGET + '.json', JSON.stringify(global, null, 2), 'utf-8')
 
-console.log('Finished processing autocomplete documentation')
+console.log('Finished processing built in autocomplete documentation')
+
+console.log('Building modules autocomplete documentation')
+
+const MODULE_LIST_URL = "https://raw.githubusercontent.com/source-academy/modules/refs/heads/master/modules.json";
+const MODULE_DOCS_URL = "https://source-academy.github.io/modules/jsons";
+const OUTFILE = "modules.json";
+
+const names = Object.keys(await (await fetch(MODULE_LIST_URL)).json())
+const modules = {}
+
+function mapKindToMeta(kind) {
+  switch (kind) {
+    case "variable":
+      return "const";
+    case "function":
+      return "func";
+    default:
+      return "const";
+  }
+}
+
+async function buildDoc(name) {
+  const doc = await (await fetch(`${MODULE_DOCS_URL}/${name}.json`)).json();
+  const module = {};
+  for (const key in doc) {
+    const item = {
+      "label": key,
+      meta: mapKindToMeta(doc[key]["kind"]),
+      title: `Auto-import from ${name}`,
+      description: ""
+    };
+
+    if (doc[key]["kind"] === "variable")
+      item["description"] = `#### ${key}:${doc[key]['type']}\n${turndownService.turndown(doc[key]["description"])}`;
+    else if (doc[key]["kind"] === "function") {
+      const params = doc[key]['params'].map(x => x[0]);
+      item["description"] = `#### ${key}(${params.join(', ')}) → ${doc[key]['retType']}\n${turndownService.turndown(doc[key]["description"])}`;
+      item["parameters"] = params
+    }
+
+    module[key] = item;
+  }
+
+  return module;
+}
+
+for (const name of names) {
+  modules[name] = await buildDoc(name);
+}
+
+await fs.writeFile(OUTFILE, JSON.stringify(modules, null, 2), 'utf-8')
+
+console.log('Finished processing modules autocomplete documentation')
