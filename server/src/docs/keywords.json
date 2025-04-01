@@ -1,0 +1,88 @@
+{
+    "source": [
+        ["true", "false", "undefined", "const", "ternary", "function", "if_source1", "else", "lambda"],
+        ["true", "false", "undefined", "const", "ternary", "function", "if_source1", "else", "lambda", "null"],
+        ["true", "false", "undefined", "const", "ternary", "function", "if_source3", "else", "lambda", "null", "let", "while", "for", "break", "continue"],
+        ["true", "false", "undefined", "const", "ternary", "function", "if_source3", "else", "lambda", "null", "let", "while", "for", "break", "continue"]
+    ],
+    "keywords": {
+        "true": {
+            "label": "true",
+            "documentation": "Boolean true"
+        },
+        "false": {
+            "label": "false",
+            "documentation": "Boolean false"
+        },
+        "undefined": {
+            "label": "undefined",
+            "documentation": "Primitive value"
+        },
+        "return": {
+            "label": "return",
+            "documentation": "Return statement"
+        },
+        "const": {
+            "label": "const",
+            "documentation": "```js\nconst name = value\n```",
+            "insertText": "const ${1:name} = ${2:value};"
+        },
+        "ternary": {
+            "label": "ternary",
+            "documentation": "```js\npredicate ? consequent : alternate\n```",
+            "insertText": "${1:predicate} ? ${2:consequent} : ${3:alternate};"
+        },
+        "function": {
+            "label": "function",
+            "documentation": "```js\nfunction name(args) {\n\t// Function body\n}\n```",
+            "insertText": "function ${1:name}(${2:args}) {\n\t${3:}\n}"
+        }, 
+        "if_source1": {
+            "label": "if",
+            "documentation": "```js\nif (predicate) {\n\t// If body\n}\nelse {\n\t\n}\n```",
+            "insertText": "if (${1:predicate}) {\n\t${2:}\n}\nelse {\n\t${3:}\n}"
+        },
+        "else": {
+            "label": "else",
+            "documentation": "```js\nelse {\n\t// Else body\n}\n```",
+            "insertText": "else {\n\t${1:}\n}"
+        },
+        "lambda": {
+            "label": "lambda",
+            "documentation": "```js\n(args) => // Lambda body\n```",
+            "insertText": "(${1:args}) => ${2:}"
+        },
+        "null": {
+            "label": "null",
+            "documentation": "Primitive value, the empty list."
+        },
+        "if_source3": {
+            "label": "if",
+            "documentation": "```js\nif (predicate) {\n\t// If body\n}\n```",
+            "insertText": "if (${1:predicate}) {\n\t${2:}\n}"
+        },
+        "let": {
+            "label": "let",
+            "documentation": "```js\nlet name = value\n```",
+            "insertText": "let ${1:name} = ${2:value};"
+        },
+        "while": {
+            "label": "while",
+            "documentation": "```js\nwhile(predicate) {\n\t// While body\n}\n```",
+            "insertText": "while(${1:predicate}) {\n\t${2:}\n}"
+        },
+        "for": {
+            "label": "for",
+            "documentation": "```js\nfor(let index = 0; i < n; index++) {\n\t// For body\n}\n```",
+            "insertText": "for(let ${1:index} = 0; i < ${2:n}; ${1:index}++) {\n\t${3:}\n}"
+        },
+        "break": {
+            "label": "break",
+            "documentation": "Break statement"
+        },
+        "continue": {
+            "label": "continue",
+            "documentation": "Conintue statement"
+        }
+    }
+}

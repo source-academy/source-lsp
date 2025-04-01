@@ -1,9 +1,10 @@
 import * as es from "estree";
-import { CompletionItem, CompletionItemKind, DocumentSymbol, MarkupKind, Position, Range, SymbolKind } from "vscode-languageserver";
+import { CompletionItem, CompletionItemKind, DocumentSymbol, InsertTextFormat, MarkupKind, Position, Range, SymbolKind } from "vscode-languageserver";
 import { AUTOCOMPLETE_TYPES, Chapter, CompletionItemData, Context, DeclarationKind, DeclarationSymbol, Documentation } from "./types";
 
 import source from './docs/source.json'
 import modules from "./docs/modules.json";
+import keywords from "./docs/keywords.json"
 
 export const builtin_functions: Array<{ [key: string]: Documentation }> = source.map(version => version.filter(doc => doc.meta === "func").reduce((a, v) => ({ ...a, [v.label]: v }), {}));
 export const builtin_constants: Array<{ [key: string]: Documentation }> = source.map(version => version.filter(doc => doc.meta === "const").reduce((a, v) => ({ ...a, [v.label]: v }), {}));
@@ -42,6 +43,26 @@ for (const key in modules) {
       data: { type: AUTOCOMPLETE_TYPES.MODULE, idx: idx, module_name: key, parameters: doc.parameters, optional_params: doc.optional_params } as CompletionItemData,
       sortText: '' + AUTOCOMPLETE_TYPES.MODULE
     });
+  });
+}
+
+export const keyword_autocomplete: CompletionItem[][] = [];
+for (let i = 0; i < 4; i++) {
+  keyword_autocomplete[i] = [];
+  keywords.source[i].forEach(s => {
+    const keyword: {label: string, documentation: string, insertText?:string} = keywords.keywords[s as keyof typeof keywords.keywords];
+
+    keyword_autocomplete[i].push({
+      ...keyword,
+      kind: CompletionItemKind.Keyword,
+      labelDetails: { detail: " (keyword)" },
+      documentation: {
+        kind: MarkupKind.Markdown,
+        value: keyword.documentation
+      },
+      ...keyword.insertText && { insertTextFormat: InsertTextFormat.Snippet },
+      sortText: '' + AUTOCOMPLETE_TYPES.KEYWORD
+    })
   });
 }
 
@@ -95,7 +116,7 @@ export function getNodeChildren(node: es.Node, allChildren = false): es.Node[] {
     case 'VariableDeclaration':
       return node.declarations.flatMap(x => getNodeChildren(x, allChildren))
     case 'VariableDeclarator':
-      const var_id: es.Node[] = (allChildren && node.id ) ? [node.id] : []
+      const var_id: es.Node[] = (allChildren && node.id) ? [node.id] : []
       const init = node.init ? [node.init] : []
       return var_id.concat(init);
     case 'ImportDeclaration':

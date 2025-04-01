@@ -4,6 +4,7 @@ import * as es from 'estree';
 // Note that the order the enum fields appear in determine the order they are displayed in the autocomplete list
 export enum AUTOCOMPLETE_TYPES {
 	BUILTIN,
+    KEYWORD,
 	SYMBOL,
 	MODULE
 }

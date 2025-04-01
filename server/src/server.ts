@@ -148,7 +148,7 @@ connection.onCompletion(
 // This handler resolves additional information for the item selected in
 // the completion list.
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
-  if (item.data.parameters) {
+  if (item.data?.parameters) {
     item.insertText = `${item.label}(${item.data.parameters.filter((x: string) => item.data.optional_params ? !item.data.optional_params.includes(x) : true).map((param: string, idx: number) => `\${${idx + 1}:${param}}`)})`;
     item.insertTextFormat = InsertTextFormat.Snippet;
   };

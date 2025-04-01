@@ -1,6 +1,6 @@
 import { Identifier, Literal, SourceLocation, Node, Position as EsPosition } from 'estree';
 import { AUTOCOMPLETE_TYPES, Chapter, Context, DeclarationKind, DECLARATIONS, DeclarationSymbol, Documentation, EXPRESSIONS, ImportedSymbol, NODES, ParameterSymbol } from "./types";
-import { autocomplete_labels, builtin_constants, builtin_functions, esPosInSourceLoc, findLastRange, getImportedName, getNodeChildren, isBuiltinConst, isBuiltinFunction, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, moduleExists, rangeToSourceLoc, sourceLocEquals, sourceLocInSourceLoc, sourceLocToRange, vsPosInSourceLoc, vsPosToEsPos } from "./utils";
+import { autocomplete_labels, builtin_constants, builtin_functions, esPosInSourceLoc, findLastRange, getImportedName, getNodeChildren, isBuiltinConst, isBuiltinFunction, keyword_autocomplete, mapDeclarationSymbolToDocumentSymbol, mapMetaToCompletionItemKind, module_autocomplete, moduleExists, rangeToSourceLoc, sourceLocEquals, sourceLocInSourceLoc, sourceLocToRange, vsPosInSourceLoc, vsPosToEsPos } from "./utils";
 import { CompletionItem, Diagnostic, DiagnosticSeverity, DiagnosticTag, DocumentHighlight, DocumentSymbol, Hover, Position, Range, TextEdit, WorkspaceEdit } from "vscode-languageserver";
 import { parse as acornParse, Options } from 'acorn';
 import { parse as looseParse } from 'acorn-loose';
@@ -68,6 +68,7 @@ export class AST {
         this.processDeclarations(child, parent);
         this.processDiagnostics(child, parent);
         queue.push(child);
+        
       })
     }
 
@@ -471,7 +472,8 @@ export class AST {
             TextEdit.insert({ line: 0, character: 0 }, `import { ${item.label} } from "${item.data.module_name}";\n`)
           ]
         };
-      }));
+      }))
+      .concat(keyword_autocomplete[this.context.chapter-1]);
   }
 
   public getDiagnostics(): Diagnostic[] {
