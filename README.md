@@ -1,2 +1,2 @@
 # source-lsp
-Language Server Protocol for the Source languages
+Language Server Protocol (LSP) resources for the Source languages
