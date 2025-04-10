@@ -68,7 +68,7 @@ export class AST {
         this.processDeclarations(child, parent);
         this.processDiagnostics(child, parent);
         queue.push(child);
-        
+
       })
     }
 
@@ -403,14 +403,25 @@ export class AST {
       else if (isBuiltinFunction(identifier.name, this.context))
         value = builtin_functions[this.context.chapter - 1][identifier.name].description
     }
-    if (value === undefined)
+    if (value === undefined) {
       return null;
-    else return {
+
+    }
+
+    // Hack: make the first line syntax highlighted
+    // TODO: This should be done elsewhere, perhaps during the docs parsing
+    const lines = value.split("\n");
+    lines.unshift("```source");
+    lines[1] = lines[1].substring(5);
+    lines.splice(2, 0, "```");
+    value = lines.join("\n");
+
+    return {
       contents: {
         kind: "markdown",
         value: value
-      }
-    }
+      },
+    };
   }
 
   public getCompletionItems(pos: Position): CompletionItem[] {
