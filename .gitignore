@@ -1,5 +1,14 @@
+# Node dependencies
 node_modules
+
+# Build artifacts
 *.vsix
 client/out
 server/out
 dist
+
+# Caches
+**/tsconfig.tsbuildinfo
+
+# Misc
+.DS_Store
