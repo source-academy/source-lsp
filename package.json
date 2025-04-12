@@ -60,14 +60,23 @@
     "turndown": "^7.2.0",
     "vscode-languageserver": "^9.0.1"
   },
+  "scripts-info": {
+    "format": "Format codebase with Prettier"
+  },
   "scripts": {
     "vscode:prepublish": "npm run build",
     "build": "tsc -b ./client && node esbuild.js",
     "watch": "tsc -b -w",
     "lint": "eslint",
+    "format": "prettier . --write",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
     "test": "node node_modules/mocha/bin/mocha.js dist/tests/*.js --ui tdd",
     "docs": "node ./server/src/docs/build_docs.mjs"
+  },
+  "lint-staged": {
+    "**/*": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -76,7 +85,10 @@
     "@types/node": "^20",
     "esbuild": "^0.25.1",
     "eslint": "^9.13.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
     "mocha": "^11.1.0",
+    "prettier": "^3.5.3",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.16.0"
   }
