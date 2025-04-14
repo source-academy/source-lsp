@@ -405,7 +405,8 @@ export class AST {
     }
     if (value === undefined)
       return null;
-    else return {
+
+    return {
       contents: {
         kind: "markdown",
         value: value

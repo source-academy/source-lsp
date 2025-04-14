@@ -50,7 +50,13 @@ function processConstant(names, element, document) {
   const descriptionDiv = document.createElement('div');
   descriptionDiv.appendChild(titleNode);
   descriptionDiv.appendChild(descriptionNode);
-  const markdown = buildDescriptionMarkdown(descriptionDiv);
+
+  let markdown = buildDescriptionMarkdown(descriptionDiv);
+  const lines = markdown.split("\n");
+  lines.unshift("```source");
+  lines[1] = lines[1].substring(5);
+  lines.splice(2, 0, "```");
+  markdown = lines.join("\n");
 
   names.push({ label: name, title, description: markdown, meta: CONST_DECL });
 }
@@ -66,10 +72,16 @@ function processFunction(names, element, document) {
   const descriptionDiv = document.createElement('div');
   descriptionDiv.appendChild(titleNode);
   descriptionDiv.appendChild(descriptionNode);
-  const html = buildDescriptionMarkdown(descriptionDiv);
+
+  let markdown = buildDescriptionMarkdown(descriptionDiv);
+  const lines = markdown.split("\n");
+  lines.unshift("```source");
+  lines[1] = lines[1].substring(5);
+  lines.splice(2, 0, "```");
+  markdown = lines.join("\n");
 
   const params = (Object.keys(patches["rename_params"])).includes(name) ? patches["rename_params"][name] : [...title.matchAll(/\w+\(([^)]*)\)/g)][0][1].split(",").map(s => s.trim());
-  const autocomplete = { label: name, title, description: html, meta: FUNC_DECL, parameters: params[0] === '' ? [] : params };
+  const autocomplete = { label: name, title, description: markdown, meta: FUNC_DECL, parameters: params[0] === '' ? [] : params };
 
   if (Object.keys(patches["optional_params"]).includes(name))
     autocomplete["optional_params"] = patches["optional_params"][name];
@@ -148,7 +160,7 @@ async function buildDoc(name) {
       item["description"] = `#### ${key}:${doc[key]['type']}\n${turndownService.turndown(doc[key]["description"])}`;
     else if (doc[key]["kind"] === "function") {
       const params = doc[key]['params'].map(x => x[0]);
-      item["description"] = `#### ${key}(${params.join(', ')}) → ${doc[key]['retType']}\n${turndownService.turndown(doc[key]["description"])}`;
+      item["description"] = `\`\`\`source\n${key}(${params.join(', ')}) → ${doc[key]['retType']}\n\`\`\`\n${turndownService.turndown(doc[key]["description"])}`;
       item["parameters"] = params
     }
 

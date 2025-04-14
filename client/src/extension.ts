@@ -38,7 +38,7 @@ export function activate(context: ExtensionContext) {
 	// Options to control the language client
 	const clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
-		documentSelector: [{ scheme: 'file', language: 'sourcejs' }],
+		documentSelector: [{ scheme: 'file', language: 'source' }],
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
@@ -58,7 +58,7 @@ export function activate(context: ExtensionContext) {
 	client.start();
 
 	context.subscriptions.push(
-		commands.registerCommand("sourcejs.setLanguageVersion", async () => {
+		commands.registerCommand("source.setLanguageVersion", async () => {
 			const versions = [`Source ${SECTION}1`, `Source ${SECTION}2`, `Source ${SECTION}3`, `Source ${SECTION}4`]
 			const selectedVersion = await window.showQuickPick(versions, {
 				placeHolder: "Select the language version",
