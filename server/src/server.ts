@@ -16,7 +16,8 @@ import {
   WorkspaceEdit,
   DocumentSymbol,
   HoverParams,
-  Hover
+  DeclarationParams,
+  DefinitionParams
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -74,6 +75,7 @@ connection.onInitialize((params: InitializeParams) => {
       completionProvider: {
         resolveProvider: true
       },
+      definitionProvider: true,
       declarationProvider: true,
       documentHighlightProvider: true,
       documentSymbolProvider: true,
@@ -157,26 +159,28 @@ connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
 }
 );
 
-
-
-// This handler provides the declaration location of the name at the location provided
-connection.onDeclaration(async (params) => {
+/**
+ * Provides the declaration location of the name at the location provided.
+ */
+// Because Source programs do not allow declarations without definitions, we can use the same handler
+const handleDefinitionOrDeclaration = (params: DeclarationParams | DefinitionParams) => {
   const position = params.position;
 
   const result = getAST(params.textDocument.uri).findDeclaration(position);
+  if (!result) {
+    return null;
+  }
 
-  if (result) {
     const range: Range = sourceLocToRange(result);
-
     return {
       uri: params.textDocument.uri,
       range
     };
   }
-  else {
-    return null;
-  }
-});
+
+connection.onDefinition(handleDefinitionOrDeclaration)
+
+connection.onDeclaration(handleDefinitionOrDeclaration);
 
 connection.onDocumentHighlight((params: DocumentHighlightParams) => {
   const document = documents.get(params.textDocument.uri);
