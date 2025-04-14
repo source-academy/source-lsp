@@ -1,8 +1,3 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
-
 import * as path from 'path';
 import { workspace, ExtensionContext } from 'vscode';
 
@@ -27,6 +22,8 @@ export function activate(context: ExtensionContext) {
 		path.join("dist", 'source-lsp.js')
 	);
 
+    let debugOptions = { execArgv: ["--nolazy", "--inspect=6009"] };
+
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
 	const serverOptions: ServerOptions = {
@@ -34,6 +31,7 @@ export function activate(context: ExtensionContext) {
 		debug: {
 			module: serverModule,
 			transport: TransportKind.ipc,
+			options: debugOptions
 		}
 	};
 
@@ -65,7 +63,7 @@ export function activate(context: ExtensionContext) {
 			const selectedVersion = await window.showQuickPick(versions, {
 				placeHolder: "Select the language version",
 			});
-		
+
 			if (selectedVersion) {
 				await setLanguageVersion(selectedVersion);
 			}
