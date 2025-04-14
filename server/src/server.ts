@@ -16,7 +16,8 @@ import {
   WorkspaceEdit,
   DocumentSymbol,
   HoverParams,
-  Hover
+  Hover,
+  DocumentHighlight,
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -50,6 +51,7 @@ let astCache: Map<string, AST> = new Map();
 function getAST(uri: string): AST {
   if (astCache.has(uri)) return astCache.get(uri)!;
 
+  // const ast = new AST(documents.get(uri)!.getText(), context, uri, 4);
   const ast = new AST(documents.get(uri)!.getText(), context, uri);
   astCache.set(uri, ast);
   return ast;
@@ -78,7 +80,7 @@ connection.onInitialize((params: InitializeParams) => {
       documentHighlightProvider: true,
       documentSymbolProvider: true,
       renameProvider: true,
-      hoverProvider: true
+      hoverProvider: true,
     }
   };
   if (hasWorkspaceFolderCapability) {
@@ -122,7 +124,7 @@ documents.onDidChangeContent(change => {
   timeout = setTimeout(() => {
     astCache.delete(change.document.uri);
     validateTextDocument(change.document);
-  }, 300);
+  }, 100);
 });
 
 async function validateTextDocument(document: TextDocument): Promise<void> {
@@ -182,7 +184,7 @@ connection.onDocumentHighlight((params: DocumentHighlightParams) => {
   const document = documents.get(params.textDocument.uri);
   if (!document) return null;
 
-  return getAST(params.textDocument.uri).getOccurences(params.position);
+  return getAST(params.textDocument.uri).getOccurences(params.position).map(x => ({ range: x}));
 })
 
 connection.onDocumentSymbol(async (params: DocumentSymbolParams): Promise<DocumentSymbol[] | null> => {
@@ -206,7 +208,6 @@ connection.onHover((params: HoverParams): Hover | null => {
 
   return getAST(params.textDocument.uri).onHover(position);
 })
-
 
 // Make the text document manager listen on the connection
 documents.listen(connection);
