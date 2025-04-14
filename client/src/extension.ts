@@ -54,8 +54,12 @@ export function activate(context: ExtensionContext) {
 		clientOptions
 	);
 
-	// Start the client. This will also launch the server
-	client.start();
+  // Start the client. This will also launch the server
+  (async function () {
+    console.log("Going to call client.start()");
+    await client.start();
+    console.log("client.start() called");
+  })();
 
 	context.subscriptions.push(
 		commands.registerCommand("sourcejs.setLanguageVersion", async () => {

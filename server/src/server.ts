@@ -43,12 +43,20 @@ let documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
 let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
-let context: Context = { chapter: Chapter.SOURCE_1 };
 
+// let context: Context = { chapter: Chapter.SOURCE_1 };
+let contextCache: Map<string, Context> = new Map();
 let astCache: Map<string, AST> = new Map();
 
 function getAST(uri: string): AST {
   if (astCache.has(uri)) return astCache.get(uri)!;
+
+  let context = contextCache.get(uri)
+  if (!context) {
+    context = { chapter: Chapter.SOURCE_1 };
+    console.log(`No context found for ${uri}, using default context ${JSON.stringify(context)}`);
+  }
+  console.log(`Creating AST for ${uri} with context ${JSON.stringify(context)}`);
 
   const ast = new AST(documents.get(uri)!.getText(), context, uri);
   astCache.set(uri, ast);
@@ -56,6 +64,7 @@ function getAST(uri: string): AST {
 }
 
 connection.onInitialize((params: InitializeParams) => {
+    connection.console.log('LSP INIT');
   let capabilities = params.capabilities;
 
   // Does the client support the `workspace/configuration` request?
@@ -103,16 +112,16 @@ connection.onInitialized(() => {
   }
 });
 
-// Custom request to set the language version
-connection.onRequest("setLanguageVersion", (params: { version: string }) => {
-  if (Object.keys(chapter_names).includes(params.version)) {
-    context = { chapter: chapter_names[params.version as keyof typeof chapter_names] }
-    astCache.clear();
-    documents.all().forEach(validateTextDocument);
-    return { success: true };
-  }
-  else return { success: false };
-});
+// // Custom request to set the language version
+// connection.onRequest("setLanguageVersion", (params: { version: string }) => {
+//   if (Object.keys(chapter_names).includes(params.version)) {
+//     context = { chapter: chapter_names[params.version as keyof typeof chapter_names] }
+//     astCache.clear();
+//     documents.all().forEach(validateTextDocument);
+//     return { success: true };
+//   }
+//   else return { success: false };
+// });
 
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
@@ -129,7 +138,7 @@ async function validateTextDocument(document: TextDocument): Promise<void> {
   connection.sendDiagnostics({ uri: document.uri, diagnostics: getAST(document.uri).getDiagnostics() });
 }
 
-// TODO: handle file deletion and creation 
+// TODO: handle file deletion and creation
 connection.onDidChangeWatchedFiles(_change => {
   // Monitored files have change in VS Code
   connection.console.log('We received a file change event');
@@ -207,6 +216,16 @@ connection.onHover((params: HoverParams): Hover | null => {
   return getAST(params.textDocument.uri).onHover(position);
 })
 
+connection.onNotification("source/publishInfo", (info) => {
+  connection.console.log("Info");
+  connection.console.log(info);
+
+  contextCache = new Map(Object.entries(info));
+  // TODO: We only need to revalidate the documents that have changed
+  astCache.clear();
+  documents.all().forEach(validateTextDocument);
+  return { success: true };
+})
 
 // Make the text document manager listen on the connection
 documents.listen(connection);
