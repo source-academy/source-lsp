@@ -3,7 +3,7 @@ name: Release LSP
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - "package.json" # Triggers only when package.json changes
 
