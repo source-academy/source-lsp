@@ -136,8 +136,8 @@ export class AST {
             if (specifier.imported.type === "Identifier") {
               const real_name = specifier.imported.name;
               const name = specifier.local.name;
-              let imported: Documentation | undefined;
-              if ((imported = getImportedName(module_name, real_name)) !== undefined) {
+              let imported: Documentation | undefined = getImportedName(module_name, real_name);
+              if (imported !== undefined) {
                 this.imported_names[module_name].set(real_name, { range: sourceLocToRange(specifier.loc!), local: name });
                 const declaration: ImportedSymbol = {
                   name: name,
@@ -474,6 +474,7 @@ export class AST {
               data: { type: AUTOCOMPLETE_TYPES.SYMBOL, ...item.data }
             };
           }
+          // Check if last import specifier exists after prepend, if so allow insert there
           else if ([...map][map.size-1][1].range.start.line >= this.prependLines){
             return {
               ...item,
@@ -483,6 +484,7 @@ export class AST {
             };
           };
         }
+        // Default case, insert at the first line after prepend
         return {
           ...item,
           additionalTextEdits: [

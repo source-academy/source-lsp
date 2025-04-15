@@ -18,7 +18,7 @@ export const autocomplete_labels = source.map(version => version.map((doc, idx):
       value: doc.description
     },
     kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
-    data: { type: AUTOCOMPLETE_TYPES.BUILTIN, idx: idx, parameters: doc.parameters, optional_params: doc.optional_params, hasRestElement: doc.hasRestElement } as CompletionItemData,
+    data: { type: AUTOCOMPLETE_TYPES.BUILTIN, parameters: doc.parameters, optional_params: doc.optional_params } as CompletionItemData,
     sortText: '' + AUTOCOMPLETE_TYPES.BUILTIN
   };
 }));
@@ -39,7 +39,7 @@ for (const key in modules) {
       },
       kind: doc.meta === "const" ? CompletionItemKind.Constant : CompletionItemKind.Function,
       // @ts-ignore
-      data: { type: AUTOCOMPLETE_TYPES.MODULE, idx: idx, module_name: key, parameters: doc.parameters, optional_params: doc.optional_params } as CompletionItemData,
+      data: { type: AUTOCOMPLETE_TYPES.MODULE, module_name: key, parameters: doc.parameters, optional_params: doc.optional_params } as CompletionItemData,
       sortText: '' + AUTOCOMPLETE_TYPES.MODULE
     });
   });
