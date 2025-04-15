@@ -48,19 +48,15 @@ function getAST(uri: string): AST {
   let context = contextCache.get(uri);
   if (!context) {
     context = DEFAULT_CONTEXT;
-    contextCache.set(uri, DEFAULT_CONTEXT);
     console.log(`No context found for ${uri}, using default context ${JSON.stringify(DEFAULT_CONTEXT)}`);
   }
-  // console.log(`Creating AST for ${uri} with context ${JSON.stringify(context)}`);
 
-  // const ast = new AST(documents.get(uri)!.getText(), context, uri, 4);
   const ast = new AST(documents.get(uri)!.getText(), context, uri);
   astCache.set(uri, ast);
   return ast;
 }
 
 connection.onInitialize((params: InitializeParams) => {
-  connection.console.log('LSP INIT');
   let capabilities = params.capabilities;
 
   // Does the client support the `workspace/configuration` request?
@@ -213,9 +209,6 @@ connection.onHover((params: HoverParams): Hover | null => {
 })
 
 connection.onRequest("source/publishInfo", (info: { [uri: string]: Context }) => {
-  connection.console.log("Info");
-  connection.console.log(JSON.stringify(info));
-
   for (const [uri, context] of Object.entries(info)) {
     const document = documents.get(uri);
     if (document) {
