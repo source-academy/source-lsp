@@ -227,7 +227,7 @@ connection.onRequest("source/publishInfo", (info: { [uri: string]: Context }) =>
         validateTextDocument(document)
       }
       // Check if context changed
-      else if (context.chapter !== oldContext.chapter || context.prelude !== oldContext.prelude) {
+      else if (context.chapter !== oldContext.chapter || context.prepend !== oldContext.prepend) {
         contextCache.set(uri, context);
         astCache.delete(uri);
         validateTextDocument(document);

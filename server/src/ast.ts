@@ -24,7 +24,7 @@ export class AST {
 
   // If prepend is supplied, prepend it to text, and offset all locations returned back to client
   constructor(text: string, context: Context, uri: string) {
-    this.prependLines = context.prelude ? context.prelude.split("\n").length : 0;
+    this.prependLines = context.prepend ? context.prepend : 0
     const acornOptions: Options = {
       ecmaVersion: DEFAULT_ECMA_VERSION,
       sourceType: "module",

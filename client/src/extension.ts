@@ -86,7 +86,7 @@ async function setLanguageVersion(uri: string, version: number) {
 	  return;
 	}
 	try {
-	  const response = await client.sendRequest("source/publishInfo", { [uri]: { chapter: version , prelude: "\n\n\n" } });
+	  const response = await client.sendRequest("source/publishInfo", { [uri]: { chapter: version } });
 	  window.showInformationMessage(`Language version set to ${version}`);
 	} catch (error) {
 	  window.showErrorMessage(`Failed to set language version: ${error}`);
