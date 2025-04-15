@@ -1,5 +1,4 @@
 import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
 
 import {
 	LanguageClient,
@@ -10,7 +9,11 @@ import {
 
 import {
 	commands,
-	window
+	window,
+	Uri,
+	workspace,
+	ExtensionContext,
+	TextDocumentChangeEvent
 } from 'vscode'
 
 let client: LanguageClient;
@@ -48,8 +51,8 @@ export function activate(context: ExtensionContext) {
 
 	// Create the language client and start the client.
 	client = new LanguageClient(
-		'languageServerExample',
-		'Language Server Example',
+		'sourceLSP',
+		'Source Language Server',
 		serverOptions,
 		clientOptions
 	);
@@ -62,14 +65,14 @@ export function activate(context: ExtensionContext) {
   })();
 
 	context.subscriptions.push(
-		commands.registerCommand("source.setLanguageVersion", async () => {
+		commands.registerCommand("source.setLanguageVersion", async (uri: Uri) => {
 			const versions = [`Source ${SECTION}1`, `Source ${SECTION}2`, `Source ${SECTION}3`, `Source ${SECTION}4`]
 			const selectedVersion = await window.showQuickPick(versions, {
 				placeHolder: "Select the language version",
 			});
 
 			if (selectedVersion) {
-				await setLanguageVersion(selectedVersion);
+				await setLanguageVersion(uri.toString(false), versions.indexOf(selectedVersion)+1);
 			}
 
 		})
@@ -77,13 +80,13 @@ export function activate(context: ExtensionContext) {
 }
 
 // Function to send the version to the server
-async function setLanguageVersion(version: string) {
+async function setLanguageVersion(uri: string, version: number) {
 	if (!client) {
 	  window.showErrorMessage("Language server is not running.");
 	  return;
 	}
 	try {
-	  const response = await client.sendRequest("setLanguageVersion", { version });
+	  const response = await client.sendRequest("source/publishInfo", { [uri]: { chapter: version , prelude: "\n\n\n" } });
 	  window.showInformationMessage(`Language version set to ${version}`);
 	} catch (error) {
 	  window.showErrorMessage(`Failed to set language version: ${error}`);

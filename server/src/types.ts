@@ -105,5 +105,6 @@ export enum Chapter {
 }
 
 export interface Context {
-    chapter: Chapter
+    chapter: Chapter,
+    prelude?: string
 }

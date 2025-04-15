@@ -53,7 +53,16 @@
         "command": "source.setLanguageVersion",
         "title": "Source: Set Source Version Used"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "source.setLanguageVersion",
+          "when": "resourceFilename",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "dependencies": {
     "jsdom": "^26.0.0",

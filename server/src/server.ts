@@ -17,7 +17,6 @@ import {
   DocumentSymbol,
   HoverParams,
   Hover,
-  DocumentHighlight,
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -27,13 +26,6 @@ import { sourceLocToRange } from './utils';
 import { AST } from './ast';
 import { Chapter, Context } from './types';
 
-const SECTION = "\u00A7";
-const chapter_names = {
-  [`Source ${SECTION}1`]: Chapter.SOURCE_1,
-  [`Source ${SECTION}2`]: Chapter.SOURCE_2,
-  [`Source ${SECTION}3`]: Chapter.SOURCE_3,
-  [`Source ${SECTION}4`]: Chapter.SOURCE_4
-};
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -45,19 +37,21 @@ let documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
 
-// let context: Context = { chapter: Chapter.SOURCE_1 };
+// Map between file uri string and context object
 let contextCache: Map<string, Context> = new Map();
 let astCache: Map<string, AST> = new Map();
+const DEFAULT_CONTEXT: Context = { chapter: Chapter.SOURCE_1 };
 
 function getAST(uri: string): AST {
   if (astCache.has(uri)) return astCache.get(uri)!;
 
-  let context = contextCache.get(uri)
+  let context = contextCache.get(uri);
   if (!context) {
-    context = { chapter: Chapter.SOURCE_1 };
-    console.log(`No context found for ${uri}, using default context ${JSON.stringify(context)}`);
+    context = DEFAULT_CONTEXT;
+    contextCache.set(uri, DEFAULT_CONTEXT);
+    console.log(`No context found for ${uri}, using default context ${JSON.stringify(DEFAULT_CONTEXT)}`);
   }
-  console.log(`Creating AST for ${uri} with context ${JSON.stringify(context)}`);
+  // console.log(`Creating AST for ${uri} with context ${JSON.stringify(context)}`);
 
   // const ast = new AST(documents.get(uri)!.getText(), context, uri, 4);
   const ast = new AST(documents.get(uri)!.getText(), context, uri);
@@ -66,7 +60,7 @@ function getAST(uri: string): AST {
 }
 
 connection.onInitialize((params: InitializeParams) => {
-    connection.console.log('LSP INIT');
+  connection.console.log('LSP INIT');
   let capabilities = params.capabilities;
 
   // Does the client support the `workspace/configuration` request?
@@ -193,7 +187,7 @@ connection.onDocumentHighlight((params: DocumentHighlightParams) => {
   const document = documents.get(params.textDocument.uri);
   if (!document) return null;
 
-  return getAST(params.textDocument.uri).getOccurences(params.position).map(x => ({ range: x}));
+  return getAST(params.textDocument.uri).getOccurences(params.position).map(x => ({ range: x }));
 })
 
 connection.onDocumentSymbol(async (params: DocumentSymbolParams): Promise<DocumentSymbol[] | null> => {
@@ -218,14 +212,29 @@ connection.onHover((params: HoverParams): Hover | null => {
   return getAST(params.textDocument.uri).onHover(position);
 })
 
-connection.onNotification("source/publishInfo", (info) => {
+connection.onRequest("source/publishInfo", (info: { [uri: string]: Context }) => {
   connection.console.log("Info");
-  connection.console.log(info);
+  connection.console.log(JSON.stringify(info));
 
-  contextCache = new Map(Object.entries(info));
-  // TODO: We only need to revalidate the documents that have changed
-  astCache.clear();
-  documents.all().forEach(validateTextDocument);
+  for (const [uri, context] of Object.entries(info)) {
+    const document = documents.get(uri);
+    if (document) {
+      let oldContext = contextCache.get(uri);
+      if (!oldContext) {
+        oldContext = context;
+        contextCache.set(uri, context);
+        astCache.delete(uri);
+        validateTextDocument(document)
+      }
+      // Check if context changed
+      else if (context.chapter !== oldContext.chapter || context.prelude !== oldContext.prelude) {
+        contextCache.set(uri, context);
+        astCache.delete(uri);
+        validateTextDocument(document);
+      }
+    }
+  }
+
   return { success: true };
 })
 
