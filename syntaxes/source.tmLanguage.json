@@ -13,11 +13,11 @@
     "comments": {
       "patterns": [
         {
-          "name": "comment.line.double-slash.sourcejs",
+          "name": "comment.line.double-slash.source",
           "match": "//.*$"
         },
         {
-          "name": "comment.block.sourcejs",
+          "name": "comment.block.source",
           "begin": "/\\*",
           "end": "\\*/"
         }
@@ -26,7 +26,7 @@
     "strings": {
       "patterns": [
         {
-          "name": "string.quoted.double.sourcejs",
+          "name": "string.quoted.double.source",
           "begin": "\"",
           "end": "\"",
           "patterns": [
@@ -34,7 +34,7 @@
           ]
         },
         {
-          "name": "string.quoted.single.sourcejs",
+          "name": "string.quoted.single.source",
           "begin": "'",
           "end": "'",
           "patterns": [
@@ -42,7 +42,7 @@
           ]
         },
         {
-          "name": "string.template.sourcejs",
+          "name": "string.template.source",
           "begin": "`",
           "end": "`",
           "patterns": [
@@ -54,7 +54,7 @@
     "numbers": {
       "patterns": [
         {
-          "name": "constant.numeric.sourcejs",
+          "name": "constant.numeric.source",
           "match": "\\b(0[xX][0-9a-fA-F]+|0[bB][01]+|0[oO]?[0-7]+|\\d+(\\.\\d+)?([eE][+-]?\\d+)?|true|false)\\b"
         }
       ]
@@ -62,7 +62,7 @@
     "keywords": {
       "patterns": [
         {
-          "name": "keyword.control.sourcejs",
+          "name": "keyword.control.source",
           "match": "\\b(if|else|for|while|break|continue|return|function|in|let|const|import)\\b"
         }
       ]
@@ -70,11 +70,11 @@
     "operators": {
       "patterns": [
         {
-          "name": "keyword.operator.sourcejs",
+          "name": "keyword.operator.source",
           "match": "(\\+|\\-|\\*|\\/|%|===|!==|>|<|>=|<=|&&|\\|\\||!|=|=>)"
         }
       ]
     }
   },
-	"scopeName": "source.sourcejs"
+	"scopeName": "source.source"
 }

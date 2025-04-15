@@ -2,7 +2,7 @@
   "name": "source-lsp",
   "displayName": "Source-LSP",
   "description": "lsp server for source",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "main": "./client/out/extension",
   "engines": {
     "vscode": "^1.93.0"
@@ -13,22 +13,22 @@
   "contributes": {
     "languages": [
       {
-        "id": "sourcejs",
+        "id": "source",
         "aliases": [
           "Source",
-          "sourcejs"
+          "source"
         ],
         "extensions": [
-          ".sourcejs"
+          ".source"
         ],
         "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
       {
-        "language": "sourcejs",
-        "scopeName": "source.sourcejs",
-        "path": "./syntaxes/sourcejs.tmLanguage.json"
+        "language": "source",
+        "scopeName": "source.source",
+        "path": "./syntaxes/source.tmLanguage.json"
       }
     ],
     "configuration": {
@@ -50,8 +50,8 @@
     },
     "commands": [
       {
-        "command": "sourcejs.setLanguageVersion",
-        "title": "Sourcejs: Set Source Version Used"
+        "command": "source.setLanguageVersion",
+        "title": "Source: Set Source Version Used"
       }
     ]
   },

@@ -74,7 +74,7 @@
         "for": {
             "label": "for",
             "documentation": "```js\nfor(let index = 0; i < n; index++) {\n\t// For body\n}\n```",
-            "insertText": "for(let ${1:index} = 0; i < ${2:n}; ${1:index}++) {\n\t${3:}\n}"
+            "insertText": "for(let ${1:index} = 0; ${1:index} < ${2:n}; ${1:index}++) {\n\t${3:}\n}"
         },
         "break": {
             "label": "break",

@@ -13,7 +13,6 @@ export const autocomplete_labels = source.map(version => version.map((doc, idx):
   return {
     label: doc.label,
     labelDetails: { detail: ` (${doc.meta})` },
-    detail: doc.title,
     documentation: {
       kind: MarkupKind.Markdown,
       value: doc.description

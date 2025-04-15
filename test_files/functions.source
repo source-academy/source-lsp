@@ -1,0 +1,15 @@
+// PREPENDED LINES, DO NOT EDIT
+import { black } from "rune";
+const foo = (x, y) => x*y;
+// END OF PREPEND
+function test(arg1, ...args) {
+    
+}
+
+const x = () => return 0
+x();
+
+let y = 1;
+y(); // Runtime error
+
+foo(10, 5);

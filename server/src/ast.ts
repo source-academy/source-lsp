@@ -16,12 +16,15 @@ export class AST {
     [module_name: string]: Map<string, { range: Range, local: string }>
   } = {};
   private uri: string;
+  private prependLines: number;
   private diagnostics: Diagnostic[] = [];
   // Array of callbacks to call once parsing is done
   // Needed for things like checking if an variable name has already been declared
   private diagnosticsCallbacks: Array<[(child: Node) => void, Node]> = [];
 
-  constructor(text: string, context: Context, uri: string) {
+  // If prepend is supplied, prepend it to text, and offset all locations returned back to client
+  constructor(text: string, context: Context, uri: string, prependLines: number = 0) {
+    this.prependLines = prependLines;
     const acornOptions: Options = {
       ecmaVersion: DEFAULT_ECMA_VERSION,
       sourceType: "module",
@@ -327,15 +330,17 @@ export class AST {
     else return undefined;
   }
 
-  public getOccurences(pos: Position): DocumentHighlight[] {
-    const identifier = this.findIdentifierNode(vsPosToEsPos(pos));
+  public getOccurences(pos: Position, identifier?: Identifier, declaration?: DeclarationSymbol): Range[] {
+    if (identifier === undefined)
+      identifier = this.findIdentifierNode(vsPosToEsPos(pos));
     if (!identifier) return [];
 
-    const declaration = this.findDeclarationByName(identifier.name, identifier.loc!);
+    if (declaration === undefined)
+      declaration = this.findDeclarationByName(identifier.name, identifier.loc!);
     if (!declaration) return [];
 
     let scopeFound = false;
-    const ret: DocumentHighlight[] = [];
+    const ret: Range[] = [];
     const queue: Node[] = [this.ast];
 
     while (queue.length > 0) {
@@ -345,7 +350,7 @@ export class AST {
       if (!scopeFound && node.loc && sourceLocEquals(node.loc, declaration.scope))
         scopeFound = true;
       if (scopeFound && node.type === NODES.IDENTIFIER && node.name === identifier.name)
-        ret.push({ range: sourceLocToRange(node.loc!) })
+        ret.push(sourceLocToRange(node.loc!))
 
       getNodeChildren(node, true).forEach(node => {
         if (
@@ -364,7 +369,6 @@ export class AST {
   }
 
   public getDocumentSymbols(): DocumentSymbol[] {
-
     let ret: DocumentSymbol[] = []
     this.declarations.forEach((value, key) => {
       ret = ret.concat(value.filter(x => x.showInDocumentSymbols !== false).map((declaration: DeclarationSymbol): DocumentSymbol => mapDeclarationSymbolToDocumentSymbol(declaration, this.context)))
@@ -374,12 +378,27 @@ export class AST {
   }
 
   public renameSymbol(pos: Position, newName: string): WorkspaceEdit | null {
-    const occurences = this.getOccurences(pos);
-    if (occurences.length === 0) return null;
+    // Currently, trying to rename an imported function has two issues
+    // The first issue is that we should be replacing the import statement with import { <old name> as <new name> } from "<module name>";
+    // The second issue is that in a import specifier, there is an imported and local field.
+    // Imported is an identifier node for actual name of the function that was imported
+    // Local is also an identifier node for the alias of the function that was imported
+    // If the function was not renamed, both imported and local will have the same location
+    // This leads to an error in the client, as there are two changes to the program that have overlapping ranges
+    // For now, if the name that the user is trying to rename is an imported name, we don't allow renames
+    // I will leave this for a future CP3108 student to fix :)
+    const identifier = this.findIdentifierNode(vsPosToEsPos(pos));
+    if (!identifier) return null;
+
+    const declaration = this.findDeclarationByName(identifier.name, identifier.loc!);
+    if (!declaration || declaration.declarationKind === DeclarationKind.KIND_IMPORT) return null;
+
+    const occurences = this.getOccurences(pos, identifier, declaration);
+    if (occurences.length === 0 || occurences.some(x => x.start.line < this.prependLines)) return null;
 
     return {
       changes: {
-        [this.uri]: occurences.map(loc => TextEdit.replace(loc.range, newName))
+        [this.uri]: occurences.map(loc => TextEdit.replace(loc, newName))
       }
     };
   }
@@ -405,7 +424,8 @@ export class AST {
     }
     if (value === undefined)
       return null;
-    else return {
+
+    return {
       contents: {
         kind: "markdown",
         value: value
@@ -443,33 +463,30 @@ export class AST {
     return autocomplete_labels[this.context.chapter - 1]
       .concat(ret)
       .concat(module_autocomplete.map((item: CompletionItem): CompletionItem => {
-        if (this.imported_names[item.data.module_name]) {
-          if (this.imported_names[item.data.module_name].has(item.label)) {
+        // Logic for auto imports
+        const map = this.imported_names[item.data.module_name];
+        if (map) {
+          if (map.has(item.label)) {
             return {
               ...item,
-              label: this.imported_names[item.data.module_name].get(item.label)!.local,
+              label: map.get(item.label)!.local,
               detail: `Imported from ${item.data.module_name}`,
               data: { type: AUTOCOMPLETE_TYPES.SYMBOL, ...item.data }
             };
           }
-          else {
-            // Not sure if the map preserves the order that names were inserted
-            let last_imported_range: Range = { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } };
-            this.imported_names[item.data.module_name].forEach(range => {
-              last_imported_range = findLastRange(last_imported_range, range.range);
-            });
+          else if ([...map][map.size-1][1].range.start.line >= this.prependLines){
             return {
               ...item,
               additionalTextEdits: [
-                TextEdit.insert(last_imported_range.end, `, ${item.label}`)
+                TextEdit.insert([...map][map.size-1][1].range.end, `, ${item.label}`)
               ]
             };
           };
         }
-        else return {
+        return {
           ...item,
           additionalTextEdits: [
-            TextEdit.insert({ line: 0, character: 0 }, `import { ${item.label} } from "${item.data.module_name}";\n`)
+            TextEdit.insert({ line: this.prependLines, character: 0 }, `import { ${item.label} } from "${item.data.module_name}";\n`)
           ]
         };
       }))
