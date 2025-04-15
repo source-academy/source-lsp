@@ -210,20 +210,14 @@ connection.onHover((params: HoverParams): Hover | null => {
 
 connection.onRequest("source/publishInfo", (info: { [uri: string]: Context }) => {
   for (const [uri, context] of Object.entries(info)) {
-    const document = documents.get(uri);
-    if (document) {
-      let oldContext = contextCache.get(uri);
-      if (!oldContext) {
-        oldContext = context;
-        contextCache.set(uri, context);
-        astCache.delete(uri);
+    const oldContext = contextCache.get(uri);
+    if (!oldContext || context.chapter !== oldContext.chapter || context.prepend !== oldContext.prepend) {
+      // Context has been added or changed for this URI
+      contextCache.set(uri, context);
+      astCache.delete(uri);
+      const document = documents.get(uri);
+      if (document) {
         validateTextDocument(document)
-      }
-      // Check if context changed
-      else if (context.chapter !== oldContext.chapter || context.prepend !== oldContext.prepend) {
-        contextCache.set(uri, context);
-        astCache.delete(uri);
-        validateTextDocument(document);
       }
     }
   }
