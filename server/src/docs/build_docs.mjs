@@ -76,7 +76,7 @@ function processFunction(names, element, document) {
   let markdown = buildDescriptionMarkdown(descriptionDiv);
   const lines = markdown.split("\n");
   lines.unshift("```source");
-  lines[1] = lines[1].substring(5);
+  lines[1] = lines[1].substring(5).replaceAll("\\", "");
   lines.splice(2, 0, "```");
   markdown = lines.join("\n");
 

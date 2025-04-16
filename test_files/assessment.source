@@ -1,0 +1,11 @@
+function partition(xs, p) {
+    function pair_partition(xs, ret, p) {
+        return is_null(xs) 
+            ? ret 
+            : head(xs) <= p 
+                ? pair_partition(tail(xs),pair(pair(head(xs),head(ret)),tail(ret)),p)
+                : pair_partition(tail(xs),pair(head(ret),pair(head(xs),tail(ret))),p);
+    }
+
+    return pair_partition(xs,pair(null,null),p);
+}

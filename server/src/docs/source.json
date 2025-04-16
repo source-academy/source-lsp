@@ -78,7 +78,7 @@
     {
       "label": "char_at",
       "title": "char_at(s, i) → {string}",
-      "description": "```source\nchar\\_at(s, i) → {string}\n```\n\nTakes a string `s` as first argument and a nonnegative integer `i` as second argument. If `i` is less than the length of `s`, this function returns a one-character string that contains the character of `s` at position `i`, counting from 0. If `i` is larger than or equal to the length of `s`, this function returns `undefined`.",
+      "description": "```source\nchar_at(s, i) → {string}\n```\n\nTakes a string `s` as first argument and a nonnegative integer `i` as second argument. If `i` is less than the length of `s`, this function returns a one-character string that contains the character of `s` at position `i`, counting from 0. If `i` is larger than or equal to the length of `s`, this function returns `undefined`.",
       "meta": "func",
       "parameters": [
         "s",
@@ -114,14 +114,14 @@
     {
       "label": "get_time",
       "title": "get_time() → {number}",
-      "description": "```source\nget\\_time() → {number}\n```\n\nReturns number of milliseconds elapsed since January 1, 1970 00:00:00 UTC. See also [textbook example](https://sourceacademy.org/sicpjs/1.2.6#ex-1.21).",
+      "description": "```source\nget_time() → {number}\n```\n\nReturns number of milliseconds elapsed since January 1, 1970 00:00:00 UTC. See also [textbook example](https://sourceacademy.org/sicpjs/1.2.6#ex-1.21).",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "is_boolean",
       "title": "is_boolean(v) → {boolean}",
-      "description": "```source\nis\\_boolean(v) → {boolean}\n```\n\nchecks whether a given value is a boolean",
+      "description": "```source\nis_boolean(v) → {boolean}\n```\n\nchecks whether a given value is a boolean",
       "meta": "func",
       "parameters": [
         "v"
@@ -130,7 +130,7 @@
     {
       "label": "is_function",
       "title": "is_function(v) → {boolean}",
-      "description": "```source\nis\\_function(v) → {boolean}\n```\n\nchecks whether a given value is a function",
+      "description": "```source\nis_function(v) → {boolean}\n```\n\nchecks whether a given value is a function",
       "meta": "func",
       "parameters": [
         "v"
@@ -139,7 +139,7 @@
     {
       "label": "is_number",
       "title": "is_number(v) → {boolean}",
-      "description": "```source\nis\\_number(v) → {boolean}\n```\n\nchecks whether a given value is a number. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
+      "description": "```source\nis_number(v) → {boolean}\n```\n\nchecks whether a given value is a number. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
       "meta": "func",
       "parameters": [
         "v"
@@ -148,7 +148,7 @@
     {
       "label": "is_string",
       "title": "is_string(v) → {boolean}",
-      "description": "```source\nis\\_string(v) → {boolean}\n```\n\nchecks whether a given value is a string. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
+      "description": "```source\nis_string(v) → {boolean}\n```\n\nchecks whether a given value is a string. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
       "meta": "func",
       "parameters": [
         "v"
@@ -157,7 +157,7 @@
     {
       "label": "is_undefined",
       "title": "is_undefined(v) → {boolean}",
-      "description": "```source\nis\\_undefined(v) → {boolean}\n```\n\nchecks whether a given value is the special value `undefined`",
+      "description": "```source\nis_undefined(v) → {boolean}\n```\n\nchecks whether a given value is the special value `undefined`",
       "meta": "func",
       "parameters": [
         "v"
@@ -166,7 +166,7 @@
     {
       "label": "math_abs",
       "title": "math_abs(x) → {number}",
-      "description": "```source\nmath\\_abs(x) → {number}\n```\n\ncomputes the absolute value of x; the result has the same magnitude as `x` but has positive sign.",
+      "description": "```source\nmath_abs(x) → {number}\n```\n\ncomputes the absolute value of x; the result has the same magnitude as `x` but has positive sign.",
       "meta": "func",
       "parameters": [
         "x"
@@ -175,7 +175,7 @@
     {
       "label": "math_acos",
       "title": "math_acos(x) → {number}",
-      "description": "```source\nmath\\_acos(x) → {number}\n```\n\ncomputes the arc cosine of `x`. The result is expressed in radians and ranges from +0 to +π.",
+      "description": "```source\nmath_acos(x) → {number}\n```\n\ncomputes the arc cosine of `x`. The result is expressed in radians and ranges from +0 to +π.",
       "meta": "func",
       "parameters": [
         "x"
@@ -184,7 +184,7 @@
     {
       "label": "math_acosh",
       "title": "math_acosh(x) → {number}",
-      "description": "```source\nmath\\_acosh(x) → {number}\n```\n\ncomputes the inverse hyperbolic cosine of `x`.",
+      "description": "```source\nmath_acosh(x) → {number}\n```\n\ncomputes the inverse hyperbolic cosine of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -193,7 +193,7 @@
     {
       "label": "math_asin",
       "title": "math_asin(x) → {number}",
-      "description": "```source\nmath\\_asin(x) → {number}\n```\n\ncomputes the arc sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_asin(x) → {number}\n```\n\ncomputes the arc sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -202,7 +202,7 @@
     {
       "label": "math_asinh",
       "title": "math_asinh(x) → {number}",
-      "description": "```source\nmath\\_asinh(x) → {number}\n```\n\ncomputes the inverse hyperbolic sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_asinh(x) → {number}\n```\n\ncomputes the inverse hyperbolic sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -211,7 +211,7 @@
     {
       "label": "math_atan",
       "title": "math_atan(x) → {number}",
-      "description": "```source\nmath\\_atan(x) → {number}\n```\n\ncomputes the arc tangent of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_atan(x) → {number}\n```\n\ncomputes the arc tangent of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -220,7 +220,7 @@
     {
       "label": "math_atan2",
       "title": "math_atan2(y, x) → {number}",
-      "description": "```source\nmath\\_atan2(y, x) → {number}\n```\n\ncomputes the arc tangent of the quotient `y` / `x` of the arguments `y` and `x`, where the signs of `y` and `x` are used to determine the quadrant of the result. Note that it is intentional and traditional for the two-argument arc tangent function that the argument named `y` be first and the argument named `x` be second. The result is expressed in radians and ranges from -π to +π.",
+      "description": "```source\nmath_atan2(y, x) → {number}\n```\n\ncomputes the arc tangent of the quotient `y` / `x` of the arguments `y` and `x`, where the signs of `y` and `x` are used to determine the quadrant of the result. Note that it is intentional and traditional for the two-argument arc tangent function that the argument named `y` be first and the argument named `x` be second. The result is expressed in radians and ranges from -π to +π.",
       "meta": "func",
       "parameters": [
         "y",
@@ -230,7 +230,7 @@
     {
       "label": "math_atanh",
       "title": "math_atanh(x) → {number}",
-      "description": "```source\nmath\\_atanh(x) → {number}\n```\n\ncomputes the inverse hyperbolic tangent of `x`.",
+      "description": "```source\nmath_atanh(x) → {number}\n```\n\ncomputes the inverse hyperbolic tangent of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -239,7 +239,7 @@
     {
       "label": "math_cbrt",
       "title": "math_cbrt(x) → {number}",
-      "description": "```source\nmath\\_cbrt(x) → {number}\n```\n\ncomputes the cube root of `x`.",
+      "description": "```source\nmath_cbrt(x) → {number}\n```\n\ncomputes the cube root of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -248,7 +248,7 @@
     {
       "label": "math_ceil",
       "title": "math_ceil(x) → {number}",
-      "description": "```source\nmath\\_ceil(x) → {number}\n```\n\ncomputes the smallest (closest to -∞) Number value that is not less than `x` and is an integer. If `x` is already an integer, the result is `x`. The value of math\\_ceil(x) is the same as the value of -math\\_floor(-x).",
+      "description": "```source\nmath_ceil(x) → {number}\n```\n\ncomputes the smallest (closest to -∞) Number value that is not less than `x` and is an integer. If `x` is already an integer, the result is `x`. The value of math\\_ceil(x) is the same as the value of -math\\_floor(-x).",
       "meta": "func",
       "parameters": [
         "x"
@@ -257,7 +257,7 @@
     {
       "label": "math_clz32",
       "title": "math_clz32(n) → {number}",
-      "description": "```source\nmath\\_clz32(n) → {number}\n```\n\nWhen math\\_clz32 is called with one argument `x`, the following steps are taken: Let n be ToUint32(x). Let p be the number of leading zero bits in the 32-bit binary representation of n. Return p.\n\nNOTE:  \nIf n is 0, p will be 32. If the most significant bit of the 32-bit binary encoding of n is 1, p will be 0.",
+      "description": "```source\nmath_clz32(n) → {number}\n```\n\nWhen math\\_clz32 is called with one argument `x`, the following steps are taken: Let n be ToUint32(x). Let p be the number of leading zero bits in the 32-bit binary representation of n. Return p.\n\nNOTE:  \nIf n is 0, p will be 32. If the most significant bit of the 32-bit binary encoding of n is 1, p will be 0.",
       "meta": "func",
       "parameters": [
         "n"
@@ -266,7 +266,7 @@
     {
       "label": "math_cos",
       "title": "math_cos(x) → {number}",
-      "description": "```source\nmath\\_cos(x) → {number}\n```\n\nComputes the cosine of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_cos(x) → {number}\n```\n\nComputes the cosine of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -275,7 +275,7 @@
     {
       "label": "math_cosh",
       "title": "math_cosh(x) → {number}",
-      "description": "```source\nmath\\_cosh(x) → {number}\n```\n\ncomputes the hyperbolic cosine of `x`.\n\nNOTE: The value of cosh(x) is the same as (exp(x) + exp(-x)) / 2.",
+      "description": "```source\nmath_cosh(x) → {number}\n```\n\ncomputes the hyperbolic cosine of `x`.\n\nNOTE: The value of cosh(x) is the same as (exp(x) + exp(-x)) / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -284,7 +284,7 @@
     {
       "label": "math_exp",
       "title": "math_exp(x) → {number}",
-      "description": "```source\nmath\\_exp(x) → {number}\n```\n\ncomputes the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms).",
+      "description": "```source\nmath_exp(x) → {number}\n```\n\ncomputes the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms).",
       "meta": "func",
       "parameters": [
         "x"
@@ -293,7 +293,7 @@
     {
       "label": "math_expm1",
       "title": "math_expm1(x) → {number}",
-      "description": "```source\nmath\\_expm1(x) → {number}\n```\n\ncomputes subtracting 1 from the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms). The result is computed in a way that is accurate even when the value of `x` is close to 0.",
+      "description": "```source\nmath_expm1(x) → {number}\n```\n\ncomputes subtracting 1 from the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms). The result is computed in a way that is accurate even when the value of `x` is close to 0.",
       "meta": "func",
       "parameters": [
         "x"
@@ -302,7 +302,7 @@
     {
       "label": "math_floor",
       "title": "math_floor(x) → {number}",
-      "description": "```source\nmath\\_floor(x) → {number}\n```\n\ncomputes the greatest (closest to +∞) Number value that is not greater than `x` and is an integer.  \nIf `x` is already an integer, the result is `x`.\n\nNOTE: The value of math\\_floor(x) is the same as the value of -math\\_ceil(-x).",
+      "description": "```source\nmath_floor(x) → {number}\n```\n\ncomputes the greatest (closest to +∞) Number value that is not greater than `x` and is an integer.  \nIf `x` is already an integer, the result is `x`.\n\nNOTE: The value of math\\_floor(x) is the same as the value of -math\\_ceil(-x).",
       "meta": "func",
       "parameters": [
         "x"
@@ -311,7 +311,7 @@
     {
       "label": "math_fround",
       "title": "math_fround(x) → {number}",
-      "description": "```source\nmath\\_fround(x) → {number}\n```\n\nWhen math\\_fround is called with argument `x`, the following steps are taken:\n\n1.  If `x` is NaN, return NaN.\n2.  If `x` is one of +0, -0, +∞, -∞, return `x`.\n3.  Let x32 be the result of converting `x` to a value in IEEE 754-2008 binary32 format using roundTiesToEven mode.\n4.  Let x64 be the result of converting x32 to a value in IEEE 754-2008 binary64 format.\n5.  Return the ECMAScript Number value corresponding to x64.",
+      "description": "```source\nmath_fround(x) → {number}\n```\n\nWhen math\\_fround is called with argument `x`, the following steps are taken:\n\n1.  If `x` is NaN, return NaN.\n2.  If `x` is one of +0, -0, +∞, -∞, return `x`.\n3.  Let x32 be the result of converting `x` to a value in IEEE 754-2008 binary32 format using roundTiesToEven mode.\n4.  Let x64 be the result of converting x32 to a value in IEEE 754-2008 binary64 format.\n5.  Return the ECMAScript Number value corresponding to x64.",
       "meta": "func",
       "parameters": [
         "x"
@@ -320,14 +320,14 @@
     {
       "label": "math_hypot",
       "title": "math_hypot() → {number}",
-      "description": "```source\nmath\\_hypot() → {number}\n```\n\ncomputes the square root of the sum of squares of its arguments.  \nIf no arguments are passed, the result is +0.",
+      "description": "```source\nmath_hypot() → {number}\n```\n\ncomputes the square root of the sum of squares of its arguments.  \nIf no arguments are passed, the result is +0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_imul",
       "title": "math_imul(x, x) → {number}",
-      "description": "```source\nmath\\_imul(x, x) → {number}\n```\n\nWhen math\\_imul is called with arguments `x` and `y`, the following steps are taken:\n\n1.  Let a be ToUint32(x).\n2.  Let b be ToUint32(y).\n3.  Let product be (a × b) modulo 232.\n4.  If product ≥ 231, return product - 232; otherwise return product.",
+      "description": "```source\nmath_imul(x, x) → {number}\n```\n\nWhen math\\_imul is called with arguments `x` and `y`, the following steps are taken:\n\n1.  Let a be ToUint32(x).\n2.  Let b be ToUint32(y).\n3.  Let product be (a × b) modulo 232.\n4.  If product ≥ 231, return product - 232; otherwise return product.",
       "meta": "func",
       "parameters": [
         "x",
@@ -337,7 +337,7 @@
     {
       "label": "math_log",
       "title": "math_log(x) → {number}",
-      "description": "```source\nmath\\_log(x) → {number}\n```\n\nComputes the natural logarithm of `x`.",
+      "description": "```source\nmath_log(x) → {number}\n```\n\nComputes the natural logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -346,7 +346,7 @@
     {
       "label": "math_log1p",
       "title": "math_log1p(x) → {number}",
-      "description": "```source\nmath\\_log1p(x) → {number}\n```\n\ncomputes the natural logarithm of 1 + `x`. The result is computed in a way that is accurate even when the value of `x` is close to zero.",
+      "description": "```source\nmath_log1p(x) → {number}\n```\n\ncomputes the natural logarithm of 1 + `x`. The result is computed in a way that is accurate even when the value of `x` is close to zero.",
       "meta": "func",
       "parameters": [
         "x"
@@ -355,7 +355,7 @@
     {
       "label": "math_log2",
       "title": "math_log2(x) → {number}",
-      "description": "```source\nmath\\_log2(x) → {number}\n```\n\ncomputes the base 2 logarithm of `x`.",
+      "description": "```source\nmath_log2(x) → {number}\n```\n\ncomputes the base 2 logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -364,7 +364,7 @@
     {
       "label": "math_log10",
       "title": "math_log10(x) → {number}",
-      "description": "```source\nmath\\_log10(x) → {number}\n```\n\ncomputes the base 10 logarithm of `x`.",
+      "description": "```source\nmath_log10(x) → {number}\n```\n\ncomputes the base 10 logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -373,21 +373,21 @@
     {
       "label": "math_max",
       "title": "math_max() → {number}",
-      "description": "```source\nmath\\_max() → {number}\n```\n\nGiven zero or more numbers, returns the largest of them.  \nIf no arguments are given, the result is -∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the largest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
+      "description": "```source\nmath_max() → {number}\n```\n\nGiven zero or more numbers, returns the largest of them.  \nIf no arguments are given, the result is -∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the largest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_min",
       "title": "math_min() → {number}",
-      "description": "```source\nmath\\_min() → {number}\n```\n\nGiven zero or more arguments, returns the smallest of them.  \nIf no arguments are given, the result is +∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the smallest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
+      "description": "```source\nmath_min() → {number}\n```\n\nGiven zero or more arguments, returns the smallest of them.  \nIf no arguments are given, the result is +∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the smallest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_pow",
       "title": "math_pow(base, exponent) → {number}",
-      "description": "```source\nmath\\_pow(base, exponent) → {number}\n```\n\nComputes the result of raising base to the power of exponent.",
+      "description": "```source\nmath_pow(base, exponent) → {number}\n```\n\nComputes the result of raising base to the power of exponent.",
       "meta": "func",
       "parameters": [
         "base",
@@ -397,14 +397,14 @@
     {
       "label": "math_random",
       "title": "math_random() → {number}",
-      "description": "```source\nmath\\_random() → {number}\n```\n\nReturns a number value with positive sign, greater than or equal to 0 but less than 1, chosen randomly or pseudo randomly with approximately uniform distribution over that range, using an implementation-dependent algorithm or strategy. This function takes no arguments. Each math\\_random function created for distinct realms must produce a distinct sequence of values from successive calls.",
+      "description": "```source\nmath_random() → {number}\n```\n\nReturns a number value with positive sign, greater than or equal to 0 but less than 1, chosen randomly or pseudo randomly with approximately uniform distribution over that range, using an implementation-dependent algorithm or strategy. This function takes no arguments. Each math\\_random function created for distinct realms must produce a distinct sequence of values from successive calls.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_round",
       "title": "math_round(x) → {number}",
-      "description": "```source\nmath\\_round(x) → {number}\n```\n\nReturns the number value that is closest to `x` and is an integer.  \nIf two integers are equally close to `x`, then the result is the Number value that is closer to +∞. If `x` is already an integer, the result is `x`. NOTE 1: math\\_round(3.5) returns 4, but math\\_round(-3.5) returns -3.",
+      "description": "```source\nmath_round(x) → {number}\n```\n\nReturns the number value that is closest to `x` and is an integer.  \nIf two integers are equally close to `x`, then the result is the Number value that is closer to +∞. If `x` is already an integer, the result is `x`. NOTE 1: math\\_round(3.5) returns 4, but math\\_round(-3.5) returns -3.",
       "meta": "func",
       "parameters": [
         "x"
@@ -413,7 +413,7 @@
     {
       "label": "math_sign",
       "title": "math_sign(x) → {number}",
-      "description": "```source\nmath\\_sign(x) → {number}\n```\n\nComputes the sign of `x`, indicating whether `x` is positive, negative, or zero.",
+      "description": "```source\nmath_sign(x) → {number}\n```\n\nComputes the sign of `x`, indicating whether `x` is positive, negative, or zero.",
       "meta": "func",
       "parameters": [
         "x"
@@ -422,7 +422,7 @@
     {
       "label": "math_sin",
       "title": "math_sin(x) → {number}",
-      "description": "```source\nmath\\_sin(x) → {number}\n```\n\nComputes the sine of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_sin(x) → {number}\n```\n\nComputes the sine of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -431,7 +431,7 @@
     {
       "label": "math_sinh",
       "title": "math_sinh(x) → {number}",
-      "description": "```source\nmath\\_sinh(x) → {number}\n```\n\nComputes the hyperbolic sine of `x`.\n\nNOTE: The value of sinh(x) is the same as (exp(x) - exp(-x)) / 2.",
+      "description": "```source\nmath_sinh(x) → {number}\n```\n\nComputes the hyperbolic sine of `x`.\n\nNOTE: The value of sinh(x) is the same as (exp(x) - exp(-x)) / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -440,7 +440,7 @@
     {
       "label": "math_sqrt",
       "title": "math_sqrt(x) → {number}",
-      "description": "```source\nmath\\_sqrt(x) → {number}\n```\n\nComputes the square root of `x`.",
+      "description": "```source\nmath_sqrt(x) → {number}\n```\n\nComputes the square root of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -449,7 +449,7 @@
     {
       "label": "math_tan",
       "title": "math_tan(x) → {number}",
-      "description": "```source\nmath\\_tan(x) → {number}\n```\n\nComputes the tangent of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_tan(x) → {number}\n```\n\nComputes the tangent of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -458,7 +458,7 @@
     {
       "label": "math_tanh",
       "title": "math_tanh(x) → {number}",
-      "description": "```source\nmath\\_tanh(x) → {number}\n```\n\nComputes the hyperbolic tangent of `x`.\n\nNOTE: The value of `math_tanh(x)` is the same as `(exp(x) - exp(-x))/(exp(x) + exp(-x))`.",
+      "description": "```source\nmath_tanh(x) → {number}\n```\n\nComputes the hyperbolic tangent of `x`.\n\nNOTE: The value of `math_tanh(x)` is the same as `(exp(x) - exp(-x))/(exp(x) + exp(-x))`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -467,7 +467,7 @@
     {
       "label": "math_trunc",
       "title": "math_trunc(x) → {number}",
-      "description": "```source\nmath\\_trunc(x) → {number}\n```\n\nComputes the integral part of the number `x`, removing any fractional digits.",
+      "description": "```source\nmath_trunc(x) → {number}\n```\n\nComputes the integral part of the number `x`, removing any fractional digits.",
       "meta": "func",
       "parameters": [
         "x"
@@ -476,7 +476,7 @@
     {
       "label": "parse_int",
       "title": "parse_int(s, i) → {number}",
-      "description": "```source\nparse\\_int(s, i) → {number}\n```\n\nInterprets a given string `s` as an integer, using the positive integer `i` as radix, and returns the respective value.  \nExamples: `parse_int(\"909\", 10)` returns the number `909`, and `parse_int(\"-1111\", 2)` returns the number `-15`.  \nSee [ECMAScript Specification, Section 18.2.5](https://www.ecma-international.org/ecma-262/9.0/index.html#sec-parseint-string-radix) for details.",
+      "description": "```source\nparse_int(s, i) → {number}\n```\n\nInterprets a given string `s` as an integer, using the positive integer `i` as radix, and returns the respective value.  \nExamples: `parse_int(\"909\", 10)` returns the number `909`, and `parse_int(\"-1111\", 2)` returns the number `-15`.  \nSee [ECMAScript Specification, Section 18.2.5](https://www.ecma-international.org/ecma-262/9.0/index.html#sec-parseint-string-radix) for details.",
       "meta": "func",
       "parameters": [
         "s",
@@ -572,7 +572,7 @@
     {
       "label": "__access_export__",
       "title": "__access_export__(exports, lookup_name) → {value}",
-      "description": "```source\n\\_\\_access\\_export\\_\\_(exports, lookup\\_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a pair where the head element is the default export and the tail element is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the lookup name is \"default\", the default export is returned instead of a named export. If the name does not exist, `undefined` is returned.",
+      "description": "```source\n__access_export__(exports, lookup_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a pair where the head element is the default export and the tail element is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the lookup name is \"default\", the default export is returned instead of a named export. If the name does not exist, `undefined` is returned.",
       "meta": "func",
       "parameters": [
         "exports",
@@ -582,7 +582,7 @@
     {
       "label": "__access_named_export__",
       "title": "__access_named_export__(named_exports, lookup_name) → {value}",
-      "description": "```source\n\\_\\_access\\_named\\_export\\_\\_(named\\_exports, lookup\\_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the name does not exist, `undefined` is returned.",
+      "description": "```source\n__access_named_export__(named_exports, lookup_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the name does not exist, `undefined` is returned.",
       "meta": "func",
       "parameters": [
         "named_exports",
@@ -622,7 +622,7 @@
     {
       "label": "build_list",
       "title": "build_list(f, n) → {list}",
-      "description": "```source\nbuild\\_list(f, n) → {list}\n```\n\nMakes a list with `n` elements by applying the unary function `f` to the numbers 0 to `n - 1`, assumed to be a nonnegative integer. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(n)` (apart from `f`).",
+      "description": "```source\nbuild_list(f, n) → {list}\n```\n\nMakes a list with `n` elements by applying the unary function `f` to the numbers 0 to `n - 1`, assumed to be a nonnegative integer. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(n)` (apart from `f`).",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -632,7 +632,7 @@
     {
       "label": "char_at",
       "title": "char_at(s, i) → {string}",
-      "description": "```source\nchar\\_at(s, i) → {string}\n```\n\nTakes a string `s` as first argument and a nonnegative integer `i` as second argument. If `i` is less than the length of `s`, this function returns a one-character string that contains the character of `s` at position `i`, counting from 0. If `i` is larger than or equal to the length of `s`, this function returns `undefined`.",
+      "description": "```source\nchar_at(s, i) → {string}\n```\n\nTakes a string `s` as first argument and a nonnegative integer `i` as second argument. If `i` is less than the length of `s`, this function returns a one-character string that contains the character of `s` at position `i`, counting from 0. If `i` is larger than or equal to the length of `s`, this function returns `undefined`.",
       "meta": "func",
       "parameters": [
         "s",
@@ -655,7 +655,7 @@
     {
       "label": "display_list",
       "title": "display_list(xs, s) → {value}",
-      "description": "```source\ndisplay\\_list(xs, s) → {value}\n```\n\nOptional second argument. Similar to `display`, but formats well-formed lists nicely if detected; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in `x`.",
+      "description": "```source\ndisplay_list(xs, s) → {value}\n```\n\nOptional second argument. Similar to `display`, but formats well-formed lists nicely if detected; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in `x`.",
       "meta": "func",
       "parameters": [
         "xs",
@@ -668,7 +668,7 @@
     {
       "label": "draw_data",
       "title": "draw_data() → {value}",
-      "description": "```source\ndraw\\_data() → {value}\n```\n\nvisualizes the arguments in a separate drawing area in the Source Academy using box-and-pointer diagrams; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in the arguments.",
+      "description": "```source\ndraw_data() → {value}\n```\n\nvisualizes the arguments in a separate drawing area in the Source Academy using box-and-pointer diagrams; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in the arguments.",
       "meta": "func",
       "parameters": [],
       "hasRestElement": true
@@ -676,7 +676,7 @@
     {
       "label": "enum_list",
       "title": "enum_list(start, end) → {list}",
-      "description": "```source\nenum\\_list(start, end) → {list}\n```\n\nReturns a list that enumerates numbers starting from `start` using a step size of 1, until the number exceeds (`>`) `end`. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is `end - start`.",
+      "description": "```source\nenum_list(start, end) → {list}\n```\n\nReturns a list that enumerates numbers starting from `start` using a step size of 1, until the number exceeds (`>`) `end`. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is `end - start`.",
       "meta": "func",
       "parameters": [
         "start",
@@ -719,7 +719,7 @@
     {
       "label": "for_each",
       "title": "for_each(f, xs) → {boolean}",
-      "description": "```source\nfor\\_each(f, xs) → {boolean}\n```\n\nApplies unary function `f` to every element of the list `xs`. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(1)` (apart from `f`), where `n` is the length of `xs`. `f` is applied element-by-element: `for_each(fun, list(1, 2))` results in the calls `fun(1)` and `fun(2)`.",
+      "description": "```source\nfor_each(f, xs) → {boolean}\n```\n\nApplies unary function `f` to every element of the list `xs`. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(1)` (apart from `f`), where `n` is the length of `xs`. `f` is applied element-by-element: `for_each(fun, list(1, 2))` results in the calls `fun(1)` and `fun(2)`.",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -729,7 +729,7 @@
     {
       "label": "get_time",
       "title": "get_time() → {number}",
-      "description": "```source\nget\\_time() → {number}\n```\n\nReturns number of milliseconds elapsed since January 1, 1970 00:00:00 UTC. See also [textbook example](https://sourceacademy.org/sicpjs/1.2.6#ex-1.21).",
+      "description": "```source\nget_time() → {number}\n```\n\nReturns number of milliseconds elapsed since January 1, 1970 00:00:00 UTC. See also [textbook example](https://sourceacademy.org/sicpjs/1.2.6#ex-1.21).",
       "meta": "func",
       "parameters": []
     },
@@ -745,7 +745,7 @@
     {
       "label": "is_boolean",
       "title": "is_boolean(v) → {boolean}",
-      "description": "```source\nis\\_boolean(v) → {boolean}\n```\n\nchecks whether a given value is a boolean",
+      "description": "```source\nis_boolean(v) → {boolean}\n```\n\nchecks whether a given value is a boolean",
       "meta": "func",
       "parameters": [
         "v"
@@ -754,7 +754,7 @@
     {
       "label": "is_function",
       "title": "is_function(v) → {boolean}",
-      "description": "```source\nis\\_function(v) → {boolean}\n```\n\nchecks whether a given value is a function",
+      "description": "```source\nis_function(v) → {boolean}\n```\n\nchecks whether a given value is a function",
       "meta": "func",
       "parameters": [
         "v"
@@ -763,7 +763,7 @@
     {
       "label": "is_list",
       "title": "is_list(xs) → {xs}",
-      "description": "```source\nis\\_list(xs) → {xs}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `xs` is a list as defined in the textbook, and `false` otherwise. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of the chain of `tail` operations that can be applied to `xs`. `is_list` recurses down the list and checks that it ends with the empty list null",
+      "description": "```source\nis_list(xs) → {xs}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `xs` is a list as defined in the textbook, and `false` otherwise. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of the chain of `tail` operations that can be applied to `xs`. `is_list` recurses down the list and checks that it ends with the empty list null",
       "meta": "func",
       "parameters": [
         "xs"
@@ -772,7 +772,7 @@
     {
       "label": "is_null",
       "title": "is_null(x) → {boolean}",
-      "description": "```source\nis\\_null(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is the empty list `null`, and `false` otherwise; time: `Theta(1)Theta(1)`.",
+      "description": "```source\nis_null(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is the empty list `null`, and `false` otherwise; time: `Theta(1)Theta(1)`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -781,7 +781,7 @@
     {
       "label": "is_number",
       "title": "is_number(v) → {boolean}",
-      "description": "```source\nis\\_number(v) → {boolean}\n```\n\nchecks whether a given value is a number. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
+      "description": "```source\nis_number(v) → {boolean}\n```\n\nchecks whether a given value is a number. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
       "meta": "func",
       "parameters": [
         "v"
@@ -790,7 +790,7 @@
     {
       "label": "is_pair",
       "title": "is_pair(x) → {boolean}",
-      "description": "```source\nis\\_pair(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is a pair and false otherwise; time: `Theta(1)Theta(1)`.",
+      "description": "```source\nis_pair(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is a pair and false otherwise; time: `Theta(1)Theta(1)`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -799,7 +799,7 @@
     {
       "label": "is_string",
       "title": "is_string(v) → {boolean}",
-      "description": "```source\nis\\_string(v) → {boolean}\n```\n\nchecks whether a given value is a string. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
+      "description": "```source\nis_string(v) → {boolean}\n```\n\nchecks whether a given value is a string. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
       "meta": "func",
       "parameters": [
         "v"
@@ -808,7 +808,7 @@
     {
       "label": "is_undefined",
       "title": "is_undefined(v) → {boolean}",
-      "description": "```source\nis\\_undefined(v) → {boolean}\n```\n\nchecks whether a given value is the special value `undefined`",
+      "description": "```source\nis_undefined(v) → {boolean}\n```\n\nchecks whether a given value is the special value `undefined`",
       "meta": "func",
       "parameters": [
         "v"
@@ -834,7 +834,7 @@
     {
       "label": "list_ref",
       "title": "list_ref(xs, n) → {value}",
-      "description": "```source\nlist\\_ref(xs, n) → {value}\n```\n\nReturns the element of list `xs` at position `n`, where the first element has index 0. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of `xs`.",
+      "description": "```source\nlist_ref(xs, n) → {value}\n```\n\nReturns the element of list `xs` at position `n`, where the first element has index 0. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of `xs`.",
       "meta": "func",
       "parameters": [
         "xs",
@@ -844,7 +844,7 @@
     {
       "label": "list_to_string",
       "title": "list_to_string(xs) → {string}",
-      "description": "```source\nlist\\_to\\_string(xs) → {string}\n```\n\nReturns a string that represents list `xs` using the text-based box-and-pointer notation `[...]`. Iterative process; time: `Theta(n)` where `n` is the size of the list, space: `Theta(m)` where `m` is the length of the string. The process is iterative, but consumes space `O(m)` because of the result string.",
+      "description": "```source\nlist_to_string(xs) → {string}\n```\n\nReturns a string that represents list `xs` using the text-based box-and-pointer notation `[...]`. Iterative process; time: `Theta(n)` where `n` is the size of the list, space: `Theta(m)` where `m` is the length of the string. The process is iterative, but consumes space `O(m)` because of the result string.",
       "meta": "func",
       "parameters": [
         "xs"
@@ -863,7 +863,7 @@
     {
       "label": "math_abs",
       "title": "math_abs(x) → {number}",
-      "description": "```source\nmath\\_abs(x) → {number}\n```\n\ncomputes the absolute value of x; the result has the same magnitude as `x` but has positive sign.",
+      "description": "```source\nmath_abs(x) → {number}\n```\n\ncomputes the absolute value of x; the result has the same magnitude as `x` but has positive sign.",
       "meta": "func",
       "parameters": [
         "x"
@@ -872,7 +872,7 @@
     {
       "label": "math_acos",
       "title": "math_acos(x) → {number}",
-      "description": "```source\nmath\\_acos(x) → {number}\n```\n\ncomputes the arc cosine of `x`. The result is expressed in radians and ranges from +0 to +π.",
+      "description": "```source\nmath_acos(x) → {number}\n```\n\ncomputes the arc cosine of `x`. The result is expressed in radians and ranges from +0 to +π.",
       "meta": "func",
       "parameters": [
         "x"
@@ -881,7 +881,7 @@
     {
       "label": "math_acosh",
       "title": "math_acosh(x) → {number}",
-      "description": "```source\nmath\\_acosh(x) → {number}\n```\n\ncomputes the inverse hyperbolic cosine of `x`.",
+      "description": "```source\nmath_acosh(x) → {number}\n```\n\ncomputes the inverse hyperbolic cosine of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -890,7 +890,7 @@
     {
       "label": "math_asin",
       "title": "math_asin(x) → {number}",
-      "description": "```source\nmath\\_asin(x) → {number}\n```\n\ncomputes the arc sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_asin(x) → {number}\n```\n\ncomputes the arc sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -899,7 +899,7 @@
     {
       "label": "math_asinh",
       "title": "math_asinh(x) → {number}",
-      "description": "```source\nmath\\_asinh(x) → {number}\n```\n\ncomputes the inverse hyperbolic sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_asinh(x) → {number}\n```\n\ncomputes the inverse hyperbolic sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -908,7 +908,7 @@
     {
       "label": "math_atan",
       "title": "math_atan(x) → {number}",
-      "description": "```source\nmath\\_atan(x) → {number}\n```\n\ncomputes the arc tangent of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_atan(x) → {number}\n```\n\ncomputes the arc tangent of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -917,7 +917,7 @@
     {
       "label": "math_atan2",
       "title": "math_atan2(y, x) → {number}",
-      "description": "```source\nmath\\_atan2(y, x) → {number}\n```\n\ncomputes the arc tangent of the quotient `y` / `x` of the arguments `y` and `x`, where the signs of `y` and `x` are used to determine the quadrant of the result. Note that it is intentional and traditional for the two-argument arc tangent function that the argument named `y` be first and the argument named `x` be second. The result is expressed in radians and ranges from -π to +π.",
+      "description": "```source\nmath_atan2(y, x) → {number}\n```\n\ncomputes the arc tangent of the quotient `y` / `x` of the arguments `y` and `x`, where the signs of `y` and `x` are used to determine the quadrant of the result. Note that it is intentional and traditional for the two-argument arc tangent function that the argument named `y` be first and the argument named `x` be second. The result is expressed in radians and ranges from -π to +π.",
       "meta": "func",
       "parameters": [
         "y",
@@ -927,7 +927,7 @@
     {
       "label": "math_atanh",
       "title": "math_atanh(x) → {number}",
-      "description": "```source\nmath\\_atanh(x) → {number}\n```\n\ncomputes the inverse hyperbolic tangent of `x`.",
+      "description": "```source\nmath_atanh(x) → {number}\n```\n\ncomputes the inverse hyperbolic tangent of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -936,7 +936,7 @@
     {
       "label": "math_cbrt",
       "title": "math_cbrt(x) → {number}",
-      "description": "```source\nmath\\_cbrt(x) → {number}\n```\n\ncomputes the cube root of `x`.",
+      "description": "```source\nmath_cbrt(x) → {number}\n```\n\ncomputes the cube root of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -945,7 +945,7 @@
     {
       "label": "math_ceil",
       "title": "math_ceil(x) → {number}",
-      "description": "```source\nmath\\_ceil(x) → {number}\n```\n\ncomputes the smallest (closest to -∞) Number value that is not less than `x` and is an integer. If `x` is already an integer, the result is `x`. The value of math\\_ceil(x) is the same as the value of -math\\_floor(-x).",
+      "description": "```source\nmath_ceil(x) → {number}\n```\n\ncomputes the smallest (closest to -∞) Number value that is not less than `x` and is an integer. If `x` is already an integer, the result is `x`. The value of math\\_ceil(x) is the same as the value of -math\\_floor(-x).",
       "meta": "func",
       "parameters": [
         "x"
@@ -954,7 +954,7 @@
     {
       "label": "math_clz32",
       "title": "math_clz32(n) → {number}",
-      "description": "```source\nmath\\_clz32(n) → {number}\n```\n\nWhen math\\_clz32 is called with one argument `x`, the following steps are taken: Let n be ToUint32(x). Let p be the number of leading zero bits in the 32-bit binary representation of n. Return p.\n\nNOTE:  \nIf n is 0, p will be 32. If the most significant bit of the 32-bit binary encoding of n is 1, p will be 0.",
+      "description": "```source\nmath_clz32(n) → {number}\n```\n\nWhen math\\_clz32 is called with one argument `x`, the following steps are taken: Let n be ToUint32(x). Let p be the number of leading zero bits in the 32-bit binary representation of n. Return p.\n\nNOTE:  \nIf n is 0, p will be 32. If the most significant bit of the 32-bit binary encoding of n is 1, p will be 0.",
       "meta": "func",
       "parameters": [
         "n"
@@ -963,7 +963,7 @@
     {
       "label": "math_cos",
       "title": "math_cos(x) → {number}",
-      "description": "```source\nmath\\_cos(x) → {number}\n```\n\nComputes the cosine of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_cos(x) → {number}\n```\n\nComputes the cosine of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -972,7 +972,7 @@
     {
       "label": "math_cosh",
       "title": "math_cosh(x) → {number}",
-      "description": "```source\nmath\\_cosh(x) → {number}\n```\n\ncomputes the hyperbolic cosine of `x`.\n\nNOTE: The value of cosh(x) is the same as (exp(x) + exp(-x)) / 2.",
+      "description": "```source\nmath_cosh(x) → {number}\n```\n\ncomputes the hyperbolic cosine of `x`.\n\nNOTE: The value of cosh(x) is the same as (exp(x) + exp(-x)) / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -981,7 +981,7 @@
     {
       "label": "math_exp",
       "title": "math_exp(x) → {number}",
-      "description": "```source\nmath\\_exp(x) → {number}\n```\n\ncomputes the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms).",
+      "description": "```source\nmath_exp(x) → {number}\n```\n\ncomputes the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms).",
       "meta": "func",
       "parameters": [
         "x"
@@ -990,7 +990,7 @@
     {
       "label": "math_expm1",
       "title": "math_expm1(x) → {number}",
-      "description": "```source\nmath\\_expm1(x) → {number}\n```\n\ncomputes subtracting 1 from the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms). The result is computed in a way that is accurate even when the value of `x` is close to 0.",
+      "description": "```source\nmath_expm1(x) → {number}\n```\n\ncomputes subtracting 1 from the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms). The result is computed in a way that is accurate even when the value of `x` is close to 0.",
       "meta": "func",
       "parameters": [
         "x"
@@ -999,7 +999,7 @@
     {
       "label": "math_floor",
       "title": "math_floor(x) → {number}",
-      "description": "```source\nmath\\_floor(x) → {number}\n```\n\ncomputes the greatest (closest to +∞) Number value that is not greater than `x` and is an integer.  \nIf `x` is already an integer, the result is `x`.\n\nNOTE: The value of math\\_floor(x) is the same as the value of -math\\_ceil(-x).",
+      "description": "```source\nmath_floor(x) → {number}\n```\n\ncomputes the greatest (closest to +∞) Number value that is not greater than `x` and is an integer.  \nIf `x` is already an integer, the result is `x`.\n\nNOTE: The value of math\\_floor(x) is the same as the value of -math\\_ceil(-x).",
       "meta": "func",
       "parameters": [
         "x"
@@ -1008,7 +1008,7 @@
     {
       "label": "math_fround",
       "title": "math_fround(x) → {number}",
-      "description": "```source\nmath\\_fround(x) → {number}\n```\n\nWhen math\\_fround is called with argument `x`, the following steps are taken:\n\n1.  If `x` is NaN, return NaN.\n2.  If `x` is one of +0, -0, +∞, -∞, return `x`.\n3.  Let x32 be the result of converting `x` to a value in IEEE 754-2008 binary32 format using roundTiesToEven mode.\n4.  Let x64 be the result of converting x32 to a value in IEEE 754-2008 binary64 format.\n5.  Return the ECMAScript Number value corresponding to x64.",
+      "description": "```source\nmath_fround(x) → {number}\n```\n\nWhen math\\_fround is called with argument `x`, the following steps are taken:\n\n1.  If `x` is NaN, return NaN.\n2.  If `x` is one of +0, -0, +∞, -∞, return `x`.\n3.  Let x32 be the result of converting `x` to a value in IEEE 754-2008 binary32 format using roundTiesToEven mode.\n4.  Let x64 be the result of converting x32 to a value in IEEE 754-2008 binary64 format.\n5.  Return the ECMAScript Number value corresponding to x64.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1017,14 +1017,14 @@
     {
       "label": "math_hypot",
       "title": "math_hypot() → {number}",
-      "description": "```source\nmath\\_hypot() → {number}\n```\n\ncomputes the square root of the sum of squares of its arguments.  \nIf no arguments are passed, the result is +0.",
+      "description": "```source\nmath_hypot() → {number}\n```\n\ncomputes the square root of the sum of squares of its arguments.  \nIf no arguments are passed, the result is +0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_imul",
       "title": "math_imul(x, x) → {number}",
-      "description": "```source\nmath\\_imul(x, x) → {number}\n```\n\nWhen math\\_imul is called with arguments `x` and `y`, the following steps are taken:\n\n1.  Let a be ToUint32(x).\n2.  Let b be ToUint32(y).\n3.  Let product be (a × b) modulo 232.\n4.  If product ≥ 231, return product - 232; otherwise return product.",
+      "description": "```source\nmath_imul(x, x) → {number}\n```\n\nWhen math\\_imul is called with arguments `x` and `y`, the following steps are taken:\n\n1.  Let a be ToUint32(x).\n2.  Let b be ToUint32(y).\n3.  Let product be (a × b) modulo 232.\n4.  If product ≥ 231, return product - 232; otherwise return product.",
       "meta": "func",
       "parameters": [
         "x",
@@ -1034,7 +1034,7 @@
     {
       "label": "math_log",
       "title": "math_log(x) → {number}",
-      "description": "```source\nmath\\_log(x) → {number}\n```\n\nComputes the natural logarithm of `x`.",
+      "description": "```source\nmath_log(x) → {number}\n```\n\nComputes the natural logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1043,7 +1043,7 @@
     {
       "label": "math_log1p",
       "title": "math_log1p(x) → {number}",
-      "description": "```source\nmath\\_log1p(x) → {number}\n```\n\ncomputes the natural logarithm of 1 + `x`. The result is computed in a way that is accurate even when the value of `x` is close to zero.",
+      "description": "```source\nmath_log1p(x) → {number}\n```\n\ncomputes the natural logarithm of 1 + `x`. The result is computed in a way that is accurate even when the value of `x` is close to zero.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1052,7 +1052,7 @@
     {
       "label": "math_log2",
       "title": "math_log2(x) → {number}",
-      "description": "```source\nmath\\_log2(x) → {number}\n```\n\ncomputes the base 2 logarithm of `x`.",
+      "description": "```source\nmath_log2(x) → {number}\n```\n\ncomputes the base 2 logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1061,7 +1061,7 @@
     {
       "label": "math_log10",
       "title": "math_log10(x) → {number}",
-      "description": "```source\nmath\\_log10(x) → {number}\n```\n\ncomputes the base 10 logarithm of `x`.",
+      "description": "```source\nmath_log10(x) → {number}\n```\n\ncomputes the base 10 logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1070,21 +1070,21 @@
     {
       "label": "math_max",
       "title": "math_max() → {number}",
-      "description": "```source\nmath\\_max() → {number}\n```\n\nGiven zero or more numbers, returns the largest of them.  \nIf no arguments are given, the result is -∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the largest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
+      "description": "```source\nmath_max() → {number}\n```\n\nGiven zero or more numbers, returns the largest of them.  \nIf no arguments are given, the result is -∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the largest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_min",
       "title": "math_min() → {number}",
-      "description": "```source\nmath\\_min() → {number}\n```\n\nGiven zero or more arguments, returns the smallest of them.  \nIf no arguments are given, the result is +∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the smallest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
+      "description": "```source\nmath_min() → {number}\n```\n\nGiven zero or more arguments, returns the smallest of them.  \nIf no arguments are given, the result is +∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the smallest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_pow",
       "title": "math_pow(base, exponent) → {number}",
-      "description": "```source\nmath\\_pow(base, exponent) → {number}\n```\n\nComputes the result of raising base to the power of exponent.",
+      "description": "```source\nmath_pow(base, exponent) → {number}\n```\n\nComputes the result of raising base to the power of exponent.",
       "meta": "func",
       "parameters": [
         "base",
@@ -1094,14 +1094,14 @@
     {
       "label": "math_random",
       "title": "math_random() → {number}",
-      "description": "```source\nmath\\_random() → {number}\n```\n\nReturns a number value with positive sign, greater than or equal to 0 but less than 1, chosen randomly or pseudo randomly with approximately uniform distribution over that range, using an implementation-dependent algorithm or strategy. This function takes no arguments. Each math\\_random function created for distinct realms must produce a distinct sequence of values from successive calls.",
+      "description": "```source\nmath_random() → {number}\n```\n\nReturns a number value with positive sign, greater than or equal to 0 but less than 1, chosen randomly or pseudo randomly with approximately uniform distribution over that range, using an implementation-dependent algorithm or strategy. This function takes no arguments. Each math\\_random function created for distinct realms must produce a distinct sequence of values from successive calls.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_round",
       "title": "math_round(x) → {number}",
-      "description": "```source\nmath\\_round(x) → {number}\n```\n\nReturns the number value that is closest to `x` and is an integer.  \nIf two integers are equally close to `x`, then the result is the Number value that is closer to +∞. If `x` is already an integer, the result is `x`. NOTE 1: math\\_round(3.5) returns 4, but math\\_round(-3.5) returns -3.",
+      "description": "```source\nmath_round(x) → {number}\n```\n\nReturns the number value that is closest to `x` and is an integer.  \nIf two integers are equally close to `x`, then the result is the Number value that is closer to +∞. If `x` is already an integer, the result is `x`. NOTE 1: math\\_round(3.5) returns 4, but math\\_round(-3.5) returns -3.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1110,7 +1110,7 @@
     {
       "label": "math_sign",
       "title": "math_sign(x) → {number}",
-      "description": "```source\nmath\\_sign(x) → {number}\n```\n\nComputes the sign of `x`, indicating whether `x` is positive, negative, or zero.",
+      "description": "```source\nmath_sign(x) → {number}\n```\n\nComputes the sign of `x`, indicating whether `x` is positive, negative, or zero.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1119,7 +1119,7 @@
     {
       "label": "math_sin",
       "title": "math_sin(x) → {number}",
-      "description": "```source\nmath\\_sin(x) → {number}\n```\n\nComputes the sine of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_sin(x) → {number}\n```\n\nComputes the sine of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1128,7 +1128,7 @@
     {
       "label": "math_sinh",
       "title": "math_sinh(x) → {number}",
-      "description": "```source\nmath\\_sinh(x) → {number}\n```\n\nComputes the hyperbolic sine of `x`.\n\nNOTE: The value of sinh(x) is the same as (exp(x) - exp(-x)) / 2.",
+      "description": "```source\nmath_sinh(x) → {number}\n```\n\nComputes the hyperbolic sine of `x`.\n\nNOTE: The value of sinh(x) is the same as (exp(x) - exp(-x)) / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1137,7 +1137,7 @@
     {
       "label": "math_sqrt",
       "title": "math_sqrt(x) → {number}",
-      "description": "```source\nmath\\_sqrt(x) → {number}\n```\n\nComputes the square root of `x`.",
+      "description": "```source\nmath_sqrt(x) → {number}\n```\n\nComputes the square root of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1146,7 +1146,7 @@
     {
       "label": "math_tan",
       "title": "math_tan(x) → {number}",
-      "description": "```source\nmath\\_tan(x) → {number}\n```\n\nComputes the tangent of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_tan(x) → {number}\n```\n\nComputes the tangent of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1155,7 +1155,7 @@
     {
       "label": "math_tanh",
       "title": "math_tanh(x) → {number}",
-      "description": "```source\nmath\\_tanh(x) → {number}\n```\n\nComputes the hyperbolic tangent of `x`.\n\nNOTE: The value of `math_tanh(x)` is the same as `(exp(x) - exp(-x))/(exp(x) + exp(-x))`.",
+      "description": "```source\nmath_tanh(x) → {number}\n```\n\nComputes the hyperbolic tangent of `x`.\n\nNOTE: The value of `math_tanh(x)` is the same as `(exp(x) - exp(-x))/(exp(x) + exp(-x))`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1164,7 +1164,7 @@
     {
       "label": "math_trunc",
       "title": "math_trunc(x) → {number}",
-      "description": "```source\nmath\\_trunc(x) → {number}\n```\n\nComputes the integral part of the number `x`, removing any fractional digits.",
+      "description": "```source\nmath_trunc(x) → {number}\n```\n\nComputes the integral part of the number `x`, removing any fractional digits.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1193,7 +1193,7 @@
     {
       "label": "parse_int",
       "title": "parse_int(s, i) → {number}",
-      "description": "```source\nparse\\_int(s, i) → {number}\n```\n\nInterprets a given string `s` as an integer, using the positive integer `i` as radix, and returns the respective value.  \nExamples: `parse_int(\"909\", 10)` returns the number `909`, and `parse_int(\"-1111\", 2)` returns the number `-15`.  \nSee [ECMAScript Specification, Section 18.2.5](https://www.ecma-international.org/ecma-262/9.0/index.html#sec-parseint-string-radix) for details.",
+      "description": "```source\nparse_int(s, i) → {number}\n```\n\nInterprets a given string `s` as an integer, using the positive integer `i` as radix, and returns the respective value.  \nExamples: `parse_int(\"909\", 10)` returns the number `909`, and `parse_int(\"-1111\", 2)` returns the number `-15`.  \nSee [ECMAScript Specification, Section 18.2.5](https://www.ecma-international.org/ecma-262/9.0/index.html#sec-parseint-string-radix) for details.",
       "meta": "func",
       "parameters": [
         "s",
@@ -1222,7 +1222,7 @@
     {
       "label": "remove_all",
       "title": "remove_all(v, xs) → {list}",
-      "description": "```source\nremove\\_all(v, xs) → {list}\n```\n\nReturns a list that results from `xs` by removing all items from `xs` that are identical (`===`) to `v`. Returns the original list if there is no occurrence. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is the length of `xs`.",
+      "description": "```source\nremove_all(v, xs) → {list}\n```\n\nReturns a list that results from `xs` by removing all items from `xs` that are identical (`===`) to `v`. Returns the original list if there is no occurrence. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is the length of `xs`.",
       "meta": "func",
       "parameters": [
         "v",
@@ -1327,7 +1327,7 @@
     {
       "label": "__access_export__",
       "title": "__access_export__(exports, lookup_name) → {value}",
-      "description": "```source\n\\_\\_access\\_export\\_\\_(exports, lookup\\_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a pair where the head element is the default export and the tail element is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the lookup name is \"default\", the default export is returned instead of a named export. If the name does not exist, `undefined` is returned.",
+      "description": "```source\n__access_export__(exports, lookup_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a pair where the head element is the default export and the tail element is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the lookup name is \"default\", the default export is returned instead of a named export. If the name does not exist, `undefined` is returned.",
       "meta": "func",
       "parameters": [
         "exports",
@@ -1337,7 +1337,7 @@
     {
       "label": "__access_named_export__",
       "title": "__access_named_export__(named_exports, lookup_name) → {value}",
-      "description": "```source\n\\_\\_access\\_named\\_export\\_\\_(named\\_exports, lookup\\_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the name does not exist, `undefined` is returned.",
+      "description": "```source\n__access_named_export__(named_exports, lookup_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the name does not exist, `undefined` is returned.",
       "meta": "func",
       "parameters": [
         "named_exports",
@@ -1377,7 +1377,7 @@
     {
       "label": "array_length",
       "title": "array_length(x) → {number}",
-      "description": "```source\narray\\_length(x) → {number}\n```\n\n\\*\\*primitive\\*\\*; returns the current length of array `x`, which is 1 plus the highest index that has been used so far in an array assignment on `x`. Here literal array expressions are counted too: The array `[10, 20, 30]` has a length of 3. Time: `Θ(1)`, space: `Θ(1)`",
+      "description": "```source\narray_length(x) → {number}\n```\n\n\\*\\*primitive\\*\\*; returns the current length of array `x`, which is 1 plus the highest index that has been used so far in an array assignment on `x`. Here literal array expressions are counted too: The array `[10, 20, 30]` has a length of 3. Time: `Θ(1)`, space: `Θ(1)`",
       "meta": "func",
       "parameters": [
         "x"
@@ -1386,7 +1386,7 @@
     {
       "label": "build_list",
       "title": "build_list(f, n) → {list}",
-      "description": "```source\nbuild\\_list(f, n) → {list}\n```\n\nMakes a list with `n` elements by applying the unary function `f` to the numbers 0 to `n - 1`, assumed to be a nonnegative integer. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(n)` (apart from `f`).",
+      "description": "```source\nbuild_list(f, n) → {list}\n```\n\nMakes a list with `n` elements by applying the unary function `f` to the numbers 0 to `n - 1`, assumed to be a nonnegative integer. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(n)` (apart from `f`).",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -1396,7 +1396,7 @@
     {
       "label": "build_stream",
       "title": "build_stream(f, n) → {stream}",
-      "description": "```source\nbuild\\_stream(f, n) → {stream}\n```\n\nMakes a stream with `n` elements by applying the unary function `f` to the numbers 0 to `n - 1`, assumed to be a nonnegative integer. Lazy? Yes: The result stream forces the application of `f` for the next element",
+      "description": "```source\nbuild_stream(f, n) → {stream}\n```\n\nMakes a stream with `n` elements by applying the unary function `f` to the numbers 0 to `n - 1`, assumed to be a nonnegative integer. Lazy? Yes: The result stream forces the application of `f` for the next element",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -1406,7 +1406,7 @@
     {
       "label": "char_at",
       "title": "char_at(s, i) → {string}",
-      "description": "```source\nchar\\_at(s, i) → {string}\n```\n\nTakes a string `s` as first argument and a nonnegative integer `i` as second argument. If `i` is less than the length of `s`, this function returns a one-character string that contains the character of `s` at position `i`, counting from 0. If `i` is larger than or equal to the length of `s`, this function returns `undefined`.",
+      "description": "```source\nchar_at(s, i) → {string}\n```\n\nTakes a string `s` as first argument and a nonnegative integer `i` as second argument. If `i` is less than the length of `s`, this function returns a one-character string that contains the character of `s` at position `i`, counting from 0. If `i` is larger than or equal to the length of `s`, this function returns `undefined`.",
       "meta": "func",
       "parameters": [
         "s",
@@ -1429,7 +1429,7 @@
     {
       "label": "display_list",
       "title": "display_list(xs, s) → {value}",
-      "description": "```source\ndisplay\\_list(xs, s) → {value}\n```\n\nOptional second argument. Similar to `display`, but formats well-formed lists nicely if detected; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in `x`.",
+      "description": "```source\ndisplay_list(xs, s) → {value}\n```\n\nOptional second argument. Similar to `display`, but formats well-formed lists nicely if detected; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in `x`.",
       "meta": "func",
       "parameters": [
         "xs",
@@ -1442,7 +1442,7 @@
     {
       "label": "draw_data",
       "title": "draw_data() → {value}",
-      "description": "```source\ndraw\\_data() → {value}\n```\n\nvisualizes the arguments in a separate drawing area in the Source Academy using box-and-pointer diagrams; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in the arguments.",
+      "description": "```source\ndraw_data() → {value}\n```\n\nvisualizes the arguments in a separate drawing area in the Source Academy using box-and-pointer diagrams; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in the arguments.",
       "meta": "func",
       "parameters": [],
       "hasRestElement": true
@@ -1450,7 +1450,7 @@
     {
       "label": "enum_list",
       "title": "enum_list(start, end) → {list}",
-      "description": "```source\nenum\\_list(start, end) → {list}\n```\n\nReturns a list that enumerates numbers starting from `start` using a step size of 1, until the number exceeds (`>`) `end`. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is `end - start`.",
+      "description": "```source\nenum_list(start, end) → {list}\n```\n\nReturns a list that enumerates numbers starting from `start` using a step size of 1, until the number exceeds (`>`) `end`. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is `end - start`.",
       "meta": "func",
       "parameters": [
         "start",
@@ -1460,7 +1460,7 @@
     {
       "label": "enum_stream",
       "title": "enum_stream(start, end) → {stream}",
-      "description": "```source\nenum\\_stream(start, end) → {stream}\n```\n\nReturns a stream that enumerates numbers starting from `start` using a step size of 1, until the number exceeds (`>`) `end`. Lazy? Yes: The result stream forces the construction of each next element",
+      "description": "```source\nenum_stream(start, end) → {stream}\n```\n\nReturns a stream that enumerates numbers starting from `start` using a step size of 1, until the number exceeds (`>`) `end`. Lazy? Yes: The result stream forces the construction of each next element",
       "meta": "func",
       "parameters": [
         "start",
@@ -1493,7 +1493,7 @@
     {
       "label": "eval_stream",
       "title": "eval_stream(s, n) → {list}",
-      "description": "```source\neval\\_stream(s, n) → {list}\n```\n\nConstructs the list of the first `n` elements of a given stream `s` Lazy? Sort-of: `eval_stream` only forces the computation of the first `n` elements, and leaves the rest of the stream untouched.",
+      "description": "```source\neval_stream(s, n) → {list}\n```\n\nConstructs the list of the first `n` elements of a given stream `s` Lazy? Sort-of: `eval_stream` only forces the computation of the first `n` elements, and leaves the rest of the stream untouched.",
       "meta": "func",
       "parameters": [
         "s",
@@ -1513,7 +1513,7 @@
     {
       "label": "for_each",
       "title": "for_each(f, xs) → {boolean}",
-      "description": "```source\nfor\\_each(f, xs) → {boolean}\n```\n\nApplies unary function `f` to every element of the list `xs`. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(1)` (apart from `f`), where `n` is the length of `xs`. `f` is applied element-by-element: `for_each(fun, list(1, 2))` results in the calls `fun(1)` and `fun(2)`.",
+      "description": "```source\nfor_each(f, xs) → {boolean}\n```\n\nApplies unary function `f` to every element of the list `xs`. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(1)` (apart from `f`), where `n` is the length of `xs`. `f` is applied element-by-element: `for_each(fun, list(1, 2))` results in the calls `fun(1)` and `fun(2)`.",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -1523,7 +1523,7 @@
     {
       "label": "get_time",
       "title": "get_time() → {number}",
-      "description": "```source\nget\\_time() → {number}\n```\n\nReturns number of milliseconds elapsed since January 1, 1970 00:00:00 UTC. See also [textbook example](https://sourceacademy.org/sicpjs/1.2.6#ex-1.21).",
+      "description": "```source\nget_time() → {number}\n```\n\nReturns number of milliseconds elapsed since January 1, 1970 00:00:00 UTC. See also [textbook example](https://sourceacademy.org/sicpjs/1.2.6#ex-1.21).",
       "meta": "func",
       "parameters": []
     },
@@ -1539,7 +1539,7 @@
     {
       "label": "integers_from",
       "title": "integers_from(start) → {stream}",
-      "description": "```source\nintegers\\_from(start) → {stream}\n```\n\nReturns infinite stream if integers starting at given number `n` using a step size of 1. Lazy? Yes: The result stream forces the construction of each next element",
+      "description": "```source\nintegers_from(start) → {stream}\n```\n\nReturns infinite stream if integers starting at given number `n` using a step size of 1. Lazy? Yes: The result stream forces the construction of each next element",
       "meta": "func",
       "parameters": [
         "start"
@@ -1548,7 +1548,7 @@
     {
       "label": "is_array",
       "title": "is_array(x) → {boolean}",
-      "description": "```source\nis\\_array(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is an array, and `false` if it is not. Time: `Θ(1)`, space: `Θ(1)`",
+      "description": "```source\nis_array(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is an array, and `false` if it is not. Time: `Θ(1)`, space: `Θ(1)`",
       "meta": "func",
       "parameters": [
         "x"
@@ -1557,7 +1557,7 @@
     {
       "label": "is_boolean",
       "title": "is_boolean(v) → {boolean}",
-      "description": "```source\nis\\_boolean(v) → {boolean}\n```\n\nchecks whether a given value is a boolean",
+      "description": "```source\nis_boolean(v) → {boolean}\n```\n\nchecks whether a given value is a boolean",
       "meta": "func",
       "parameters": [
         "v"
@@ -1566,7 +1566,7 @@
     {
       "label": "is_function",
       "title": "is_function(v) → {boolean}",
-      "description": "```source\nis\\_function(v) → {boolean}\n```\n\nchecks whether a given value is a function",
+      "description": "```source\nis_function(v) → {boolean}\n```\n\nchecks whether a given value is a function",
       "meta": "func",
       "parameters": [
         "v"
@@ -1575,7 +1575,7 @@
     {
       "label": "is_list",
       "title": "is_list(xs) → {xs}",
-      "description": "```source\nis\\_list(xs) → {xs}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `xs` is a list as defined in the textbook, and `false` otherwise. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of the chain of `tail` operations that can be applied to `xs`. `is_list` recurses down the list and checks that it ends with the empty list null",
+      "description": "```source\nis_list(xs) → {xs}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `xs` is a list as defined in the textbook, and `false` otherwise. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of the chain of `tail` operations that can be applied to `xs`. `is_list` recurses down the list and checks that it ends with the empty list null",
       "meta": "func",
       "parameters": [
         "xs"
@@ -1584,7 +1584,7 @@
     {
       "label": "is_null",
       "title": "is_null(x) → {boolean}",
-      "description": "```source\nis\\_null(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is the empty list `null`, and `false` otherwise; time: `Theta(1)Theta(1)`.",
+      "description": "```source\nis_null(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is the empty list `null`, and `false` otherwise; time: `Theta(1)Theta(1)`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1593,7 +1593,7 @@
     {
       "label": "is_number",
       "title": "is_number(v) → {boolean}",
-      "description": "```source\nis\\_number(v) → {boolean}\n```\n\nchecks whether a given value is a number. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
+      "description": "```source\nis_number(v) → {boolean}\n```\n\nchecks whether a given value is a number. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
       "meta": "func",
       "parameters": [
         "v"
@@ -1602,7 +1602,7 @@
     {
       "label": "is_pair",
       "title": "is_pair(x) → {boolean}",
-      "description": "```source\nis\\_pair(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is a pair and false otherwise; time: `Theta(1)Theta(1)`.",
+      "description": "```source\nis_pair(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is a pair and false otherwise; time: `Theta(1)Theta(1)`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1611,7 +1611,7 @@
     {
       "label": "is_stream",
       "title": "is_stream(xs) → {boolean}",
-      "description": "```source\nis\\_stream(xs) → {boolean}\n```\n\nReturns `true` if `xs` is a stream as defined in the textbook, and `false` otherwise. Iterative process. Recurses down the stream and checks that it ends with the empty stream null. Laziness: No: `is_stream` needs to force the given stream.",
+      "description": "```source\nis_stream(xs) → {boolean}\n```\n\nReturns `true` if `xs` is a stream as defined in the textbook, and `false` otherwise. Iterative process. Recurses down the stream and checks that it ends with the empty stream null. Laziness: No: `is_stream` needs to force the given stream.",
       "meta": "func",
       "parameters": [
         "xs"
@@ -1620,7 +1620,7 @@
     {
       "label": "is_string",
       "title": "is_string(v) → {boolean}",
-      "description": "```source\nis\\_string(v) → {boolean}\n```\n\nchecks whether a given value is a string. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
+      "description": "```source\nis_string(v) → {boolean}\n```\n\nchecks whether a given value is a string. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
       "meta": "func",
       "parameters": [
         "v"
@@ -1629,7 +1629,7 @@
     {
       "label": "is_undefined",
       "title": "is_undefined(v) → {boolean}",
-      "description": "```source\nis\\_undefined(v) → {boolean}\n```\n\nchecks whether a given value is the special value `undefined`",
+      "description": "```source\nis_undefined(v) → {boolean}\n```\n\nchecks whether a given value is the special value `undefined`",
       "meta": "func",
       "parameters": [
         "v"
@@ -1655,7 +1655,7 @@
     {
       "label": "list_ref",
       "title": "list_ref(xs, n) → {value}",
-      "description": "```source\nlist\\_ref(xs, n) → {value}\n```\n\nReturns the element of list `xs` at position `n`, where the first element has index 0. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of `xs`.",
+      "description": "```source\nlist_ref(xs, n) → {value}\n```\n\nReturns the element of list `xs` at position `n`, where the first element has index 0. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of `xs`.",
       "meta": "func",
       "parameters": [
         "xs",
@@ -1665,7 +1665,7 @@
     {
       "label": "list_to_stream",
       "title": "list_to_stream(xs) → {stream}",
-      "description": "```source\nlist\\_to\\_stream(xs) → {stream}\n```\n\nGiven list `xs`, returns a stream of same length with the same elements as `xs` in the same order. Laziness: Yes: `list_to_stream` goes down the list only when forced.",
+      "description": "```source\nlist_to_stream(xs) → {stream}\n```\n\nGiven list `xs`, returns a stream of same length with the same elements as `xs` in the same order. Laziness: Yes: `list_to_stream` goes down the list only when forced.",
       "meta": "func",
       "parameters": [
         "xs"
@@ -1674,7 +1674,7 @@
     {
       "label": "list_to_string",
       "title": "list_to_string(xs) → {string}",
-      "description": "```source\nlist\\_to\\_string(xs) → {string}\n```\n\nReturns a string that represents list `xs` using the text-based box-and-pointer notation `[...]`. Iterative process; time: `Theta(n)` where `n` is the size of the list, space: `Theta(m)` where `m` is the length of the string. The process is iterative, but consumes space `O(m)` because of the result string.",
+      "description": "```source\nlist_to_string(xs) → {string}\n```\n\nReturns a string that represents list `xs` using the text-based box-and-pointer notation `[...]`. Iterative process; time: `Theta(n)` where `n` is the size of the list, space: `Theta(m)` where `m` is the length of the string. The process is iterative, but consumes space `O(m)` because of the result string.",
       "meta": "func",
       "parameters": [
         "xs"
@@ -1693,7 +1693,7 @@
     {
       "label": "math_abs",
       "title": "math_abs(x) → {number}",
-      "description": "```source\nmath\\_abs(x) → {number}\n```\n\ncomputes the absolute value of x; the result has the same magnitude as `x` but has positive sign.",
+      "description": "```source\nmath_abs(x) → {number}\n```\n\ncomputes the absolute value of x; the result has the same magnitude as `x` but has positive sign.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1702,7 +1702,7 @@
     {
       "label": "math_acos",
       "title": "math_acos(x) → {number}",
-      "description": "```source\nmath\\_acos(x) → {number}\n```\n\ncomputes the arc cosine of `x`. The result is expressed in radians and ranges from +0 to +π.",
+      "description": "```source\nmath_acos(x) → {number}\n```\n\ncomputes the arc cosine of `x`. The result is expressed in radians and ranges from +0 to +π.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1711,7 +1711,7 @@
     {
       "label": "math_acosh",
       "title": "math_acosh(x) → {number}",
-      "description": "```source\nmath\\_acosh(x) → {number}\n```\n\ncomputes the inverse hyperbolic cosine of `x`.",
+      "description": "```source\nmath_acosh(x) → {number}\n```\n\ncomputes the inverse hyperbolic cosine of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1720,7 +1720,7 @@
     {
       "label": "math_asin",
       "title": "math_asin(x) → {number}",
-      "description": "```source\nmath\\_asin(x) → {number}\n```\n\ncomputes the arc sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_asin(x) → {number}\n```\n\ncomputes the arc sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1729,7 +1729,7 @@
     {
       "label": "math_asinh",
       "title": "math_asinh(x) → {number}",
-      "description": "```source\nmath\\_asinh(x) → {number}\n```\n\ncomputes the inverse hyperbolic sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_asinh(x) → {number}\n```\n\ncomputes the inverse hyperbolic sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1738,7 +1738,7 @@
     {
       "label": "math_atan",
       "title": "math_atan(x) → {number}",
-      "description": "```source\nmath\\_atan(x) → {number}\n```\n\ncomputes the arc tangent of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_atan(x) → {number}\n```\n\ncomputes the arc tangent of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1747,7 +1747,7 @@
     {
       "label": "math_atan2",
       "title": "math_atan2(y, x) → {number}",
-      "description": "```source\nmath\\_atan2(y, x) → {number}\n```\n\ncomputes the arc tangent of the quotient `y` / `x` of the arguments `y` and `x`, where the signs of `y` and `x` are used to determine the quadrant of the result. Note that it is intentional and traditional for the two-argument arc tangent function that the argument named `y` be first and the argument named `x` be second. The result is expressed in radians and ranges from -π to +π.",
+      "description": "```source\nmath_atan2(y, x) → {number}\n```\n\ncomputes the arc tangent of the quotient `y` / `x` of the arguments `y` and `x`, where the signs of `y` and `x` are used to determine the quadrant of the result. Note that it is intentional and traditional for the two-argument arc tangent function that the argument named `y` be first and the argument named `x` be second. The result is expressed in radians and ranges from -π to +π.",
       "meta": "func",
       "parameters": [
         "y",
@@ -1757,7 +1757,7 @@
     {
       "label": "math_atanh",
       "title": "math_atanh(x) → {number}",
-      "description": "```source\nmath\\_atanh(x) → {number}\n```\n\ncomputes the inverse hyperbolic tangent of `x`.",
+      "description": "```source\nmath_atanh(x) → {number}\n```\n\ncomputes the inverse hyperbolic tangent of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1766,7 +1766,7 @@
     {
       "label": "math_cbrt",
       "title": "math_cbrt(x) → {number}",
-      "description": "```source\nmath\\_cbrt(x) → {number}\n```\n\ncomputes the cube root of `x`.",
+      "description": "```source\nmath_cbrt(x) → {number}\n```\n\ncomputes the cube root of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1775,7 +1775,7 @@
     {
       "label": "math_ceil",
       "title": "math_ceil(x) → {number}",
-      "description": "```source\nmath\\_ceil(x) → {number}\n```\n\ncomputes the smallest (closest to -∞) Number value that is not less than `x` and is an integer. If `x` is already an integer, the result is `x`. The value of math\\_ceil(x) is the same as the value of -math\\_floor(-x).",
+      "description": "```source\nmath_ceil(x) → {number}\n```\n\ncomputes the smallest (closest to -∞) Number value that is not less than `x` and is an integer. If `x` is already an integer, the result is `x`. The value of math\\_ceil(x) is the same as the value of -math\\_floor(-x).",
       "meta": "func",
       "parameters": [
         "x"
@@ -1784,7 +1784,7 @@
     {
       "label": "math_clz32",
       "title": "math_clz32(n) → {number}",
-      "description": "```source\nmath\\_clz32(n) → {number}\n```\n\nWhen math\\_clz32 is called with one argument `x`, the following steps are taken: Let n be ToUint32(x). Let p be the number of leading zero bits in the 32-bit binary representation of n. Return p.\n\nNOTE:  \nIf n is 0, p will be 32. If the most significant bit of the 32-bit binary encoding of n is 1, p will be 0.",
+      "description": "```source\nmath_clz32(n) → {number}\n```\n\nWhen math\\_clz32 is called with one argument `x`, the following steps are taken: Let n be ToUint32(x). Let p be the number of leading zero bits in the 32-bit binary representation of n. Return p.\n\nNOTE:  \nIf n is 0, p will be 32. If the most significant bit of the 32-bit binary encoding of n is 1, p will be 0.",
       "meta": "func",
       "parameters": [
         "n"
@@ -1793,7 +1793,7 @@
     {
       "label": "math_cos",
       "title": "math_cos(x) → {number}",
-      "description": "```source\nmath\\_cos(x) → {number}\n```\n\nComputes the cosine of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_cos(x) → {number}\n```\n\nComputes the cosine of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1802,7 +1802,7 @@
     {
       "label": "math_cosh",
       "title": "math_cosh(x) → {number}",
-      "description": "```source\nmath\\_cosh(x) → {number}\n```\n\ncomputes the hyperbolic cosine of `x`.\n\nNOTE: The value of cosh(x) is the same as (exp(x) + exp(-x)) / 2.",
+      "description": "```source\nmath_cosh(x) → {number}\n```\n\ncomputes the hyperbolic cosine of `x`.\n\nNOTE: The value of cosh(x) is the same as (exp(x) + exp(-x)) / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1811,7 +1811,7 @@
     {
       "label": "math_exp",
       "title": "math_exp(x) → {number}",
-      "description": "```source\nmath\\_exp(x) → {number}\n```\n\ncomputes the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms).",
+      "description": "```source\nmath_exp(x) → {number}\n```\n\ncomputes the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms).",
       "meta": "func",
       "parameters": [
         "x"
@@ -1820,7 +1820,7 @@
     {
       "label": "math_expm1",
       "title": "math_expm1(x) → {number}",
-      "description": "```source\nmath\\_expm1(x) → {number}\n```\n\ncomputes subtracting 1 from the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms). The result is computed in a way that is accurate even when the value of `x` is close to 0.",
+      "description": "```source\nmath_expm1(x) → {number}\n```\n\ncomputes subtracting 1 from the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms). The result is computed in a way that is accurate even when the value of `x` is close to 0.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1829,7 +1829,7 @@
     {
       "label": "math_floor",
       "title": "math_floor(x) → {number}",
-      "description": "```source\nmath\\_floor(x) → {number}\n```\n\ncomputes the greatest (closest to +∞) Number value that is not greater than `x` and is an integer.  \nIf `x` is already an integer, the result is `x`.\n\nNOTE: The value of math\\_floor(x) is the same as the value of -math\\_ceil(-x).",
+      "description": "```source\nmath_floor(x) → {number}\n```\n\ncomputes the greatest (closest to +∞) Number value that is not greater than `x` and is an integer.  \nIf `x` is already an integer, the result is `x`.\n\nNOTE: The value of math\\_floor(x) is the same as the value of -math\\_ceil(-x).",
       "meta": "func",
       "parameters": [
         "x"
@@ -1838,7 +1838,7 @@
     {
       "label": "math_fround",
       "title": "math_fround(x) → {number}",
-      "description": "```source\nmath\\_fround(x) → {number}\n```\n\nWhen math\\_fround is called with argument `x`, the following steps are taken:\n\n1.  If `x` is NaN, return NaN.\n2.  If `x` is one of +0, -0, +∞, -∞, return `x`.\n3.  Let x32 be the result of converting `x` to a value in IEEE 754-2008 binary32 format using roundTiesToEven mode.\n4.  Let x64 be the result of converting x32 to a value in IEEE 754-2008 binary64 format.\n5.  Return the ECMAScript Number value corresponding to x64.",
+      "description": "```source\nmath_fround(x) → {number}\n```\n\nWhen math\\_fround is called with argument `x`, the following steps are taken:\n\n1.  If `x` is NaN, return NaN.\n2.  If `x` is one of +0, -0, +∞, -∞, return `x`.\n3.  Let x32 be the result of converting `x` to a value in IEEE 754-2008 binary32 format using roundTiesToEven mode.\n4.  Let x64 be the result of converting x32 to a value in IEEE 754-2008 binary64 format.\n5.  Return the ECMAScript Number value corresponding to x64.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1847,14 +1847,14 @@
     {
       "label": "math_hypot",
       "title": "math_hypot() → {number}",
-      "description": "```source\nmath\\_hypot() → {number}\n```\n\ncomputes the square root of the sum of squares of its arguments.  \nIf no arguments are passed, the result is +0.",
+      "description": "```source\nmath_hypot() → {number}\n```\n\ncomputes the square root of the sum of squares of its arguments.  \nIf no arguments are passed, the result is +0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_imul",
       "title": "math_imul(x, x) → {number}",
-      "description": "```source\nmath\\_imul(x, x) → {number}\n```\n\nWhen math\\_imul is called with arguments `x` and `y`, the following steps are taken:\n\n1.  Let a be ToUint32(x).\n2.  Let b be ToUint32(y).\n3.  Let product be (a × b) modulo 232.\n4.  If product ≥ 231, return product - 232; otherwise return product.",
+      "description": "```source\nmath_imul(x, x) → {number}\n```\n\nWhen math\\_imul is called with arguments `x` and `y`, the following steps are taken:\n\n1.  Let a be ToUint32(x).\n2.  Let b be ToUint32(y).\n3.  Let product be (a × b) modulo 232.\n4.  If product ≥ 231, return product - 232; otherwise return product.",
       "meta": "func",
       "parameters": [
         "x",
@@ -1864,7 +1864,7 @@
     {
       "label": "math_log",
       "title": "math_log(x) → {number}",
-      "description": "```source\nmath\\_log(x) → {number}\n```\n\nComputes the natural logarithm of `x`.",
+      "description": "```source\nmath_log(x) → {number}\n```\n\nComputes the natural logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1873,7 +1873,7 @@
     {
       "label": "math_log1p",
       "title": "math_log1p(x) → {number}",
-      "description": "```source\nmath\\_log1p(x) → {number}\n```\n\ncomputes the natural logarithm of 1 + `x`. The result is computed in a way that is accurate even when the value of `x` is close to zero.",
+      "description": "```source\nmath_log1p(x) → {number}\n```\n\ncomputes the natural logarithm of 1 + `x`. The result is computed in a way that is accurate even when the value of `x` is close to zero.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1882,7 +1882,7 @@
     {
       "label": "math_log2",
       "title": "math_log2(x) → {number}",
-      "description": "```source\nmath\\_log2(x) → {number}\n```\n\ncomputes the base 2 logarithm of `x`.",
+      "description": "```source\nmath_log2(x) → {number}\n```\n\ncomputes the base 2 logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1891,7 +1891,7 @@
     {
       "label": "math_log10",
       "title": "math_log10(x) → {number}",
-      "description": "```source\nmath\\_log10(x) → {number}\n```\n\ncomputes the base 10 logarithm of `x`.",
+      "description": "```source\nmath_log10(x) → {number}\n```\n\ncomputes the base 10 logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1900,21 +1900,21 @@
     {
       "label": "math_max",
       "title": "math_max() → {number}",
-      "description": "```source\nmath\\_max() → {number}\n```\n\nGiven zero or more numbers, returns the largest of them.  \nIf no arguments are given, the result is -∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the largest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
+      "description": "```source\nmath_max() → {number}\n```\n\nGiven zero or more numbers, returns the largest of them.  \nIf no arguments are given, the result is -∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the largest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_min",
       "title": "math_min() → {number}",
-      "description": "```source\nmath\\_min() → {number}\n```\n\nGiven zero or more arguments, returns the smallest of them.  \nIf no arguments are given, the result is +∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the smallest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
+      "description": "```source\nmath_min() → {number}\n```\n\nGiven zero or more arguments, returns the smallest of them.  \nIf no arguments are given, the result is +∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the smallest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_pow",
       "title": "math_pow(base, exponent) → {number}",
-      "description": "```source\nmath\\_pow(base, exponent) → {number}\n```\n\nComputes the result of raising base to the power of exponent.",
+      "description": "```source\nmath_pow(base, exponent) → {number}\n```\n\nComputes the result of raising base to the power of exponent.",
       "meta": "func",
       "parameters": [
         "base",
@@ -1924,14 +1924,14 @@
     {
       "label": "math_random",
       "title": "math_random() → {number}",
-      "description": "```source\nmath\\_random() → {number}\n```\n\nReturns a number value with positive sign, greater than or equal to 0 but less than 1, chosen randomly or pseudo randomly with approximately uniform distribution over that range, using an implementation-dependent algorithm or strategy. This function takes no arguments. Each math\\_random function created for distinct realms must produce a distinct sequence of values from successive calls.",
+      "description": "```source\nmath_random() → {number}\n```\n\nReturns a number value with positive sign, greater than or equal to 0 but less than 1, chosen randomly or pseudo randomly with approximately uniform distribution over that range, using an implementation-dependent algorithm or strategy. This function takes no arguments. Each math\\_random function created for distinct realms must produce a distinct sequence of values from successive calls.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_round",
       "title": "math_round(x) → {number}",
-      "description": "```source\nmath\\_round(x) → {number}\n```\n\nReturns the number value that is closest to `x` and is an integer.  \nIf two integers are equally close to `x`, then the result is the Number value that is closer to +∞. If `x` is already an integer, the result is `x`. NOTE 1: math\\_round(3.5) returns 4, but math\\_round(-3.5) returns -3.",
+      "description": "```source\nmath_round(x) → {number}\n```\n\nReturns the number value that is closest to `x` and is an integer.  \nIf two integers are equally close to `x`, then the result is the Number value that is closer to +∞. If `x` is already an integer, the result is `x`. NOTE 1: math\\_round(3.5) returns 4, but math\\_round(-3.5) returns -3.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1940,7 +1940,7 @@
     {
       "label": "math_sign",
       "title": "math_sign(x) → {number}",
-      "description": "```source\nmath\\_sign(x) → {number}\n```\n\nComputes the sign of `x`, indicating whether `x` is positive, negative, or zero.",
+      "description": "```source\nmath_sign(x) → {number}\n```\n\nComputes the sign of `x`, indicating whether `x` is positive, negative, or zero.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1949,7 +1949,7 @@
     {
       "label": "math_sin",
       "title": "math_sin(x) → {number}",
-      "description": "```source\nmath\\_sin(x) → {number}\n```\n\nComputes the sine of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_sin(x) → {number}\n```\n\nComputes the sine of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1958,7 +1958,7 @@
     {
       "label": "math_sinh",
       "title": "math_sinh(x) → {number}",
-      "description": "```source\nmath\\_sinh(x) → {number}\n```\n\nComputes the hyperbolic sine of `x`.\n\nNOTE: The value of sinh(x) is the same as (exp(x) - exp(-x)) / 2.",
+      "description": "```source\nmath_sinh(x) → {number}\n```\n\nComputes the hyperbolic sine of `x`.\n\nNOTE: The value of sinh(x) is the same as (exp(x) - exp(-x)) / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1967,7 +1967,7 @@
     {
       "label": "math_sqrt",
       "title": "math_sqrt(x) → {number}",
-      "description": "```source\nmath\\_sqrt(x) → {number}\n```\n\nComputes the square root of `x`.",
+      "description": "```source\nmath_sqrt(x) → {number}\n```\n\nComputes the square root of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1976,7 +1976,7 @@
     {
       "label": "math_tan",
       "title": "math_tan(x) → {number}",
-      "description": "```source\nmath\\_tan(x) → {number}\n```\n\nComputes the tangent of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_tan(x) → {number}\n```\n\nComputes the tangent of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1985,7 +1985,7 @@
     {
       "label": "math_tanh",
       "title": "math_tanh(x) → {number}",
-      "description": "```source\nmath\\_tanh(x) → {number}\n```\n\nComputes the hyperbolic tangent of `x`.\n\nNOTE: The value of `math_tanh(x)` is the same as `(exp(x) - exp(-x))/(exp(x) + exp(-x))`.",
+      "description": "```source\nmath_tanh(x) → {number}\n```\n\nComputes the hyperbolic tangent of `x`.\n\nNOTE: The value of `math_tanh(x)` is the same as `(exp(x) - exp(-x))/(exp(x) + exp(-x))`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -1994,7 +1994,7 @@
     {
       "label": "math_trunc",
       "title": "math_trunc(x) → {number}",
-      "description": "```source\nmath\\_trunc(x) → {number}\n```\n\nComputes the integral part of the number `x`, removing any fractional digits.",
+      "description": "```source\nmath_trunc(x) → {number}\n```\n\nComputes the integral part of the number `x`, removing any fractional digits.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2023,7 +2023,7 @@
     {
       "label": "parse_int",
       "title": "parse_int(s, i) → {number}",
-      "description": "```source\nparse\\_int(s, i) → {number}\n```\n\nInterprets a given string `s` as an integer, using the positive integer `i` as radix, and returns the respective value.  \nExamples: `parse_int(\"909\", 10)` returns the number `909`, and `parse_int(\"-1111\", 2)` returns the number `-15`.  \nSee [ECMAScript Specification, Section 18.2.5](https://www.ecma-international.org/ecma-262/9.0/index.html#sec-parseint-string-radix) for details.",
+      "description": "```source\nparse_int(s, i) → {number}\n```\n\nInterprets a given string `s` as an integer, using the positive integer `i` as radix, and returns the respective value.  \nExamples: `parse_int(\"909\", 10)` returns the number `909`, and `parse_int(\"-1111\", 2)` returns the number `-15`.  \nSee [ECMAScript Specification, Section 18.2.5](https://www.ecma-international.org/ecma-262/9.0/index.html#sec-parseint-string-radix) for details.",
       "meta": "func",
       "parameters": [
         "s",
@@ -2052,7 +2052,7 @@
     {
       "label": "remove_all",
       "title": "remove_all(v, xs) → {list}",
-      "description": "```source\nremove\\_all(v, xs) → {list}\n```\n\nReturns a list that results from `xs` by removing all items from `xs` that are identical (`===`) to `v`. Returns the original list if there is no occurrence. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is the length of `xs`.",
+      "description": "```source\nremove_all(v, xs) → {list}\n```\n\nReturns a list that results from `xs` by removing all items from `xs` that are identical (`===`) to `v`. Returns the original list if there is no occurrence. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is the length of `xs`.",
       "meta": "func",
       "parameters": [
         "v",
@@ -2071,7 +2071,7 @@
     {
       "label": "set_head",
       "title": "set_head(p, x) → {undefined}",
-      "description": "```source\nset\\_head(p, x) → {undefined}\n```\n\nchanges the pair `p` such that its head is `x`.",
+      "description": "```source\nset_head(p, x) → {undefined}\n```\n\nchanges the pair `p` such that its head is `x`.",
       "meta": "func",
       "parameters": [
         "p",
@@ -2081,7 +2081,7 @@
     {
       "label": "set_tail",
       "title": "set_tail(p, x) → {undefined}",
-      "description": "```source\nset\\_tail(p, x) → {undefined}\n```\n\nchanges the pair `p` such that its tail is `x`.",
+      "description": "```source\nset_tail(p, x) → {undefined}\n```\n\nchanges the pair `p` such that its tail is `x`.",
       "meta": "func",
       "parameters": [
         "p",
@@ -2099,7 +2099,7 @@
     {
       "label": "stream_append",
       "title": "stream_append(xs, ys) → {stream}",
-      "description": "```source\nstream\\_append(xs, ys) → {stream}\n```\n\nReturns a stream that results from appending the stream `ys` to the stream `xs`. In the result, null at the end of the first argument stream is replaced by the second argument, regardless what the second argument consists of. Lazy? Yes: the result stream forces the actual append operation",
+      "description": "```source\nstream_append(xs, ys) → {stream}\n```\n\nReturns a stream that results from appending the stream `ys` to the stream `xs`. In the result, null at the end of the first argument stream is replaced by the second argument, regardless what the second argument consists of. Lazy? Yes: the result stream forces the actual append operation",
       "meta": "func",
       "parameters": [
         "xs",
@@ -2109,7 +2109,7 @@
     {
       "label": "stream_filter",
       "title": "stream_filter(pred, xs) → {stream}",
-      "description": "```source\nstream\\_filter(pred, xs) → {stream}\n```\n\nReturns a stream that contains only those elements of given stream `xs` for which the one-argument function `pred` returns `true`. Lazy? Yes: The result stream forces the construction of each next element. Of course, the construction of the next element needs to go down the stream until an element is found for which `pred` holds.",
+      "description": "```source\nstream_filter(pred, xs) → {stream}\n```\n\nReturns a stream that contains only those elements of given stream `xs` for which the one-argument function `pred` returns `true`. Lazy? Yes: The result stream forces the construction of each next element. Of course, the construction of the next element needs to go down the stream until an element is found for which `pred` holds.",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -2119,7 +2119,7 @@
     {
       "label": "stream_for_each",
       "title": "stream_for_each(f, xs) → {boolean}",
-      "description": "```source\nstream\\_for\\_each(f, xs) → {boolean}\n```\n\nApplies unary function `f` to every element of the stream `xs`. Iterative process. `f` is applied element-by-element: `stream_for_each(f, stream(1, 2))` results in the calls `f(1)` and `f(2)`. Lazy? No: `stream_for_each` forces the exploration of the entire stream",
+      "description": "```source\nstream_for_each(f, xs) → {boolean}\n```\n\nApplies unary function `f` to every element of the stream `xs`. Iterative process. `f` is applied element-by-element: `stream_for_each(f, stream(1, 2))` results in the calls `f(1)` and `f(2)`. Lazy? No: `stream_for_each` forces the exploration of the entire stream",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -2129,7 +2129,7 @@
     {
       "label": "stream_length",
       "title": "stream_length(xs) → {number}",
-      "description": "```source\nstream\\_length(xs) → {number}\n```\n\nReturns the length of the stream `xs`. Iterative process. Lazy? No: The function needs to explore the whole stream",
+      "description": "```source\nstream_length(xs) → {number}\n```\n\nReturns the length of the stream `xs`. Iterative process. Lazy? No: The function needs to explore the whole stream",
       "meta": "func",
       "parameters": [
         "xs"
@@ -2138,7 +2138,7 @@
     {
       "label": "stream_map",
       "title": "stream_map(f, xs) → {stream}",
-      "description": "```source\nstream\\_map(f, xs) → {stream}\n```\n\nReturns a stream that results from stream `xs` by element-wise application of unary function `f`. `f` is applied element-by-element: `stream_map(f, stream(1,2))` results in the same as `stream(f(1),f(2))`. Lazy? Yes: The argument stream is only explored as forced by the result stream.",
+      "description": "```source\nstream_map(f, xs) → {stream}\n```\n\nReturns a stream that results from stream `xs` by element-wise application of unary function `f`. `f` is applied element-by-element: `stream_map(f, stream(1,2))` results in the same as `stream(f(1),f(2))`. Lazy? Yes: The argument stream is only explored as forced by the result stream.",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -2148,7 +2148,7 @@
     {
       "label": "stream_member",
       "title": "stream_member(v, xs) → {stream}",
-      "description": "```source\nstream\\_member(v, xs) → {stream}\n```\n\nReturns first postfix substream whose head is identical to `v` (using `===`); returns `null` if the element does not occur in the stream. Iterative process. Lazy? Sort-of: `stream_member` forces the stream only until the element is found.",
+      "description": "```source\nstream_member(v, xs) → {stream}\n```\n\nReturns first postfix substream whose head is identical to `v` (using `===`); returns `null` if the element does not occur in the stream. Iterative process. Lazy? Sort-of: `stream_member` forces the stream only until the element is found.",
       "meta": "func",
       "parameters": [
         "v",
@@ -2158,7 +2158,7 @@
     {
       "label": "stream_ref",
       "title": "stream_ref(xs, n) → {value}",
-      "description": "```source\nstream\\_ref(xs, n) → {value}\n```\n\nReturns the element of stream `xs` at position `n`, where the first element has index 0. Iterative process. Lazy? Sort-of: `stream_ref` only forces the computation of the first `n` elements, and leaves the rest of the stream untouched.",
+      "description": "```source\nstream_ref(xs, n) → {value}\n```\n\nReturns the element of stream `xs` at position `n`, where the first element has index 0. Iterative process. Lazy? Sort-of: `stream_ref` only forces the computation of the first `n` elements, and leaves the rest of the stream untouched.",
       "meta": "func",
       "parameters": [
         "xs",
@@ -2168,7 +2168,7 @@
     {
       "label": "stream_remove",
       "title": "stream_remove(v, xs) → {stream}",
-      "description": "```source\nstream\\_remove(v, xs) → {stream}\n```\n\nReturns a stream that results from `xs` by removing the first item from `xs` that is identical (`===`) to `v`. Returns the original stream if there is no occurrence. Lazy? Yes: the result stream forces the construction of each next element",
+      "description": "```source\nstream_remove(v, xs) → {stream}\n```\n\nReturns a stream that results from `xs` by removing the first item from `xs` that is identical (`===`) to `v`. Returns the original stream if there is no occurrence. Lazy? Yes: the result stream forces the construction of each next element",
       "meta": "func",
       "parameters": [
         "v",
@@ -2178,7 +2178,7 @@
     {
       "label": "stream_remove_all",
       "title": "stream_remove_all(v, xs) → {stream}",
-      "description": "```source\nstream\\_remove\\_all(v, xs) → {stream}\n```\n\nReturns a stream that results from `xs` by removing all items from `xs` that are identical (`===`) to `v`. Returns the original stream if there is no occurrence. Recursive process. Lazy? Yes: the result stream forces the construction of each next element",
+      "description": "```source\nstream_remove_all(v, xs) → {stream}\n```\n\nReturns a stream that results from `xs` by removing all items from `xs` that are identical (`===`) to `v`. Returns the original stream if there is no occurrence. Recursive process. Lazy? Yes: the result stream forces the construction of each next element",
       "meta": "func",
       "parameters": [
         "v",
@@ -2188,7 +2188,7 @@
     {
       "label": "stream_reverse",
       "title": "stream_reverse(xs) → {stream}",
-      "description": "```source\nstream\\_reverse(xs) → {stream}\n```\n\nReturns stream `xs` in reverse order. Iterative process. The process is iterative, but consumes space `Omega(n)` because of the result stream. Lazy? No: `stream_reverse` forces the exploration of the entire stream",
+      "description": "```source\nstream_reverse(xs) → {stream}\n```\n\nReturns stream `xs` in reverse order. Iterative process. The process is iterative, but consumes space `Omega(n)` because of the result stream. Lazy? No: `stream_reverse` forces the exploration of the entire stream",
       "meta": "func",
       "parameters": [
         "xs"
@@ -2197,7 +2197,7 @@
     {
       "label": "stream_tail",
       "title": "stream_tail(xs) → {Stream}",
-      "description": "```source\nstream\\_tail(xs) → {Stream}\n```\n\nassumes that the tail (second component) of the pair {x} is a nullary function, and returns the result of applying that function. Throws an exception if the argument is not a pair, or if the tail is not a function. Laziness: Yes: {stream\\_tail} only forces the direct tail stream, but not the rest of the stream, i.e. not the tail of the tail, etc.",
+      "description": "```source\nstream_tail(xs) → {Stream}\n```\n\nassumes that the tail (second component) of the pair {x} is a nullary function, and returns the result of applying that function. Throws an exception if the argument is not a pair, or if the tail is not a function. Laziness: Yes: {stream\\_tail} only forces the direct tail stream, but not the rest of the stream, i.e. not the tail of the tail, etc.",
       "meta": "func",
       "parameters": [
         "xs"
@@ -2206,7 +2206,7 @@
     {
       "label": "stream_to_list",
       "title": "stream_to_list(xs) → {list}",
-      "description": "```source\nstream\\_to\\_list(xs) → {list}\n```\n\nGiven stream `xs`, returns a list of same length with the same elements as `xs` in the same order. Laziness: No: `stream_to_list` needs to force the whole stream.",
+      "description": "```source\nstream_to_list(xs) → {list}\n```\n\nGiven stream `xs`, returns a list of same length with the same elements as `xs` in the same order. Laziness: No: `stream_to_list` needs to force the whole stream.",
       "meta": "func",
       "parameters": [
         "xs"
@@ -2301,7 +2301,7 @@
     {
       "label": "__access_export__",
       "title": "__access_export__(exports, lookup_name) → {value}",
-      "description": "```source\n\\_\\_access\\_export\\_\\_(exports, lookup\\_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a pair where the head element is the default export and the tail element is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the lookup name is \"default\", the default export is returned instead of a named export. If the name does not exist, `undefined` is returned.",
+      "description": "```source\n__access_export__(exports, lookup_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a pair where the head element is the default export and the tail element is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the lookup name is \"default\", the default export is returned instead of a named export. If the name does not exist, `undefined` is returned.",
       "meta": "func",
       "parameters": [
         "exports",
@@ -2311,7 +2311,7 @@
     {
       "label": "__access_named_export__",
       "title": "__access_named_export__(named_exports, lookup_name) → {value}",
-      "description": "```source\n\\_\\_access\\_named\\_export\\_\\_(named\\_exports, lookup\\_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the name does not exist, `undefined` is returned.",
+      "description": "```source\n__access_named_export__(named_exports, lookup_name) → {value}\n```\n\nSearches for the specified name in the data structure of exported names. The data structure is a list of pairs where each pair is a mapping from the exported name to the value being exported. If the name does not exist, `undefined` is returned.",
       "meta": "func",
       "parameters": [
         "named_exports",
@@ -2342,7 +2342,7 @@
     {
       "label": "apply_in_underlying_javascript",
       "title": "apply_in_underlying_javascript(f, xs) → {whatever}",
-      "description": "```source\napply\\_in\\_underlying\\_javascript(f, xs) → {whatever}\n```\n\ncalls the function `f` with arguments given in list `xs`. For example:\n\n    function times(x, y) {\n    return x * y;\n    }\n    apply_in_underlying_javascript(times, list(2, 3)); // returns 6",
+      "description": "```source\napply_in_underlying_javascript(f, xs) → {whatever}\n```\n\ncalls the function `f` with arguments given in list `xs`. For example:\n\n    function times(x, y) {\n    return x * y;\n    }\n    apply_in_underlying_javascript(times, list(2, 3)); // returns 6",
       "meta": "func",
       "parameters": [
         "f",
@@ -2361,7 +2361,7 @@
     {
       "label": "array_length",
       "title": "array_length(x) → {number}",
-      "description": "```source\narray\\_length(x) → {number}\n```\n\n\\*\\*primitive\\*\\*; returns the current length of array `x`, which is 1 plus the highest index that has been used so far in an array assignment on `x`. Here literal array expressions are counted too: The array `[10, 20, 30]` has a length of 3. Time: `Θ(1)`, space: `Θ(1)`",
+      "description": "```source\narray_length(x) → {number}\n```\n\n\\*\\*primitive\\*\\*; returns the current length of array `x`, which is 1 plus the highest index that has been used so far in an array assignment on `x`. Here literal array expressions are counted too: The array `[10, 20, 30]` has a length of 3. Time: `Θ(1)`, space: `Θ(1)`",
       "meta": "func",
       "parameters": [
         "x"
@@ -2370,7 +2370,7 @@
     {
       "label": "build_list",
       "title": "build_list(f, n) → {list}",
-      "description": "```source\nbuild\\_list(f, n) → {list}\n```\n\nMakes a list with `n` elements by applying the unary function `f` to the numbers 0 to `n - 1`, assumed to be a nonnegative integer. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(n)` (apart from `f`).",
+      "description": "```source\nbuild_list(f, n) → {list}\n```\n\nMakes a list with `n` elements by applying the unary function `f` to the numbers 0 to `n - 1`, assumed to be a nonnegative integer. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(n)` (apart from `f`).",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -2380,7 +2380,7 @@
     {
       "label": "build_stream",
       "title": "build_stream(f, n) → {stream}",
-      "description": "```source\nbuild\\_stream(f, n) → {stream}\n```\n\nMakes a stream with `n` elements by applying the unary function `f` to the numbers 0 to `n - 1`, assumed to be a nonnegative integer. Lazy? Yes: The result stream forces the application of `f` for the next element",
+      "description": "```source\nbuild_stream(f, n) → {stream}\n```\n\nMakes a stream with `n` elements by applying the unary function `f` to the numbers 0 to `n - 1`, assumed to be a nonnegative integer. Lazy? Yes: The result stream forces the application of `f` for the next element",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -2390,7 +2390,7 @@
     {
       "label": "char_at",
       "title": "char_at(s, i) → {string}",
-      "description": "```source\nchar\\_at(s, i) → {string}\n```\n\nTakes a string `s` as first argument and a nonnegative integer `i` as second argument. If `i` is less than the length of `s`, this function returns a one-character string that contains the character of `s` at position `i`, counting from 0. If `i` is larger than or equal to the length of `s`, this function returns `undefined`.",
+      "description": "```source\nchar_at(s, i) → {string}\n```\n\nTakes a string `s` as first argument and a nonnegative integer `i` as second argument. If `i` is less than the length of `s`, this function returns a one-character string that contains the character of `s` at position `i`, counting from 0. If `i` is larger than or equal to the length of `s`, this function returns `undefined`.",
       "meta": "func",
       "parameters": [
         "s",
@@ -2413,7 +2413,7 @@
     {
       "label": "display_list",
       "title": "display_list(xs, s) → {value}",
-      "description": "```source\ndisplay\\_list(xs, s) → {value}\n```\n\nOptional second argument. Similar to `display`, but formats well-formed lists nicely if detected; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in `x`.",
+      "description": "```source\ndisplay_list(xs, s) → {value}\n```\n\nOptional second argument. Similar to `display`, but formats well-formed lists nicely if detected; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in `x`.",
       "meta": "func",
       "parameters": [
         "xs",
@@ -2426,7 +2426,7 @@
     {
       "label": "draw_data",
       "title": "draw_data() → {value}",
-      "description": "```source\ndraw\\_data() → {value}\n```\n\nvisualizes the arguments in a separate drawing area in the Source Academy using box-and-pointer diagrams; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in the arguments.",
+      "description": "```source\ndraw_data() → {value}\n```\n\nvisualizes the arguments in a separate drawing area in the Source Academy using box-and-pointer diagrams; time, space: `Theta(n)`, where `n` is the total number of data structures such as pairs in the arguments.",
       "meta": "func",
       "parameters": [],
       "hasRestElement": true
@@ -2434,7 +2434,7 @@
     {
       "label": "enum_list",
       "title": "enum_list(start, end) → {list}",
-      "description": "```source\nenum\\_list(start, end) → {list}\n```\n\nReturns a list that enumerates numbers starting from `start` using a step size of 1, until the number exceeds (`>`) `end`. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is `end - start`.",
+      "description": "```source\nenum_list(start, end) → {list}\n```\n\nReturns a list that enumerates numbers starting from `start` using a step size of 1, until the number exceeds (`>`) `end`. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is `end - start`.",
       "meta": "func",
       "parameters": [
         "start",
@@ -2444,7 +2444,7 @@
     {
       "label": "enum_stream",
       "title": "enum_stream(start, end) → {stream}",
-      "description": "```source\nenum\\_stream(start, end) → {stream}\n```\n\nReturns a stream that enumerates numbers starting from `start` using a step size of 1, until the number exceeds (`>`) `end`. Lazy? Yes: The result stream forces the construction of each next element",
+      "description": "```source\nenum_stream(start, end) → {stream}\n```\n\nReturns a stream that enumerates numbers starting from `start` using a step size of 1, until the number exceeds (`>`) `end`. Lazy? Yes: The result stream forces the construction of each next element",
       "meta": "func",
       "parameters": [
         "start",
@@ -2477,7 +2477,7 @@
     {
       "label": "eval_stream",
       "title": "eval_stream(s, n) → {list}",
-      "description": "```source\neval\\_stream(s, n) → {list}\n```\n\nConstructs the list of the first `n` elements of a given stream `s` Lazy? Sort-of: `eval_stream` only forces the computation of the first `n` elements, and leaves the rest of the stream untouched.",
+      "description": "```source\neval_stream(s, n) → {list}\n```\n\nConstructs the list of the first `n` elements of a given stream `s` Lazy? Sort-of: `eval_stream` only forces the computation of the first `n` elements, and leaves the rest of the stream untouched.",
       "meta": "func",
       "parameters": [
         "s",
@@ -2497,7 +2497,7 @@
     {
       "label": "for_each",
       "title": "for_each(f, xs) → {boolean}",
-      "description": "```source\nfor\\_each(f, xs) → {boolean}\n```\n\nApplies unary function `f` to every element of the list `xs`. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(1)` (apart from `f`), where `n` is the length of `xs`. `f` is applied element-by-element: `for_each(fun, list(1, 2))` results in the calls `fun(1)` and `fun(2)`.",
+      "description": "```source\nfor_each(f, xs) → {boolean}\n```\n\nApplies unary function `f` to every element of the list `xs`. Iterative process; time: `Theta(n)` (apart from `f`), space: `Theta(1)` (apart from `f`), where `n` is the length of `xs`. `f` is applied element-by-element: `for_each(fun, list(1, 2))` results in the calls `fun(1)` and `fun(2)`.",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -2507,7 +2507,7 @@
     {
       "label": "get_time",
       "title": "get_time() → {number}",
-      "description": "```source\nget\\_time() → {number}\n```\n\nReturns number of milliseconds elapsed since January 1, 1970 00:00:00 UTC. See also [textbook example](https://sourceacademy.org/sicpjs/1.2.6#ex-1.21).",
+      "description": "```source\nget_time() → {number}\n```\n\nReturns number of milliseconds elapsed since January 1, 1970 00:00:00 UTC. See also [textbook example](https://sourceacademy.org/sicpjs/1.2.6#ex-1.21).",
       "meta": "func",
       "parameters": []
     },
@@ -2523,7 +2523,7 @@
     {
       "label": "integers_from",
       "title": "integers_from(start) → {stream}",
-      "description": "```source\nintegers\\_from(start) → {stream}\n```\n\nReturns infinite stream if integers starting at given number `n` using a step size of 1. Lazy? Yes: The result stream forces the construction of each next element",
+      "description": "```source\nintegers_from(start) → {stream}\n```\n\nReturns infinite stream if integers starting at given number `n` using a step size of 1. Lazy? Yes: The result stream forces the construction of each next element",
       "meta": "func",
       "parameters": [
         "start"
@@ -2532,7 +2532,7 @@
     {
       "label": "is_array",
       "title": "is_array(x) → {boolean}",
-      "description": "```source\nis\\_array(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is an array, and `false` if it is not. Time: `Θ(1)`, space: `Θ(1)`",
+      "description": "```source\nis_array(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is an array, and `false` if it is not. Time: `Θ(1)`, space: `Θ(1)`",
       "meta": "func",
       "parameters": [
         "x"
@@ -2541,7 +2541,7 @@
     {
       "label": "is_boolean",
       "title": "is_boolean(v) → {boolean}",
-      "description": "```source\nis\\_boolean(v) → {boolean}\n```\n\nchecks whether a given value is a boolean",
+      "description": "```source\nis_boolean(v) → {boolean}\n```\n\nchecks whether a given value is a boolean",
       "meta": "func",
       "parameters": [
         "v"
@@ -2550,7 +2550,7 @@
     {
       "label": "is_function",
       "title": "is_function(v) → {boolean}",
-      "description": "```source\nis\\_function(v) → {boolean}\n```\n\nchecks whether a given value is a function",
+      "description": "```source\nis_function(v) → {boolean}\n```\n\nchecks whether a given value is a function",
       "meta": "func",
       "parameters": [
         "v"
@@ -2559,7 +2559,7 @@
     {
       "label": "is_list",
       "title": "is_list(xs) → {xs}",
-      "description": "```source\nis\\_list(xs) → {xs}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `xs` is a list as defined in the textbook, and `false` otherwise. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of the chain of `tail` operations that can be applied to `xs`. `is_list` recurses down the list and checks that it ends with the empty list null",
+      "description": "```source\nis_list(xs) → {xs}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `xs` is a list as defined in the textbook, and `false` otherwise. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of the chain of `tail` operations that can be applied to `xs`. `is_list` recurses down the list and checks that it ends with the empty list null",
       "meta": "func",
       "parameters": [
         "xs"
@@ -2568,7 +2568,7 @@
     {
       "label": "is_null",
       "title": "is_null(x) → {boolean}",
-      "description": "```source\nis\\_null(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is the empty list `null`, and `false` otherwise; time: `Theta(1)Theta(1)`.",
+      "description": "```source\nis_null(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is the empty list `null`, and `false` otherwise; time: `Theta(1)Theta(1)`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2577,7 +2577,7 @@
     {
       "label": "is_number",
       "title": "is_number(v) → {boolean}",
-      "description": "```source\nis\\_number(v) → {boolean}\n```\n\nchecks whether a given value is a number. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
+      "description": "```source\nis_number(v) → {boolean}\n```\n\nchecks whether a given value is a number. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
       "meta": "func",
       "parameters": [
         "v"
@@ -2586,7 +2586,7 @@
     {
       "label": "is_pair",
       "title": "is_pair(x) → {boolean}",
-      "description": "```source\nis\\_pair(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is a pair and false otherwise; time: `Theta(1)Theta(1)`.",
+      "description": "```source\nis_pair(x) → {boolean}\n```\n\n\\*\\*primitive\\*\\*; returns `true` if `x` is a pair and false otherwise; time: `Theta(1)Theta(1)`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2595,7 +2595,7 @@
     {
       "label": "is_stream",
       "title": "is_stream(xs) → {boolean}",
-      "description": "```source\nis\\_stream(xs) → {boolean}\n```\n\nReturns `true` if `xs` is a stream as defined in the textbook, and `false` otherwise. Iterative process. Recurses down the stream and checks that it ends with the empty stream null. Laziness: No: `is_stream` needs to force the given stream.",
+      "description": "```source\nis_stream(xs) → {boolean}\n```\n\nReturns `true` if `xs` is a stream as defined in the textbook, and `false` otherwise. Iterative process. Recurses down the stream and checks that it ends with the empty stream null. Laziness: No: `is_stream` needs to force the given stream.",
       "meta": "func",
       "parameters": [
         "xs"
@@ -2604,7 +2604,7 @@
     {
       "label": "is_string",
       "title": "is_string(v) → {boolean}",
-      "description": "```source\nis\\_string(v) → {boolean}\n```\n\nchecks whether a given value is a string. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
+      "description": "```source\nis_string(v) → {boolean}\n```\n\nchecks whether a given value is a string. See also [textbook example](https://sourceacademy.org/sicpjs/2.3.2).",
       "meta": "func",
       "parameters": [
         "v"
@@ -2613,7 +2613,7 @@
     {
       "label": "is_undefined",
       "title": "is_undefined(v) → {boolean}",
-      "description": "```source\nis\\_undefined(v) → {boolean}\n```\n\nchecks whether a given value is the special value `undefined`",
+      "description": "```source\nis_undefined(v) → {boolean}\n```\n\nchecks whether a given value is the special value `undefined`",
       "meta": "func",
       "parameters": [
         "v"
@@ -2639,7 +2639,7 @@
     {
       "label": "list_ref",
       "title": "list_ref(xs, n) → {value}",
-      "description": "```source\nlist\\_ref(xs, n) → {value}\n```\n\nReturns the element of list `xs` at position `n`, where the first element has index 0. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of `xs`.",
+      "description": "```source\nlist_ref(xs, n) → {value}\n```\n\nReturns the element of list `xs` at position `n`, where the first element has index 0. Iterative process; time: `Theta(n)`, space: `Theta(1)`, where `n` is the length of `xs`.",
       "meta": "func",
       "parameters": [
         "xs",
@@ -2649,7 +2649,7 @@
     {
       "label": "list_to_stream",
       "title": "list_to_stream(xs) → {stream}",
-      "description": "```source\nlist\\_to\\_stream(xs) → {stream}\n```\n\nGiven list `xs`, returns a stream of same length with the same elements as `xs` in the same order. Laziness: Yes: `list_to_stream` goes down the list only when forced.",
+      "description": "```source\nlist_to_stream(xs) → {stream}\n```\n\nGiven list `xs`, returns a stream of same length with the same elements as `xs` in the same order. Laziness: Yes: `list_to_stream` goes down the list only when forced.",
       "meta": "func",
       "parameters": [
         "xs"
@@ -2658,7 +2658,7 @@
     {
       "label": "list_to_string",
       "title": "list_to_string(xs) → {string}",
-      "description": "```source\nlist\\_to\\_string(xs) → {string}\n```\n\nReturns a string that represents list `xs` using the text-based box-and-pointer notation `[...]`. Iterative process; time: `Theta(n)` where `n` is the size of the list, space: `Theta(m)` where `m` is the length of the string. The process is iterative, but consumes space `O(m)` because of the result string.",
+      "description": "```source\nlist_to_string(xs) → {string}\n```\n\nReturns a string that represents list `xs` using the text-based box-and-pointer notation `[...]`. Iterative process; time: `Theta(n)` where `n` is the size of the list, space: `Theta(m)` where `m` is the length of the string. The process is iterative, but consumes space `O(m)` because of the result string.",
       "meta": "func",
       "parameters": [
         "xs"
@@ -2677,7 +2677,7 @@
     {
       "label": "math_abs",
       "title": "math_abs(x) → {number}",
-      "description": "```source\nmath\\_abs(x) → {number}\n```\n\ncomputes the absolute value of x; the result has the same magnitude as `x` but has positive sign.",
+      "description": "```source\nmath_abs(x) → {number}\n```\n\ncomputes the absolute value of x; the result has the same magnitude as `x` but has positive sign.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2686,7 +2686,7 @@
     {
       "label": "math_acos",
       "title": "math_acos(x) → {number}",
-      "description": "```source\nmath\\_acos(x) → {number}\n```\n\ncomputes the arc cosine of `x`. The result is expressed in radians and ranges from +0 to +π.",
+      "description": "```source\nmath_acos(x) → {number}\n```\n\ncomputes the arc cosine of `x`. The result is expressed in radians and ranges from +0 to +π.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2695,7 +2695,7 @@
     {
       "label": "math_acosh",
       "title": "math_acosh(x) → {number}",
-      "description": "```source\nmath\\_acosh(x) → {number}\n```\n\ncomputes the inverse hyperbolic cosine of `x`.",
+      "description": "```source\nmath_acosh(x) → {number}\n```\n\ncomputes the inverse hyperbolic cosine of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2704,7 +2704,7 @@
     {
       "label": "math_asin",
       "title": "math_asin(x) → {number}",
-      "description": "```source\nmath\\_asin(x) → {number}\n```\n\ncomputes the arc sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_asin(x) → {number}\n```\n\ncomputes the arc sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2713,7 +2713,7 @@
     {
       "label": "math_asinh",
       "title": "math_asinh(x) → {number}",
-      "description": "```source\nmath\\_asinh(x) → {number}\n```\n\ncomputes the inverse hyperbolic sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_asinh(x) → {number}\n```\n\ncomputes the inverse hyperbolic sine of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2722,7 +2722,7 @@
     {
       "label": "math_atan",
       "title": "math_atan(x) → {number}",
-      "description": "```source\nmath\\_atan(x) → {number}\n```\n\ncomputes the arc tangent of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
+      "description": "```source\nmath_atan(x) → {number}\n```\n\ncomputes the arc tangent of `x`. The result is expressed in radians and ranges from -π / 2 to +π / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2731,7 +2731,7 @@
     {
       "label": "math_atan2",
       "title": "math_atan2(y, x) → {number}",
-      "description": "```source\nmath\\_atan2(y, x) → {number}\n```\n\ncomputes the arc tangent of the quotient `y` / `x` of the arguments `y` and `x`, where the signs of `y` and `x` are used to determine the quadrant of the result. Note that it is intentional and traditional for the two-argument arc tangent function that the argument named `y` be first and the argument named `x` be second. The result is expressed in radians and ranges from -π to +π.",
+      "description": "```source\nmath_atan2(y, x) → {number}\n```\n\ncomputes the arc tangent of the quotient `y` / `x` of the arguments `y` and `x`, where the signs of `y` and `x` are used to determine the quadrant of the result. Note that it is intentional and traditional for the two-argument arc tangent function that the argument named `y` be first and the argument named `x` be second. The result is expressed in radians and ranges from -π to +π.",
       "meta": "func",
       "parameters": [
         "y",
@@ -2741,7 +2741,7 @@
     {
       "label": "math_atanh",
       "title": "math_atanh(x) → {number}",
-      "description": "```source\nmath\\_atanh(x) → {number}\n```\n\ncomputes the inverse hyperbolic tangent of `x`.",
+      "description": "```source\nmath_atanh(x) → {number}\n```\n\ncomputes the inverse hyperbolic tangent of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2750,7 +2750,7 @@
     {
       "label": "math_cbrt",
       "title": "math_cbrt(x) → {number}",
-      "description": "```source\nmath\\_cbrt(x) → {number}\n```\n\ncomputes the cube root of `x`.",
+      "description": "```source\nmath_cbrt(x) → {number}\n```\n\ncomputes the cube root of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2759,7 +2759,7 @@
     {
       "label": "math_ceil",
       "title": "math_ceil(x) → {number}",
-      "description": "```source\nmath\\_ceil(x) → {number}\n```\n\ncomputes the smallest (closest to -∞) Number value that is not less than `x` and is an integer. If `x` is already an integer, the result is `x`. The value of math\\_ceil(x) is the same as the value of -math\\_floor(-x).",
+      "description": "```source\nmath_ceil(x) → {number}\n```\n\ncomputes the smallest (closest to -∞) Number value that is not less than `x` and is an integer. If `x` is already an integer, the result is `x`. The value of math\\_ceil(x) is the same as the value of -math\\_floor(-x).",
       "meta": "func",
       "parameters": [
         "x"
@@ -2768,7 +2768,7 @@
     {
       "label": "math_clz32",
       "title": "math_clz32(n) → {number}",
-      "description": "```source\nmath\\_clz32(n) → {number}\n```\n\nWhen math\\_clz32 is called with one argument `x`, the following steps are taken: Let n be ToUint32(x). Let p be the number of leading zero bits in the 32-bit binary representation of n. Return p.\n\nNOTE:  \nIf n is 0, p will be 32. If the most significant bit of the 32-bit binary encoding of n is 1, p will be 0.",
+      "description": "```source\nmath_clz32(n) → {number}\n```\n\nWhen math\\_clz32 is called with one argument `x`, the following steps are taken: Let n be ToUint32(x). Let p be the number of leading zero bits in the 32-bit binary representation of n. Return p.\n\nNOTE:  \nIf n is 0, p will be 32. If the most significant bit of the 32-bit binary encoding of n is 1, p will be 0.",
       "meta": "func",
       "parameters": [
         "n"
@@ -2777,7 +2777,7 @@
     {
       "label": "math_cos",
       "title": "math_cos(x) → {number}",
-      "description": "```source\nmath\\_cos(x) → {number}\n```\n\nComputes the cosine of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_cos(x) → {number}\n```\n\nComputes the cosine of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2786,7 +2786,7 @@
     {
       "label": "math_cosh",
       "title": "math_cosh(x) → {number}",
-      "description": "```source\nmath\\_cosh(x) → {number}\n```\n\ncomputes the hyperbolic cosine of `x`.\n\nNOTE: The value of cosh(x) is the same as (exp(x) + exp(-x)) / 2.",
+      "description": "```source\nmath_cosh(x) → {number}\n```\n\ncomputes the hyperbolic cosine of `x`.\n\nNOTE: The value of cosh(x) is the same as (exp(x) + exp(-x)) / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2795,7 +2795,7 @@
     {
       "label": "math_exp",
       "title": "math_exp(x) → {number}",
-      "description": "```source\nmath\\_exp(x) → {number}\n```\n\ncomputes the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms).",
+      "description": "```source\nmath_exp(x) → {number}\n```\n\ncomputes the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms).",
       "meta": "func",
       "parameters": [
         "x"
@@ -2804,7 +2804,7 @@
     {
       "label": "math_expm1",
       "title": "math_expm1(x) → {number}",
-      "description": "```source\nmath\\_expm1(x) → {number}\n```\n\ncomputes subtracting 1 from the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms). The result is computed in a way that is accurate even when the value of `x` is close to 0.",
+      "description": "```source\nmath_expm1(x) → {number}\n```\n\ncomputes subtracting 1 from the exponential function of `x` (e raised to the power of `x`, where e is the base of the natural logarithms). The result is computed in a way that is accurate even when the value of `x` is close to 0.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2813,7 +2813,7 @@
     {
       "label": "math_floor",
       "title": "math_floor(x) → {number}",
-      "description": "```source\nmath\\_floor(x) → {number}\n```\n\ncomputes the greatest (closest to +∞) Number value that is not greater than `x` and is an integer.  \nIf `x` is already an integer, the result is `x`.\n\nNOTE: The value of math\\_floor(x) is the same as the value of -math\\_ceil(-x).",
+      "description": "```source\nmath_floor(x) → {number}\n```\n\ncomputes the greatest (closest to +∞) Number value that is not greater than `x` and is an integer.  \nIf `x` is already an integer, the result is `x`.\n\nNOTE: The value of math\\_floor(x) is the same as the value of -math\\_ceil(-x).",
       "meta": "func",
       "parameters": [
         "x"
@@ -2822,7 +2822,7 @@
     {
       "label": "math_fround",
       "title": "math_fround(x) → {number}",
-      "description": "```source\nmath\\_fround(x) → {number}\n```\n\nWhen math\\_fround is called with argument `x`, the following steps are taken:\n\n1.  If `x` is NaN, return NaN.\n2.  If `x` is one of +0, -0, +∞, -∞, return `x`.\n3.  Let x32 be the result of converting `x` to a value in IEEE 754-2008 binary32 format using roundTiesToEven mode.\n4.  Let x64 be the result of converting x32 to a value in IEEE 754-2008 binary64 format.\n5.  Return the ECMAScript Number value corresponding to x64.",
+      "description": "```source\nmath_fround(x) → {number}\n```\n\nWhen math\\_fround is called with argument `x`, the following steps are taken:\n\n1.  If `x` is NaN, return NaN.\n2.  If `x` is one of +0, -0, +∞, -∞, return `x`.\n3.  Let x32 be the result of converting `x` to a value in IEEE 754-2008 binary32 format using roundTiesToEven mode.\n4.  Let x64 be the result of converting x32 to a value in IEEE 754-2008 binary64 format.\n5.  Return the ECMAScript Number value corresponding to x64.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2831,14 +2831,14 @@
     {
       "label": "math_hypot",
       "title": "math_hypot() → {number}",
-      "description": "```source\nmath\\_hypot() → {number}\n```\n\ncomputes the square root of the sum of squares of its arguments.  \nIf no arguments are passed, the result is +0.",
+      "description": "```source\nmath_hypot() → {number}\n```\n\ncomputes the square root of the sum of squares of its arguments.  \nIf no arguments are passed, the result is +0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_imul",
       "title": "math_imul(x, x) → {number}",
-      "description": "```source\nmath\\_imul(x, x) → {number}\n```\n\nWhen math\\_imul is called with arguments `x` and `y`, the following steps are taken:\n\n1.  Let a be ToUint32(x).\n2.  Let b be ToUint32(y).\n3.  Let product be (a × b) modulo 232.\n4.  If product ≥ 231, return product - 232; otherwise return product.",
+      "description": "```source\nmath_imul(x, x) → {number}\n```\n\nWhen math\\_imul is called with arguments `x` and `y`, the following steps are taken:\n\n1.  Let a be ToUint32(x).\n2.  Let b be ToUint32(y).\n3.  Let product be (a × b) modulo 232.\n4.  If product ≥ 231, return product - 232; otherwise return product.",
       "meta": "func",
       "parameters": [
         "x",
@@ -2848,7 +2848,7 @@
     {
       "label": "math_log",
       "title": "math_log(x) → {number}",
-      "description": "```source\nmath\\_log(x) → {number}\n```\n\nComputes the natural logarithm of `x`.",
+      "description": "```source\nmath_log(x) → {number}\n```\n\nComputes the natural logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2857,7 +2857,7 @@
     {
       "label": "math_log1p",
       "title": "math_log1p(x) → {number}",
-      "description": "```source\nmath\\_log1p(x) → {number}\n```\n\ncomputes the natural logarithm of 1 + `x`. The result is computed in a way that is accurate even when the value of `x` is close to zero.",
+      "description": "```source\nmath_log1p(x) → {number}\n```\n\ncomputes the natural logarithm of 1 + `x`. The result is computed in a way that is accurate even when the value of `x` is close to zero.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2866,7 +2866,7 @@
     {
       "label": "math_log2",
       "title": "math_log2(x) → {number}",
-      "description": "```source\nmath\\_log2(x) → {number}\n```\n\ncomputes the base 2 logarithm of `x`.",
+      "description": "```source\nmath_log2(x) → {number}\n```\n\ncomputes the base 2 logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2875,7 +2875,7 @@
     {
       "label": "math_log10",
       "title": "math_log10(x) → {number}",
-      "description": "```source\nmath\\_log10(x) → {number}\n```\n\ncomputes the base 10 logarithm of `x`.",
+      "description": "```source\nmath_log10(x) → {number}\n```\n\ncomputes the base 10 logarithm of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2884,21 +2884,21 @@
     {
       "label": "math_max",
       "title": "math_max() → {number}",
-      "description": "```source\nmath\\_max() → {number}\n```\n\nGiven zero or more numbers, returns the largest of them.  \nIf no arguments are given, the result is -∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the largest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
+      "description": "```source\nmath_max() → {number}\n```\n\nGiven zero or more numbers, returns the largest of them.  \nIf no arguments are given, the result is -∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the largest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_min",
       "title": "math_min() → {number}",
-      "description": "```source\nmath\\_min() → {number}\n```\n\nGiven zero or more arguments, returns the smallest of them.  \nIf no arguments are given, the result is +∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the smallest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
+      "description": "```source\nmath_min() → {number}\n```\n\nGiven zero or more arguments, returns the smallest of them.  \nIf no arguments are given, the result is +∞.  \nIf any value is NaN, the result is NaN. The comparison of values to determine the smallest value is done using the Abstract Relational Comparison algorithm except that +0 is considered to be larger than -0.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_pow",
       "title": "math_pow(base, exponent) → {number}",
-      "description": "```source\nmath\\_pow(base, exponent) → {number}\n```\n\nComputes the result of raising base to the power of exponent.",
+      "description": "```source\nmath_pow(base, exponent) → {number}\n```\n\nComputes the result of raising base to the power of exponent.",
       "meta": "func",
       "parameters": [
         "base",
@@ -2908,14 +2908,14 @@
     {
       "label": "math_random",
       "title": "math_random() → {number}",
-      "description": "```source\nmath\\_random() → {number}\n```\n\nReturns a number value with positive sign, greater than or equal to 0 but less than 1, chosen randomly or pseudo randomly with approximately uniform distribution over that range, using an implementation-dependent algorithm or strategy. This function takes no arguments. Each math\\_random function created for distinct realms must produce a distinct sequence of values from successive calls.",
+      "description": "```source\nmath_random() → {number}\n```\n\nReturns a number value with positive sign, greater than or equal to 0 but less than 1, chosen randomly or pseudo randomly with approximately uniform distribution over that range, using an implementation-dependent algorithm or strategy. This function takes no arguments. Each math\\_random function created for distinct realms must produce a distinct sequence of values from successive calls.",
       "meta": "func",
       "parameters": []
     },
     {
       "label": "math_round",
       "title": "math_round(x) → {number}",
-      "description": "```source\nmath\\_round(x) → {number}\n```\n\nReturns the number value that is closest to `x` and is an integer.  \nIf two integers are equally close to `x`, then the result is the Number value that is closer to +∞. If `x` is already an integer, the result is `x`. NOTE 1: math\\_round(3.5) returns 4, but math\\_round(-3.5) returns -3.",
+      "description": "```source\nmath_round(x) → {number}\n```\n\nReturns the number value that is closest to `x` and is an integer.  \nIf two integers are equally close to `x`, then the result is the Number value that is closer to +∞. If `x` is already an integer, the result is `x`. NOTE 1: math\\_round(3.5) returns 4, but math\\_round(-3.5) returns -3.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2924,7 +2924,7 @@
     {
       "label": "math_sign",
       "title": "math_sign(x) → {number}",
-      "description": "```source\nmath\\_sign(x) → {number}\n```\n\nComputes the sign of `x`, indicating whether `x` is positive, negative, or zero.",
+      "description": "```source\nmath_sign(x) → {number}\n```\n\nComputes the sign of `x`, indicating whether `x` is positive, negative, or zero.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2933,7 +2933,7 @@
     {
       "label": "math_sin",
       "title": "math_sin(x) → {number}",
-      "description": "```source\nmath\\_sin(x) → {number}\n```\n\nComputes the sine of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_sin(x) → {number}\n```\n\nComputes the sine of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2942,7 +2942,7 @@
     {
       "label": "math_sinh",
       "title": "math_sinh(x) → {number}",
-      "description": "```source\nmath\\_sinh(x) → {number}\n```\n\nComputes the hyperbolic sine of `x`.\n\nNOTE: The value of sinh(x) is the same as (exp(x) - exp(-x)) / 2.",
+      "description": "```source\nmath_sinh(x) → {number}\n```\n\nComputes the hyperbolic sine of `x`.\n\nNOTE: The value of sinh(x) is the same as (exp(x) - exp(-x)) / 2.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2951,7 +2951,7 @@
     {
       "label": "math_sqrt",
       "title": "math_sqrt(x) → {number}",
-      "description": "```source\nmath\\_sqrt(x) → {number}\n```\n\nComputes the square root of `x`.",
+      "description": "```source\nmath_sqrt(x) → {number}\n```\n\nComputes the square root of `x`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2960,7 +2960,7 @@
     {
       "label": "math_tan",
       "title": "math_tan(x) → {number}",
-      "description": "```source\nmath\\_tan(x) → {number}\n```\n\nComputes the tangent of `x`. The argument is expressed in radians.",
+      "description": "```source\nmath_tan(x) → {number}\n```\n\nComputes the tangent of `x`. The argument is expressed in radians.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2969,7 +2969,7 @@
     {
       "label": "math_tanh",
       "title": "math_tanh(x) → {number}",
-      "description": "```source\nmath\\_tanh(x) → {number}\n```\n\nComputes the hyperbolic tangent of `x`.\n\nNOTE: The value of `math_tanh(x)` is the same as `(exp(x) - exp(-x))/(exp(x) + exp(-x))`.",
+      "description": "```source\nmath_tanh(x) → {number}\n```\n\nComputes the hyperbolic tangent of `x`.\n\nNOTE: The value of `math_tanh(x)` is the same as `(exp(x) - exp(-x))/(exp(x) + exp(-x))`.",
       "meta": "func",
       "parameters": [
         "x"
@@ -2978,7 +2978,7 @@
     {
       "label": "math_trunc",
       "title": "math_trunc(x) → {number}",
-      "description": "```source\nmath\\_trunc(x) → {number}\n```\n\nComputes the integral part of the number `x`, removing any fractional digits.",
+      "description": "```source\nmath_trunc(x) → {number}\n```\n\nComputes the integral part of the number `x`, removing any fractional digits.",
       "meta": "func",
       "parameters": [
         "x"
@@ -3016,7 +3016,7 @@
     {
       "label": "parse_int",
       "title": "parse_int(s, i) → {number}",
-      "description": "```source\nparse\\_int(s, i) → {number}\n```\n\nInterprets a given string `s` as an integer, using the positive integer `i` as radix, and returns the respective value.  \nExamples: `parse_int(\"909\", 10)` returns the number `909`, and `parse_int(\"-1111\", 2)` returns the number `-15`.  \nSee [ECMAScript Specification, Section 18.2.5](https://www.ecma-international.org/ecma-262/9.0/index.html#sec-parseint-string-radix) for details.",
+      "description": "```source\nparse_int(s, i) → {number}\n```\n\nInterprets a given string `s` as an integer, using the positive integer `i` as radix, and returns the respective value.  \nExamples: `parse_int(\"909\", 10)` returns the number `909`, and `parse_int(\"-1111\", 2)` returns the number `-15`.  \nSee [ECMAScript Specification, Section 18.2.5](https://www.ecma-international.org/ecma-262/9.0/index.html#sec-parseint-string-radix) for details.",
       "meta": "func",
       "parameters": [
         "s",
@@ -3045,7 +3045,7 @@
     {
       "label": "remove_all",
       "title": "remove_all(v, xs) → {list}",
-      "description": "```source\nremove\\_all(v, xs) → {list}\n```\n\nReturns a list that results from `xs` by removing all items from `xs` that are identical (`===`) to `v`. Returns the original list if there is no occurrence. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is the length of `xs`.",
+      "description": "```source\nremove_all(v, xs) → {list}\n```\n\nReturns a list that results from `xs` by removing all items from `xs` that are identical (`===`) to `v`. Returns the original list if there is no occurrence. Iterative process; time: `Theta(n)`, space: `Theta(n)`, where `n` is the length of `xs`.",
       "meta": "func",
       "parameters": [
         "v",
@@ -3064,7 +3064,7 @@
     {
       "label": "set_head",
       "title": "set_head(p, x) → {undefined}",
-      "description": "```source\nset\\_head(p, x) → {undefined}\n```\n\nchanges the pair `p` such that its head is `x`.",
+      "description": "```source\nset_head(p, x) → {undefined}\n```\n\nchanges the pair `p` such that its head is `x`.",
       "meta": "func",
       "parameters": [
         "p",
@@ -3074,7 +3074,7 @@
     {
       "label": "set_tail",
       "title": "set_tail(p, x) → {undefined}",
-      "description": "```source\nset\\_tail(p, x) → {undefined}\n```\n\nchanges the pair `p` such that its tail is `x`.",
+      "description": "```source\nset_tail(p, x) → {undefined}\n```\n\nchanges the pair `p` such that its tail is `x`.",
       "meta": "func",
       "parameters": [
         "p",
@@ -3092,7 +3092,7 @@
     {
       "label": "stream_append",
       "title": "stream_append(xs, ys) → {stream}",
-      "description": "```source\nstream\\_append(xs, ys) → {stream}\n```\n\nReturns a stream that results from appending the stream `ys` to the stream `xs`. In the result, null at the end of the first argument stream is replaced by the second argument, regardless what the second argument consists of. Lazy? Yes: the result stream forces the actual append operation",
+      "description": "```source\nstream_append(xs, ys) → {stream}\n```\n\nReturns a stream that results from appending the stream `ys` to the stream `xs`. In the result, null at the end of the first argument stream is replaced by the second argument, regardless what the second argument consists of. Lazy? Yes: the result stream forces the actual append operation",
       "meta": "func",
       "parameters": [
         "xs",
@@ -3102,7 +3102,7 @@
     {
       "label": "stream_filter",
       "title": "stream_filter(pred, xs) → {stream}",
-      "description": "```source\nstream\\_filter(pred, xs) → {stream}\n```\n\nReturns a stream that contains only those elements of given stream `xs` for which the one-argument function `pred` returns `true`. Lazy? Yes: The result stream forces the construction of each next element. Of course, the construction of the next element needs to go down the stream until an element is found for which `pred` holds.",
+      "description": "```source\nstream_filter(pred, xs) → {stream}\n```\n\nReturns a stream that contains only those elements of given stream `xs` for which the one-argument function `pred` returns `true`. Lazy? Yes: The result stream forces the construction of each next element. Of course, the construction of the next element needs to go down the stream until an element is found for which `pred` holds.",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -3112,7 +3112,7 @@
     {
       "label": "stream_for_each",
       "title": "stream_for_each(f, xs) → {boolean}",
-      "description": "```source\nstream\\_for\\_each(f, xs) → {boolean}\n```\n\nApplies unary function `f` to every element of the stream `xs`. Iterative process. `f` is applied element-by-element: `stream_for_each(f, stream(1, 2))` results in the calls `f(1)` and `f(2)`. Lazy? No: `stream_for_each` forces the exploration of the entire stream",
+      "description": "```source\nstream_for_each(f, xs) → {boolean}\n```\n\nApplies unary function `f` to every element of the stream `xs`. Iterative process. `f` is applied element-by-element: `stream_for_each(f, stream(1, 2))` results in the calls `f(1)` and `f(2)`. Lazy? No: `stream_for_each` forces the exploration of the entire stream",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -3122,7 +3122,7 @@
     {
       "label": "stream_length",
       "title": "stream_length(xs) → {number}",
-      "description": "```source\nstream\\_length(xs) → {number}\n```\n\nReturns the length of the stream `xs`. Iterative process. Lazy? No: The function needs to explore the whole stream",
+      "description": "```source\nstream_length(xs) → {number}\n```\n\nReturns the length of the stream `xs`. Iterative process. Lazy? No: The function needs to explore the whole stream",
       "meta": "func",
       "parameters": [
         "xs"
@@ -3131,7 +3131,7 @@
     {
       "label": "stream_map",
       "title": "stream_map(f, xs) → {stream}",
-      "description": "```source\nstream\\_map(f, xs) → {stream}\n```\n\nReturns a stream that results from stream `xs` by element-wise application of unary function `f`. `f` is applied element-by-element: `stream_map(f, stream(1,2))` results in the same as `stream(f(1),f(2))`. Lazy? Yes: The argument stream is only explored as forced by the result stream.",
+      "description": "```source\nstream_map(f, xs) → {stream}\n```\n\nReturns a stream that results from stream `xs` by element-wise application of unary function `f`. `f` is applied element-by-element: `stream_map(f, stream(1,2))` results in the same as `stream(f(1),f(2))`. Lazy? Yes: The argument stream is only explored as forced by the result stream.",
       "meta": "func",
       "parameters": [
         "x => ",
@@ -3141,7 +3141,7 @@
     {
       "label": "stream_member",
       "title": "stream_member(v, xs) → {stream}",
-      "description": "```source\nstream\\_member(v, xs) → {stream}\n```\n\nReturns first postfix substream whose head is identical to `v` (using `===`); returns `null` if the element does not occur in the stream. Iterative process. Lazy? Sort-of: `stream_member` forces the stream only until the element is found.",
+      "description": "```source\nstream_member(v, xs) → {stream}\n```\n\nReturns first postfix substream whose head is identical to `v` (using `===`); returns `null` if the element does not occur in the stream. Iterative process. Lazy? Sort-of: `stream_member` forces the stream only until the element is found.",
       "meta": "func",
       "parameters": [
         "v",
@@ -3151,7 +3151,7 @@
     {
       "label": "stream_ref",
       "title": "stream_ref(xs, n) → {value}",
-      "description": "```source\nstream\\_ref(xs, n) → {value}\n```\n\nReturns the element of stream `xs` at position `n`, where the first element has index 0. Iterative process. Lazy? Sort-of: `stream_ref` only forces the computation of the first `n` elements, and leaves the rest of the stream untouched.",
+      "description": "```source\nstream_ref(xs, n) → {value}\n```\n\nReturns the element of stream `xs` at position `n`, where the first element has index 0. Iterative process. Lazy? Sort-of: `stream_ref` only forces the computation of the first `n` elements, and leaves the rest of the stream untouched.",
       "meta": "func",
       "parameters": [
         "xs",
@@ -3161,7 +3161,7 @@
     {
       "label": "stream_remove",
       "title": "stream_remove(v, xs) → {stream}",
-      "description": "```source\nstream\\_remove(v, xs) → {stream}\n```\n\nReturns a stream that results from `xs` by removing the first item from `xs` that is identical (`===`) to `v`. Returns the original stream if there is no occurrence. Lazy? Yes: the result stream forces the construction of each next element",
+      "description": "```source\nstream_remove(v, xs) → {stream}\n```\n\nReturns a stream that results from `xs` by removing the first item from `xs` that is identical (`===`) to `v`. Returns the original stream if there is no occurrence. Lazy? Yes: the result stream forces the construction of each next element",
       "meta": "func",
       "parameters": [
         "v",
@@ -3171,7 +3171,7 @@
     {
       "label": "stream_remove_all",
       "title": "stream_remove_all(v, xs) → {stream}",
-      "description": "```source\nstream\\_remove\\_all(v, xs) → {stream}\n```\n\nReturns a stream that results from `xs` by removing all items from `xs` that are identical (`===`) to `v`. Returns the original stream if there is no occurrence. Recursive process. Lazy? Yes: the result stream forces the construction of each next element",
+      "description": "```source\nstream_remove_all(v, xs) → {stream}\n```\n\nReturns a stream that results from `xs` by removing all items from `xs` that are identical (`===`) to `v`. Returns the original stream if there is no occurrence. Recursive process. Lazy? Yes: the result stream forces the construction of each next element",
       "meta": "func",
       "parameters": [
         "v",
@@ -3181,7 +3181,7 @@
     {
       "label": "stream_reverse",
       "title": "stream_reverse(xs) → {stream}",
-      "description": "```source\nstream\\_reverse(xs) → {stream}\n```\n\nReturns stream `xs` in reverse order. Iterative process. The process is iterative, but consumes space `Omega(n)` because of the result stream. Lazy? No: `stream_reverse` forces the exploration of the entire stream",
+      "description": "```source\nstream_reverse(xs) → {stream}\n```\n\nReturns stream `xs` in reverse order. Iterative process. The process is iterative, but consumes space `Omega(n)` because of the result stream. Lazy? No: `stream_reverse` forces the exploration of the entire stream",
       "meta": "func",
       "parameters": [
         "xs"
@@ -3190,7 +3190,7 @@
     {
       "label": "stream_tail",
       "title": "stream_tail(xs) → {Stream}",
-      "description": "```source\nstream\\_tail(xs) → {Stream}\n```\n\nassumes that the tail (second component) of the pair {x} is a nullary function, and returns the result of applying that function. Throws an exception if the argument is not a pair, or if the tail is not a function. Laziness: Yes: {stream\\_tail} only forces the direct tail stream, but not the rest of the stream, i.e. not the tail of the tail, etc.",
+      "description": "```source\nstream_tail(xs) → {Stream}\n```\n\nassumes that the tail (second component) of the pair {x} is a nullary function, and returns the result of applying that function. Throws an exception if the argument is not a pair, or if the tail is not a function. Laziness: Yes: {stream\\_tail} only forces the direct tail stream, but not the rest of the stream, i.e. not the tail of the tail, etc.",
       "meta": "func",
       "parameters": [
         "xs"
@@ -3199,7 +3199,7 @@
     {
       "label": "stream_to_list",
       "title": "stream_to_list(xs) → {list}",
-      "description": "```source\nstream\\_to\\_list(xs) → {list}\n```\n\nGiven stream `xs`, returns a list of same length with the same elements as `xs` in the same order. Laziness: No: `stream_to_list` needs to force the whole stream.",
+      "description": "```source\nstream_to_list(xs) → {list}\n```\n\nGiven stream `xs`, returns a list of same length with the same elements as `xs` in the same order. Laziness: No: `stream_to_list` needs to force the whole stream.",
       "meta": "func",
       "parameters": [
         "xs"
