@@ -111,7 +111,7 @@ export function getNodeChildren(node: es.Node, allChildren = false): es.Node[] {
       return node.argument ? [node.argument] : []
     case 'FunctionDeclaration':
       const func_id: es.Node[] = (allChildren && node.id) ? [node.id] : []
-      return func_id.concat([node.body])
+      return func_id.concat(allChildren ? node.params : [], [node.body])
     case 'VariableDeclaration':
       return node.declarations.flatMap(x => getNodeChildren(x, allChildren))
     case 'VariableDeclarator':
@@ -123,7 +123,7 @@ export function getNodeChildren(node: es.Node, allChildren = false): es.Node[] {
     case 'ImportSpecifier':
       return [node.imported, node.local]
     case 'ArrowFunctionExpression':
-      return [node.body]
+      return (allChildren ? (node.params as es.Node[]) : []).concat(node.body)
     case 'FunctionExpression':
       return [node.body]
     case 'UnaryExpression':
@@ -252,7 +252,7 @@ export function esPosInSourceLoc(pos: es.Position, loc: es.SourceLocation) {
 }
 
 export function sourceLocInSourceLoc(inner: es.SourceLocation, outer: es.SourceLocation) {
-  return vsPosInSourceLoc({ line: inner.start.line - 1, character: inner.start.column }, outer) && vsPosInSourceLoc({ line: inner.end.line - 1, character: inner.end.column }, outer);
+  return esPosInSourceLoc(inner.start, outer) && esPosInSourceLoc(inner.end, outer);
 }
 
 export function sourceLocEquals(s1: es.SourceLocation, s2: es.SourceLocation) {

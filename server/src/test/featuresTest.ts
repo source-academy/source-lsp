@@ -96,6 +96,56 @@ suite("Rename", () => {
             }
         });
     });
+
+    test("Rename Function Parameters", () => {
+        const text = "function test(arg1) { return arg1; }";
+        const doc = TextDocument.create("test://test/test.sourcejs", 'sourcejs', 0, text);
+        const ast = new AST(text, context, doc.uri);
+        const edits = ast.renameSymbol(
+            { line: 0, character: 15 },
+            'y'
+        )
+
+        assert.deepStrictEqual(edits, {
+            changes: {
+                [doc.uri]: [
+                    {
+                        "range": { "start": { "line": 0, "character": 14 }, "end": { "line": 0, "character": 18 } },
+                        "newText": "y"
+                    },
+                    {
+                        "range": { "start": { "line": 0, "character": 29 }, "end": { "line": 0, "character": 33 } },
+                        "newText": "y"
+                    }
+                ]
+            }
+        })
+    })
+
+    test("Rename Lambda Parameters", () => {
+        const text = "const test = (arg1) => { return arg1; }";
+        const doc = TextDocument.create("test://test/test.sourcejs", 'sourcejs', 0, text);
+        const ast = new AST(text, context, doc.uri);
+        const edits = ast.renameSymbol(
+            { line: 0, character: 15 },
+            'y'
+        )
+
+        assert.deepStrictEqual(edits, {
+            changes: {
+                [doc.uri]: [
+                    {
+                        "range": { "start": { "line": 0, "character": 14 }, "end": { "line": 0, "character": 18 } },
+                        "newText": "y"
+                    },
+                    {
+                        "range": { "start": { "line": 0, "character": 32 }, "end": { "line": 0, "character": 36 } },
+                        "newText": "y"
+                    }
+                ]
+            }
+        })
+    })
 });
 
 suite("Document Symbols", () => {

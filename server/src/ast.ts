@@ -195,7 +195,7 @@ export class AST {
                 }
                 const param_declaration: ParameterSymbol = {
                   name: name,
-                  scope: lambda.body.loc!,
+                  scope: lambda.loc!,
                   meta: this.context.chapter == Chapter.SOURCE_1 || this.context.chapter === Chapter.SOURCE_2 ? "const" : "let",
                   declarationKind: DeclarationKind.KIND_PARAM,
                   range: sourceLocToRange(param.loc!),
@@ -241,7 +241,8 @@ export class AST {
           }
           const param_declaration: ParameterSymbol = {
             name: name,
-            scope: child.body.loc!,
+            // Set the scope to the function loc so that the parameter can be renamed
+            scope: child.loc!,
             meta: this.context.chapter == Chapter.SOURCE_1 || this.context.chapter === Chapter.SOURCE_2 ? "const" : "let",
             declarationKind: DeclarationKind.KIND_PARAM,
             range: sourceLocToRange(loc),
@@ -351,12 +352,12 @@ export class AST {
         scopeFound = true;
       if (scopeFound && node.type === NODES.IDENTIFIER && node.name === identifier.name)
         ret.push(sourceLocToRange(node.loc!))
-
+      
       getNodeChildren(node, true).forEach(node => {
         if (
           scopeFound
           // We want to ignore scopes where the variable was redeclared
-          // This occurs when there is an inner scope in the scope of our declaration, and the child node belongs in that scope
+          // This occurs when there is a declaration with a scope in the scope of our original declaration, and the child node belongs in that scope
           && !this.declarations.get(identifier.name)?.some(x => !sourceLocEquals(x.scope, declaration.scope) && sourceLocInSourceLoc(x.scope, declaration.scope) && sourceLocInSourceLoc(node.loc!, x.scope))
           || (!scopeFound && node.loc && sourceLocInSourceLoc(declaration.scope, node.loc))
         )
@@ -387,8 +388,10 @@ export class AST {
     // This leads to an error in the client, as there are two changes to the program that have overlapping ranges
     // For now, if the name that the user is trying to rename is an imported name, we don't allow renames
     // I will leave this for a future CP3108 student to fix :)
+
     const identifier = this.findIdentifierNode(vsPosToEsPos(pos));
     if (!identifier) return null;
+
 
     const declaration = this.findDeclarationByName(identifier.name, identifier.loc!);
     if (!declaration || declaration.declarationKind === DeclarationKind.KIND_IMPORT) return null;
