@@ -1,5 +1,0 @@
-true === 1;
-true === (1 === 1);
-(1 === 1) === undefined;
-1 === undefined;
-"string" === 1;

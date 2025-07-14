@@ -10,6 +10,9 @@ export const literalRule = new class extends Rule<Literal> {
           if (child.raw!.length < 2 || !child.raw!.endsWith(child.raw!.charAt(0)))
             ast.addDiagnostic("Incomplete string expression", DiagnosticSeverity.Error, child.loc!);
         }
+        if ("regex" in child) {
+          ast.addDiagnostic("RegExp literals are not allowed", DiagnosticSeverity.Error, child.loc!);
+        }
         if (child.value === null && context.chapter == Chapter.SOURCE_1)
           ast.addDiagnostic("Null literals not allowed", DiagnosticSeverity.Error, child.loc!)
     }
