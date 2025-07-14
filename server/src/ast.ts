@@ -79,10 +79,11 @@ export class AST {
       val[0](val[1]);
     })
 
+
     this.declarations.forEach(declarationList => {
       for (let i = 0; i < declarationList.length; i++) {
         const declaration = declarationList[i];
-        if (declaration.unused && declaration.name !== "✖")
+        if (declaration.unused && declaration.name !== "✖" && declaration.range.start.line >= this.prependLines)
           this.addDiagnostic("Unused name", DiagnosticSeverity.Warning, rangeToSourceLoc(declaration.selectionRange), [DiagnosticTag.Unnecessary]);
       }
     })
